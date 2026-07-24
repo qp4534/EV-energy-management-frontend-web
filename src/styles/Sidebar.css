@@ -1,0 +1,83 @@
+/* 사이드바 전체 외곽 틀 (검은색 둥근 캡슐 형태) */
+.sidebar {
+  width: 72px;
+  height: 98%; /* 화면 높이에 맞춰 조절 가능 */
+  background-color: #0b0c10;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 8px;
+  margin: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+}
+
+/* 맨 위 격자 버튼 */
+.grid-btn {
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 10px;
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.grid-btn:hover {
+  border-color: #666;
+}
+
+/* 네비게이션 아이콘 리스트 */
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* 기본 아이콘 버튼 스타일 */
+.nav-item {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  color: #a0a5b1; /* 기본 비활성화 아이콘 색상 */
+  font-size: 22px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  color: #ffffff;
+}
+
+/* 활성화된(선택된) 메뉴 스타일 - 흰색 배경 */
+.nav-item.active {
+  background-color: #ffffff;
+  color: #000000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 하단 설정 아이콘 영역 */
+.sidebar-bottom {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
