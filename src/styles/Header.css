@@ -1,0 +1,79 @@
+.header {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  background-color: transparent;
+}
+
+/* 좌측 로고 및 타이틀 */
+.header-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 이미지 상단에 있던 작고 흐린 텍스트 */
+.page-subtitle {
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 번개 아이콘 (초록색) */
+.logo-icon {
+  font-size: 32px;
+  color: #00c853; /* 선명한 초록색 */
+  transform: rotate(-10deg);
+}
+
+/* MijungE 로고 텍스트 */
+.logo-text {
+  font-size: 28px;
+  font-weight: 800;
+  color: #123428; /* 어두운 딥그린 */
+  letter-spacing: -0.5px;
+}
+
+/* 우측 사용자 프로필 카드 */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  padding: 6px 14px 6px 8px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.user-icon-bg {
+  width: 28px;
+  height: 28px;
+  background-color: #e8f5e9;
+  color: #00c853;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+}
