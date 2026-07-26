@@ -1,6 +1,11 @@
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
-import ControllerMain from "./pages/ControllerMain";
+import ControllerMain from "./pages/Controller/ControllerMain";
+import DangerCar from "./pages/Controller/DangerCar";
+import ControllMap from "./pages/Controller/ControllerMap";
+import CarDetail from "./pages/Controller/CarDetail";
+import AiReportList from "./pages/Controller/AiReportList";
+import AiReportDetail from "./pages/Controller/AiReportDetail";
 import AdministratorMain from "./pages/AdministratorMain";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
@@ -10,7 +15,7 @@ function App() {
   // 사용자 역할 상태를 관리하는 state
   // 'controller' | 'administrator'
   // 개발하실때 useState('controller')로 설정하시면 관리자 화면이 보여요!(백엔드랑 권한 설정 넣기 전까진 이렇게 해용!)
-  const [userRole, setUserRole] = useState("controller");
+  const [userRole, setUserRole] = useState("administrator");
 
   return (
     <div className="app-container">
@@ -20,7 +25,17 @@ function App() {
         <main className="content-area">
           <Routes>
             {userRole === "controller" ? (
-              <Route path="/controller" element={<ControllerMain />} />
+              <>
+                <Route path="/controller" element={<ControllerMain />} />
+                <Route path="/controller/stat" element={<DangerCar />} />
+                <Route path="/controller/map" element={<ControllMap />} />
+                <Route path="/controller/stat/:id" element={<CarDetail />} />
+                <Route path="/controller/reports" element={<AiReportList />} />
+                <Route
+                  path="/controller/reports/:id"
+                  element={<AiReportDetail />}
+                />
+              </>
             ) : (
               <Route path="/administrator" element={<AdministratorMain />} />
             )}
