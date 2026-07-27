@@ -2,14 +2,14 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8080",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// 추후 JWT 토큰 등이 필요할 때 여기서 인터셉터 처리
+// 인터셉터 처리
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
