@@ -1,0 +1,1 @@
+// ANOMALY_LOGS, THERMAL_VIDEO_STREAMS와 관련된 api를 관리할 예정
