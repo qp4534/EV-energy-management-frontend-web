@@ -1,0 +1,28 @@
+/* 대시보드 전체 컨테이너 */
+.controller-main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 섹션 간 세로 간격 */
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* 2열 배치 Grid (1:1 비율) */
+.dashboard-grid.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 좌우 1:1 분할 */
+  gap: 20px; /* 좌우 카드 간격 */
+}
+
+/* 각 자식 카드 컴포넌트들에 공통 적용할 설정 */
+.dashboard-grid > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 화면이 작아졌을 때 (모바일/작은 모니터) 1열로 자동 전환되도록 설정 */
+@media (max-width: 1024px) {
+  .dashboard-grid.grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
