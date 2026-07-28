@@ -19,6 +19,16 @@ export const useCarList = () => {
   });
 };
 
+// 차량 요약 목록 조회 훅 (상위 5개)
+export const useCarSummaryList = () => {
+  return useQuery({
+    queryKey: ["carSummaryList"],
+    queryFn: carService.getCarSummaryList,
+    refetchInterval: 5000, // 실시간 갱신이 필요하다면 5초 간격 refetch (선택)
+    staleTime: 1000 * 60, // 1분간 캐시 유지
+  });
+};
+
 // 최근 위험 차량 수 (일별) 조회 훅
 export const useDailyDangerCarCount = () => {
   return useQuery({

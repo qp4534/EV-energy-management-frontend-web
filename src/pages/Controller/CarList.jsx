@@ -1,5 +1,5 @@
 import React from "react";
 
-export default function DangerCar() {
+export default function CarList() {
   return <div>DangerCar</div>;
 }
