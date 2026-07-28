@@ -42,9 +42,11 @@ export default function MapCard() {
   }
 
   return (
-    <div className="card">
-      <h2>위험 차량 / 충전소 지도</h2>
-      <div className="grid grid-cols-4 gap-x-8 items-center">
+    <div className="card flex flex-col gap-2">
+      <div>
+        <h2>위험 차량 / 충전소 지도</h2>
+      </div>
+      <div className="grid grid-cols-4 gap-x-4 items-center">
         <div className="col-span-3">
           <Map stations={stations} vehicles={vehicles} />
         </div>
