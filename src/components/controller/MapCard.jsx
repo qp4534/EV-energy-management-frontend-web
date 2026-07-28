@@ -19,10 +19,12 @@ export default function MapCard() {
     {
       icon: <FaCar className="text-white" />,
       color: "bg-[#FF0000]",
+      label: "긴급 차량",
     },
     {
       icon: <FaCar className="text-white" />,
       color: "bg-[#FF9900]",
+      label: "경고 차량",
     },
     {
       icon: <FaCar className="text-white" />,
