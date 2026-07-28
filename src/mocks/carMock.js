@@ -41,3 +41,11 @@ export const MOCK_CARS = [
     status: "caution", // 주의 -> caution
   },
 ];
+
+export const MOCK_ANOMALY_DAILY_COUNTS = [
+  { date: "7/12", count: 2 },
+  { date: "7/13", count: 4 },
+  { date: "7/14", count: 1 },
+  { date: "7/15", count: 3 },
+  { date: "7/16", count: 2 },
+];

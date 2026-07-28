@@ -2,6 +2,7 @@ import React from "react";
 import Map from "./Map";
 import { useStations } from "@/hooks/queries/useCharging";
 import { useCarList } from "@/hooks/queries/useCar";
+import ExpandButton from "../ExpandButton";
 
 import { FaGasPump } from "react-icons/fa";
 import { FaCar } from "react-icons/fa6";
@@ -19,10 +20,12 @@ export default function MapCard() {
     {
       icon: <FaCar className="text-white" />,
       color: "bg-[#FF0000]",
+      label: "긴급 차량",
     },
     {
       icon: <FaCar className="text-white" />,
       color: "bg-[#FF9900]",
+      label: "경고 차량",
     },
     {
       icon: <FaCar className="text-white" />,
@@ -40,10 +43,13 @@ export default function MapCard() {
   }
 
   return (
-    <div className="card">
-      <h2>위험 차량 / 충전소 지도</h2>
-      <div className="grid grid-cols-4 gap-x-8 items-center">
-        <div className="col-span-3">
+    <div className="card flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <h2>위험 차량 / 충전소 지도</h2>
+        <ExpandButton to="/controller/map" />
+      </div>
+      <div className="grid grid-cols-4 gap-x-4 items-center">
+        <div className="col-span-3 h-[240px]">
           <Map stations={stations} vehicles={vehicles} />
         </div>
         <div className="col-span-1 flex flex-col gap-6">

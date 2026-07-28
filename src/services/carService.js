@@ -1,7 +1,11 @@
 // 자동차와 관련된 api를 관리할 예정
 // CAR를 관리할 예정
 import api from "../api/axios";
-import { MOCK_CAR_STATS, MOCK_CARS } from "../mocks/carMock";
+import {
+  MOCK_CAR_STATS,
+  MOCK_CARS,
+  MOCK_ANOMALY_DAILY_COUNTS,
+} from "../mocks/carMock";
 
 const USE_MOCK = true;
 
@@ -23,6 +27,16 @@ export const carService = {
       return MOCK_CARS;
     }
     const response = await api.get("/api/v1/cars");
+    return response.data;
+  },
+
+  // 일별 위험 차량 수량 조회
+  getDailyDangerCarCount: async () => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return MOCK_ANOMALY_DAILY_COUNTS;
+    }
+    const response = await api.get("/api/v1/anomaly-logs/daily-count");
     return response.data;
   },
 };
