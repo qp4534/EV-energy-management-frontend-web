@@ -18,3 +18,12 @@ export const useCarList = () => {
     staleTime: 1000 * 60 * 5, // 5분 캐싱
   });
 };
+
+// 최근 위험 차량 수 (일별) 조회 훅
+export const useDailyDangerCarCount = () => {
+  return useQuery({
+    queryKey: ["dailyDangerCarCount"],
+    queryFn: carService.getDailyDangerCarCount,
+    staleTime: 1000 * 60 * 5,
+  });
+};

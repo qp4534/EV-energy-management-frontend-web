@@ -58,8 +58,8 @@ export default function Map({ stations = [], vehicles = [] }) {
   }, [map, stations, vehicles]);
 
   return (
-    <div className="w-full rounded-xl overflow-hidden shadow-sm border border-gray-200 relative">
-      <div ref={mapContainer} style={{ width: "100%", height: "300px" }} />
+    <div className="w-full h-full rounded-xl overflow-hidden shadow-sm border border-gray-200 relative">
+      <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
 
       {map &&
         stations.map((s, idx) => (
