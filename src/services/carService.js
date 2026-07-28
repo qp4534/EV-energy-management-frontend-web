@@ -1,7 +1,7 @@
 // 자동차와 관련된 api를 관리할 예정
 // CAR를 관리할 예정
 import api from "../api/axios";
-import { MOCK_CAR_STATS, MOCK_CAR_LIST } from "../mocks/carMock";
+import { MOCK_CAR_STATS, MOCK_CARS } from "../mocks/carMock";
 
 const USE_MOCK = true;
 
@@ -20,7 +20,7 @@ export const carService = {
   getCarList: async () => {
     if (USE_MOCK) {
       await new Promise((resolve) => setTimeout(resolve, 300));
-      return MOCK_CAR_LIST;
+      return MOCK_CARS;
     }
     const response = await api.get("/api/v1/cars");
     return response.data;
