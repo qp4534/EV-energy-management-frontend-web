@@ -1,16 +1,16 @@
 // CarPin.jsx
 import { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { FaCar } from "react-icons/fa6"; // 🚗 react-icons 차량 아이콘
+import { FaCar } from "react-icons/fa6";
 
 const bgColors = {
-  danger: "#EF4444", // 빨간색
-  warning: "#F97316", // 주황색
-  caution: "#EAB308", // 노란색
+  danger: "#EF4444",
+  warning: "#F97316",
+  caution: "#EAB308",
 };
 
 const zIndexMap = {
-  danger: 30, // 긴급 차량이 가장 위
+  danger: 30, // 긴급 차량이 가장 위에 가도록
   warning: 20,
   caution: 10,
 };
@@ -33,7 +33,6 @@ export default function CarPin({
 
     const bgColor = bgColors[status] || bgColors.danger;
 
-    // 1. 핀 메인 컨테이너 DOM 생성
     const pinContainer = document.createElement("div");
     pinContainer.style.cssText = `
       position: relative;
@@ -50,7 +49,6 @@ export default function CarPin({
       cursor: pointer;
     `;
 
-    // 2. 아이콘을 감쌀 회전용 내부 DOM 생성
     const iconWrapper = document.createElement("div");
     iconWrapper.style.cssText = `
       transform: rotate(45deg);
@@ -60,7 +58,6 @@ export default function CarPin({
     `;
     pinContainer.appendChild(iconWrapper);
 
-    // 3. react-dom/client를 이용해 react-icon 렌더링 (react-dom-server 불필요)
     const root = ReactDOM.createRoot(iconWrapper);
     root.render(<FaCar size={16} color="white" />);
 
@@ -71,7 +68,6 @@ export default function CarPin({
       };
     }
 
-    // 4. CustomOverlay 생성
     const overlay = new window.kakao.maps.CustomOverlay({
       map: map,
       position: new window.kakao.maps.LatLng(parsedLat, parsedLng),

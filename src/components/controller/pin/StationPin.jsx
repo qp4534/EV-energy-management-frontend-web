@@ -12,7 +12,6 @@ export default function StationPin({ map, lat, lng, name }) {
     if (isNaN(parsedLat) || isNaN(parsedLng) || !parsedLat || !parsedLng)
       return;
 
-    // 1. 핀 메인 컨테이너 DOM 생성
     const pinContainer = document.createElement("div");
     pinContainer.style.cssText = `
       position: relative;
@@ -28,7 +27,6 @@ export default function StationPin({ map, lat, lng, name }) {
       border: 2px solid white;
     `;
 
-    // 2. 아이콘 내부 DOM 생성
     const iconWrapper = document.createElement("div");
     iconWrapper.style.cssText = `
       transform: rotate(45deg);
@@ -38,11 +36,9 @@ export default function StationPin({ map, lat, lng, name }) {
     `;
     pinContainer.appendChild(iconWrapper);
 
-    // 3. react-icon 렌더링
     const root = ReactDOM.createRoot(iconWrapper);
     root.render(<BsFillLightningChargeFill size={16} color="white" />);
 
-    // 4. CustomOverlay 생성
     const overlay = new window.kakao.maps.CustomOverlay({
       map: map,
       position: new window.kakao.maps.LatLng(parsedLat, parsedLng),
