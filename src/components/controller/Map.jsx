@@ -12,7 +12,7 @@ export default function Map({ stations = [], vehicles = [] }) {
     console.log("🚗 수신된 vehicles 데이터:", vehicles);
   }, [vehicles]);
 
-  // 1. 지도 초기화
+  // 지도 초기화
   useEffect(() => {
     if (!mapContainer.current || !window.kakao || !window.kakao.maps) return;
 
@@ -28,7 +28,6 @@ export default function Map({ stations = [], vehicles = [] }) {
     });
   }, []);
 
-  // 2. 좌표 범위 자동 맞춤
   useEffect(() => {
     if (!map || (!stations.length && !vehicles.length)) return;
 
@@ -62,7 +61,6 @@ export default function Map({ stations = [], vehicles = [] }) {
     <div className="w-full rounded-xl overflow-hidden shadow-sm border border-gray-200 relative">
       <div ref={mapContainer} style={{ width: "100%", height: "300px" }} />
 
-      {/* ⚡ 충전소 핀 */}
       {map &&
         stations.map((s, idx) => (
           <StationPin
@@ -74,7 +72,6 @@ export default function Map({ stations = [], vehicles = [] }) {
           />
         ))}
 
-      {/* 🚗 차량 핀 */}
       {map &&
         vehicles.map((v, idx) => {
           const vehicleId = v.id || v.car_id;

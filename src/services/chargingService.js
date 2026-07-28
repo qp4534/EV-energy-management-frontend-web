@@ -7,7 +7,7 @@ import { MOCK_CARS } from "../mocks/carMock"; // 차량 mock도 함께 가져옴
 const USE_MOCK = true;
 
 export const chargingService = {
-  // 1. 충전소 목록 조회
+  // 충전소 목록 조회
   getStations: async () => {
     if (USE_MOCK) {
       return new Promise((resolve) =>
@@ -18,7 +18,7 @@ export const chargingService = {
     return response.data;
   },
 
-  // 2. 충전소 기반 관제 차량 목록 조회 (위치 + 위험도 포함)
+  //충전소 기반 관제 차량 목록 조회 (위치 + 위험도 포함)
   getMonitoringVehicles: async () => {
     if (USE_MOCK) {
       return new Promise((resolve) =>
