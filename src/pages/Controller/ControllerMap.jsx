@@ -1,37 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import Map from "@/components/controller/Map";
+import MapLegend from "@/components/controller/MapLegend";
 import { useStations } from "@/hooks/queries/useCharging";
 import { useCarList } from "@/hooks/queries/useCar";
-
-import { FaGasPump } from "react-icons/fa";
-import { FaCar } from "react-icons/fa6";
 
 export default function ControllerMap() {
   const { data: stations = [], isLoading: isStationsLoading } = useStations();
   const { data: vehicles = [], isLoading: isVehiclesLoading } = useCarList();
 
-  const legendItems = [
-    {
-      icon: <FaGasPump className="text-white text-base" />,
-      color: "bg-[#547963]",
-      label: "충전소",
-    },
-    {
-      icon: <FaCar className="text-white" />,
-      color: "bg-[#FF0000]",
-      label: "긴급 차량",
-    },
-    {
-      icon: <FaCar className="text-white" />,
-      color: "bg-[#FF9900]",
-      label: "경고 차량",
-    },
-    {
-      icon: <FaCar className="text-white" />,
-      color: "bg-[#FFDD33]",
-      label: "주의 차량",
-    },
-  ];
+  const [activeFilters, setActiveFilters] = useState({
+    station: true,
+    danger: true,
+    warning: true,
+    caution: true,
+  });
+
+  const toggleFilter = (key) => {
+    setActiveFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   if (isStationsLoading || isVehiclesLoading) {
     return (
       <div className="card">
@@ -39,11 +26,17 @@ export default function ControllerMap() {
       </div>
     );
   }
+
   return (
-    <div>
+    <div className="flex flex-col h-full gap-2">
       <h2>위험 차량 / 충전소 지도</h2>
-      <div className="w-full, h-full">
-        <Map stations={stations} vehicles={vehicles} />
+      <div className="relative w-full flex-1 min-h-0">
+        <MapLegend activeFilters={activeFilters} onToggle={toggleFilter} />
+        <Map
+          stations={stations}
+          vehicles={vehicles}
+          activeFilters={activeFilters}
+        />
       </div>
     </div>
   );
