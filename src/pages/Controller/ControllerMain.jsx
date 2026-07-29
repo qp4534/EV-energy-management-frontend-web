@@ -3,7 +3,7 @@ import React from "react";
 import StatCardList from "../../components/controller/StatCardList";
 import MapCard from "../../components/controller/MapCard";
 import ChartCard from "../../components/controller/ChartCard";
-import RiskVehicleTableCard from "../../components/controller/RiskVehicleTableCard";
+import CarTableCard from "../../components/controller/CarTableCard";
 import ThermalVideoCard from "../../components/controller/ThermalVideoCard";
 
 import "../../styles/controller/ControllerMain.css";
@@ -21,7 +21,7 @@ export default function ControllerMain() {
       </section>
 
       <section className="dashboard-grid grid-2col">
-        <RiskVehicleTableCard />
+        <CarTableCard />
         <ThermalVideoCard />
       </section>
     </div>

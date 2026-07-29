@@ -9,7 +9,23 @@ export default function Map({ stations = [], vehicles = [] }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("🚗 수신된 vehicles 데이터:", vehicles);
+    console.group("🚗 [3. Map Component] Vehicles Props 정밀 분석");
+    console.log("전달된 vehicles 개수:", vehicles.length);
+
+    vehicles.forEach((v, index) => {
+      const lat = v.latitude ?? v.lat;
+      const lng = v.longitude ?? v.lng;
+      console.log(
+        `차량 [${index}] ID: ${v.id || v.car_id} | 번호: ${v.car_number || v.name}`,
+      );
+      console.log(`  └─ Latitude: ${lat} (Type: ${typeof lat})`);
+      console.log(`  └─ Longitude: ${lng} (Type: ${typeof lng})`);
+      console.log(
+        `  └─ Valid Coordinate?:`,
+        !isNaN(Number(lat)) && !isNaN(Number(lng)) && Number(lat) > 0,
+      );
+    });
+    console.groupEnd();
   }, [vehicles]);
 
   // 지도 초기화
