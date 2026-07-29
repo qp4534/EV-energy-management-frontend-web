@@ -19,27 +19,51 @@ export default function FlowChart({ data, seriesA, seriesB, colorA, colorB }) {
   return (
     <div className="flow-chart-wrap">
       <ResponsiveContainer width="100%" height={150}>
-        <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+        <AreaChart
+          data={data}
+          margin={{ top: 5, right: 20, left: -20, bottom: 0 }}
+        >
           <defs>
             <linearGradient id={`grad-${seriesA}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={colorA} stopOpacity={0.35} />
               <stop offset="100%" stopColor={colorA} stopOpacity={0} />
             </linearGradient>
+
             <linearGradient id={`grad-${seriesB}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={colorB} stopOpacity={0.35} />
               <stop offset="100%" stopColor={colorB} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke={BORDER} vertical={false} />
+
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={BORDER}
+            vertical={false}
+          />
+
           <XAxis
             dataKey="month"
             tick={{ fontSize: 10, fill: MUTED }}
             axisLine={false}
             tickLine={false}
-            interval={1}
+            interval={0}
+            padding={{ left: 8, right: 8 }}
           />
-          <YAxis tick={{ fontSize: 10, fill: MUTED }} axisLine={false} tickLine={false} />
-          <Tooltip contentStyle={{ borderRadius: 8, border: `1px solid ${BORDER}`, fontSize: 12 }} />
+
+          <YAxis
+            tick={{ fontSize: 10, fill: MUTED }}
+            axisLine={false}
+            tickLine={false}
+          />
+
+          <Tooltip
+            contentStyle={{
+              borderRadius: 8,
+              border: `1px solid ${BORDER}`,
+              fontSize: 12,
+            }}
+          />
+
           <Area
             type="monotone"
             dataKey={seriesA}
@@ -48,6 +72,7 @@ export default function FlowChart({ data, seriesA, seriesB, colorA, colorB }) {
             fill={`url(#grad-${seriesA})`}
             dot={{ r: 2.5, fill: colorA, strokeWidth: 0 }}
           />
+
           <Area
             type="monotone"
             dataKey={seriesB}
