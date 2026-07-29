@@ -64,7 +64,7 @@ export default function CarPin({
     if (onClick) {
       pinContainer.onclick = (e) => {
         e.stopPropagation();
-        onClick(e);
+        onClick(id);
       };
     }
 
