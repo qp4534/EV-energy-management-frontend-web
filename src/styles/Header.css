@@ -6,6 +6,8 @@
   align-items: center;
   padding: 10px 24px;
   background-color: transparent;
+
+  border-bottom: 2px solid var(--color-border); /* 배경톤과 어울리는 회색 선 */
 }
 
 /* 좌측 로고 및 타이틀 */
@@ -32,7 +34,7 @@
 /* 번개 아이콘 (초록색) */
 .logo-icon {
   font-size: 32px;
-  color: #00c853; /* 선명한 초록색 */
+  color: var(--color-primary-btn); /* 선명한 초록색 */
   transform: rotate(-10deg);
 }
 
@@ -40,7 +42,7 @@
 .logo-text {
   font-size: 28px;
   font-weight: 800;
-  color: #123428; /* 어두운 딥그린 */
+  color: var(--color-header-text); /* 어두운 딥그린 */
   letter-spacing: -0.5px;
 }
 
@@ -54,7 +56,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #ffffff;
+  background-color: var(--color-login-frame);
   padding: 6px 14px 6px 8px;
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -63,8 +65,8 @@
 .user-icon-bg {
   width: 28px;
   height: 28px;
-  background-color: #e8f5e9;
-  color: #00c853;
+  background-color: var(--color-footer-bg);
+  color: var(--color-sub-text);
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -75,5 +77,5 @@
 .user-name {
   font-size: 14px;
   font-weight: 600;
-  color: #333333;
+  color: var(--color-header-text);
 }

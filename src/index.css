@@ -1,112 +1,100 @@
-/* 전역 css */
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
-  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+@layer base {
+  /* 제목 태그 설정 */
+  h1 {
+    font-size: 1.75rem; /* 28px */
+    font-weight: 700;
+    line-height: 1.3;
+  }
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  h2 {
+    font-size: 1.375rem; /* 22px */
+    font-weight: 700;
+    line-height: 1.35;
+  }
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  h3 {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  h4 {
+    font-size: 1rem; /* 16px */
+    font-weight: 600;
+  }
+
+  /* 본문 및 텍스트 기본값 */
+  p {
+    font-size: 0.938rem; /* 15px */
+    line-height: 1.5;
+  }
+
+  small {
+    font-size: 0.813rem; /* 13px */
+  }
+
+  /* 목록(List) 기본 여백 및 스타일 복구 */
+  ul {
+    list-style-type: disc;
+    padding-left: 1.25rem;
+  }
+
+  ol {
+    list-style-type: decimal;
+    padding-left: 1.25rem;
+  }
+
+  /* 버튼 기본 커서 스타일 */
+  button {
+    cursor: pointer;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* 전역 css */
+:root {
+  --color-header-text: #0f3d2e; /* 헤더 / 큰 글자 */
+  --color-primary-btn: #c0e2af; /* 버튼 / 로고 */
+  --color-sub-text: #4f7a5b; /* 작은 글자 */
+  --color-border: #e2e6d8; /* 외곽선 */
+  --color-login-frame: #ffffff; /* 로그인 프레임 */
+  --color-bg-main: #f7f5ef; /* 전체 배경 */
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+  --color-footer-bg: #eef2e4; /* 푸터 채우기 */
+  --color-footer-border: #e2e6d8; /* 푸터 외곽선 */
+  --color-footer-desc: #6b8064; /* 푸터 설명글 */
+  --color-btn-desc: #acacac; /* 버튼 설명글 */
 }
 
 body {
-  margin: 0;
+  background-color: var(--color-bg-main);
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+.card {
+  /* 배경색 및 둥근 모서리 */
+  background-color: var(--color-login-frame); /* 카드 배경색 */
+  border-radius: 15px; /* 피그마에 설정된 곡률에 맞춰 8px~16px 사이로 조절해주세요 */
+
+  /* 테두리 (외곽선이 살짝 밝은 회색/초록빛으로 들어간 경우 설정) */
+  border: 1px solid var(--color-border); /* 혹은 원하는 테두리 색상 */
+
+  /* 피그마 Drop Shadow 변환 값 */
+  /* box-shadow: [Xoffset] [Yoffset] [Blur] [Spread] [Color(alpha)] */
+  box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.25);
+
+  /* 카드 내부 여백 (기본값 설정, 필요시 컴포넌트에서 오버라이딩 가능) */
+  padding: 10px;
+
+  /* 크기 자동 처리 (너비/높이는 부모 컨테이너에 맞춰 늘어나도록) */
+  width: 100%;
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.mini-card {
+  background-color: var(--color-login-frame);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  box-shadow: none;
+  padding: 20px;
 }
