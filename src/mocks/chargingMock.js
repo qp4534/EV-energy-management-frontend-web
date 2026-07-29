@@ -3,47 +3,41 @@
 // DB 테이블 CHARGING_STATION 명세 그대로 맞춘 Mock Data
 export const MOCK_CHARGING_STATIONS = [
   {
-    charge_id: "550e8400-e29b-41d4-a716-446655440001",
+    chargeId: "550e8400-e29b-41d4-a716-446655440001",
     region: "서울특별시",
     address: "서울특별시 강남구 테헤란로 123",
     latitude: 37.4979,
     longitude: 127.0276,
-    name: "강남 테헤란로 충전소", // UI 표시용 (필요시)
   },
   {
-    charge_id: "550e8400-e29b-41d4-a716-446655440002",
+    chargeId: "550e8400-e29b-41d4-a716-446655440002",
     region: "경상북도",
     address: "경상북도 칠곡군 왜관읍 중앙로 45",
     latitude: 35.9956,
     longitude: 128.3981,
-    name: "칠곡 왜관 충전소",
   },
   {
-    charge_id: "550e8400-e29b-41d4-a716-446655440003",
+    chargeId: "550e8400-e29b-41d4-a716-446655440003",
     region: "서울특별시",
     address: "서울특별시 강남구 강남대로 396",
     latitude: 37.498095,
     longitude: 127.02761,
-    name: "강남역 EV 충전소",
   },
   {
-    charge_id: "550e8400-e29b-41d4-a716-446655440004",
+    chargeId: "550e8400-e29b-41d4-a716-446655440004",
     region: "경기도",
     address: "경기도 성남시 분당구 판교역로 160",
     latitude: 37.402056,
     longitude: 127.108212,
-    name: "판교 테크노밸리 충전소",
   },
   {
-    charge_id: "550e8400-e29b-41d4-a716-446655440005",
+    chargeId: "550e8400-e29b-41d4-a716-446655440005",
     region: "서울특별시",
     address: "서울특별시 영등포구 여의대로 128",
     latitude: 37.521569,
     longitude: 126.924311,
-    name: "여의도 관제센터 충전소",
   },
 ];
-
 // 충전 세션 및 연결 차량 Mock Data
 export const MOCK_CHARGING_SESSIONS = [
   {

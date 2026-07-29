@@ -72,28 +72,25 @@ export default function Map({ stations = [], vehicles = [] }) {
       {map &&
         stations.map((s, idx) => (
           <StationPin
-            key={`station-${s.id || s.charge_id || idx}`}
+            key={`station-${s.chargeId || idx}`}
             map={map}
-            lat={s.latitude ?? s.lat}
-            lng={s.longitude ?? s.lng}
+            lat={s.latitude}
+            lng={s.longitude}
           />
         ))}
 
       {map &&
-        vehicles.map((v, idx) => {
-          const vehicleId = v.id || v.car_id;
-          return (
-            <CarPin
-              key={`vehicle-${vehicleId || idx}`}
-              map={map}
-              lat={v.latitude ?? v.lat}
-              lng={v.longitude ?? v.lng}
-              id={vehicleId}
-              status={v.status || "danger"}
-              onClick={handleVehicleClick}
-            />
-          );
-        })}
+        vehicles.map((v, idx) => (
+          <CarPin
+            key={`vehicle-${v.carId || idx}`}
+            map={map}
+            lat={v.latitude}
+            lng={v.longitude}
+            id={v.carId}
+            status={v.status || "danger"}
+            onClick={handleVehicleClick}
+          />
+        ))}
     </div>
   );
 }
