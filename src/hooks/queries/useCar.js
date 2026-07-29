@@ -37,3 +37,22 @@ export const useDailyDangerCarCount = () => {
     staleTime: 1000 * 60 * 5,
   });
 };
+
+// 위험 차량 열화상 영상 조회 훅
+export const useHottestThermalStream = () => {
+  return useQuery({
+    queryKey: ["thermalStream", "hottest"],
+    queryFn: carService.getHottestThermalStream,
+    refetchInterval: 3000, // 3초 간격 실시간 갱신
+  });
+};
+
+// 특정 차량 ID에 대한 열화상 영상 조회 훅
+export const useThermalStreamByCarId = (carId) => {
+  return useQuery({
+    queryKey: ["thermalStream", carId],
+    queryFn: () => carService.getThermalStreamByCarId(carId),
+    refetchInterval: 3000,
+    enabled: !!carId, // carId가 전달되었을 때만 쿼리 실행
+  });
+};

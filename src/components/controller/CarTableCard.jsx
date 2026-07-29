@@ -1,15 +1,9 @@
 import React from "react";
 import ExpandButton from "../ExpandButton";
 import { useCarSummaryList } from "@/hooks/queries/useCar";
+import CarTableRow from "./CarTableRow";
 
-const RISK_COLOR_MAP = {
-  긴급: "bg-[#FF4D4D]", // 빨간색
-  경고: "bg-[#FF9500]", // 주황색
-  주의: "bg-[#FFDE00]", // 노란색
-  정상: "bg-[#4CAF50]", // 초록색
-};
-
-export default function CarTableCard() {
+export default function CarTableCard({ carId, fallbackImage }) {
   const { data: carList, isLoading, isError } = useCarSummaryList();
 
   if (isLoading) {
@@ -34,55 +28,22 @@ export default function CarTableCard() {
         <h2>차량 목록</h2>
         <ExpandButton to="/controller/cars" />
       </div>
-      <div className="max-h-[260px] overflow-y-auto pr-1">
-        <table className="w-full text-center border-collapse">
-          {/* 테이블 헤더 */}
-          <thead className="sticky top-0 bg-white z-10">
-            <tr className="text-gray-700 text-sm border-b border-gray-300">
-              <th className="py-2 px-1 font-semibold text-center w-[15%]">
-                상태
-              </th>
-              <th className="py-2 px-1 font-semibold text-center w-[25%]">
-                차량번호
-              </th>
-              <th className="py-2 px-1 font-semibold text-center w-[15%]">
-                위치
-              </th>
-              <th className="py-2 px-1 font-semibold text-center w-[25%]">
-                이상 유형
-              </th>
-              <th className="py-2 px-1 font-semibold text-center w-[20%]">
-                충전시간
-              </th>
-            </tr>
-          </thead>
+      <div>
+        {/* 그리드 헤더 */}
+        <div className="grid grid-cols-[1fr_2.5fr_1.5fr_2.5fr_2fr] text-center font-semibold border-b border-gray-300">
+          <div>상태</div>
+          <div>차량번호</div>
+          <div>위치</div>
+          <div>이상 유형</div>
+          <div>충전시간</div>
+        </div>
 
-          {/* 테이블 바디 */}
-          <tbody className="divide-y divide-gray-100 text-sm">
-            {carList?.map((car) => (
-              <tr
-                key={car.car_id}
-                className="hover:bg-gray-50 transition-colors"
-              >
-                {/* 상태 색상 라벨 박스 */}
-                <td className="py-3 px-1 flex justify-center items-center">
-                  <span
-                    className={`w-10 h-6 rounded-[2px] block ${
-                      RISK_COLOR_MAP[car.risk_level] || "bg-gray-300"
-                    }`}
-                    title={car.risk_level}
-                  />
-                </td>
-                <td className="py-3 px-1 font-medium text-gray-800">
-                  {car.car_number}
-                </td>
-                <td className="py-3 px-1 text-gray-700">{car.region}</td>
-                <td className="py-3 px-1 text-gray-700">{car.abnormal_type}</td>
-                <td className="py-3 px-1 text-gray-700">{car.charging_time}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* 그리드 바디 */}
+        <div className="flex flex-col">
+          {carList?.map((car) => (
+            <CarTableRow key={car.car_id} car={car} />
+          ))}
+        </div>
       </div>
     </div>
   );

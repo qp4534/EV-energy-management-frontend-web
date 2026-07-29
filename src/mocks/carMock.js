@@ -10,34 +10,76 @@ export const MOCK_CAR_STATS = {
   normal: 1095, // 정상 차량
 };
 
+// 차량별 열화상 데이터
+export const MOCK_CAR_THERMAL_DATA = {
+  car_id: "car-uuid-001",
+  car_number: "123가 4567",
+  max_temperature: 38.5, // 감지된 최고 온도
+  temperature_status: "0°C 이상 감지", // 안내 문구
+  // 열화상 비디오 또는 캡처 이미지 URL
+  thermal_image_url: "https://your-domain.com/path/to/thermal-image.png",
+  is_streaming: true,
+  updated_at: "2026-07-29T09:33:41",
+};
+
+// 차량별 열화상 스트리밍 데이터 (실시간)
+export const MOCK_THERMAL_STREAMS = [
+  {
+    car_id: "car-uuid-001",
+    car_number: "123가 4567",
+    max_temperature: 88.5, // ⚠️ 가장 온도가 높은 위험 차량
+    temperature_status: "최고 88.5°C 이상 감지",
+    thermal_image_url:
+      "https://via.placeholder.com/640x360/8B0000/FFFFFF?text=Thermal+Stream+Car+001",
+    is_streaming: true,
+  },
+  {
+    car_id: "car-uuid-002",
+    car_number: "89나 1234",
+    max_temperature: 62.1,
+    temperature_status: "최고 62.1°C 감지",
+    thermal_image_url:
+      "https://via.placeholder.com/640x360/FF8C00/FFFFFF?text=Thermal+Stream+Car+002",
+    is_streaming: true,
+  },
+  {
+    car_id: "car-uuid-003",
+    car_number: "56다 9012",
+    max_temperature: 36.5,
+    temperature_status: "최고 36.5°C 감지",
+    thermal_image_url:
+      "https://via.placeholder.com/640x360/00008B/FFFFFF?text=Thermal+Stream+Car+003",
+    is_streaming: true,
+  },
+];
+
 // 차량 목록 데이터
 export const MOCK_CARS = [
   {
     id: "car-uuid-001",
     car_number: "123가 4567",
     name: "아이오닉 5",
-    // 충전소 #1 (테헤란로)의 위치를 공유받음
-    latitude: MOCK_CHARGING_STATIONS[0].latitude,
-    longitude: MOCK_CHARGING_STATIONS[0].longitude,
-    // ANOMALY_LOGS의 risk_level 기반 status (danger | warning | caution | 정상)
+    // 강남 테헤란로 충전소 좌표 직접 명시
+    latitude: 37.4979,
+    longitude: 127.0276,
     status: "danger", // 긴급 -> danger
   },
   {
     id: "car-uuid-002",
     car_number: "89나 1234",
     name: "EV6",
-    // 충전소 #2 (칠곡 왜관)의 위치를 공유받음
-    latitude: MOCK_CHARGING_STATIONS[1].latitude,
-    longitude: MOCK_CHARGING_STATIONS[1].longitude,
+    // 칠곡 왜관 충전소 좌표 직접 명시
+    latitude: 35.9956,
+    longitude: 128.3981,
     status: "warning", // 경고 -> warning
   },
   {
     id: "car-uuid-003",
     car_number: "56다 9012",
     name: "레이 EV",
-    // 충전소 #4 (판교)의 위치를 공유받음
-    latitude: MOCK_CHARGING_STATIONS[3].latitude,
-    longitude: MOCK_CHARGING_STATIONS[3].longitude,
+    // 판교 테크노밸리 충전소 좌표 직접 명시
+    latitude: 37.402056,
+    longitude: 127.108212,
     status: "caution", // 주의 -> caution
   },
 ];
