@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 import StationPin from "./pin/StationPin";
 import CarPin from "./pin/CarPin";
 
-export default function Map({ stations = [], vehicles = [] }) {
+export default function Map({
+  stations = [],
+  vehicles = [],
+  activeFilters = {},
+}) {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const navigate = useNavigate();
@@ -65,12 +69,17 @@ export default function Map({ stations = [], vehicles = [] }) {
     [navigate],
   );
 
+  const visibleStations = activeFilters.station === false ? [] : stations;
+  const visibleVehicles = vehicles.filter(
+    (v) => activeFilters[v.status || "danger"] !== false,
+  );
+
   return (
     <div className="w-full h-full rounded-xl overflow-hidden shadow-sm border border-gray-200 relative">
       <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
 
       {map &&
-        stations.map((s, idx) => (
+        visibleStations.map((s, idx) => (
           <StationPin
             key={`station-${s.chargeId || idx}`}
             map={map}
@@ -80,7 +89,7 @@ export default function Map({ stations = [], vehicles = [] }) {
         ))}
 
       {map &&
-        vehicles.map((v, idx) => (
+        visibleVehicles.map((v, idx) => (
           <CarPin
             key={`vehicle-${v.carId || idx}`}
             map={map}
