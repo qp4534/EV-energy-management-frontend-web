@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+
 import StationPin from "./pin/StationPin";
 import CarPin from "./pin/CarPin";
 
@@ -8,25 +9,7 @@ export default function Map({ stations = [], vehicles = [] }) {
   const [map, setMap] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.group("🚗 [3. Map Component] Vehicles Props 정밀 분석");
-    console.log("전달된 vehicles 개수:", vehicles.length);
-
-    vehicles.forEach((v, index) => {
-      const lat = v.latitude ?? v.lat;
-      const lng = v.longitude ?? v.lng;
-      console.log(
-        `차량 [${index}] ID: ${v.id || v.car_id} | 번호: ${v.car_number || v.name}`,
-      );
-      console.log(`  └─ Latitude: ${lat} (Type: ${typeof lat})`);
-      console.log(`  └─ Longitude: ${lng} (Type: ${typeof lng})`);
-      console.log(
-        `  └─ Valid Coordinate?:`,
-        !isNaN(Number(lat)) && !isNaN(Number(lng)) && Number(lat) > 0,
-      );
-    });
-    console.groupEnd();
-  }, [vehicles]);
+  const hasFitBounds = useRef(false);
 
   // 지도 초기화
   useEffect(() => {
@@ -45,7 +28,8 @@ export default function Map({ stations = [], vehicles = [] }) {
   }, []);
 
   useEffect(() => {
-    if (!map || (!stations.length && !vehicles.length)) return;
+    if (!map || hasFitBounds.current) return;
+    if (!stations.length && !vehicles.length) return;
 
     const bounds = new window.kakao.maps.LatLngBounds();
     let hasValidCoords = false;
@@ -70,8 +54,16 @@ export default function Map({ stations = [], vehicles = [] }) {
 
     if (hasValidCoords) {
       map.setBounds(bounds);
+      hasFitBounds.current = true;
     }
   }, [map, stations, vehicles]);
+
+  const handleVehicleClick = useCallback(
+    (vehicleId) => {
+      if (vehicleId) navigate(`/controller/stat/${vehicleId}`);
+    },
+    [navigate],
+  );
 
   return (
     <div className="w-full h-full rounded-xl overflow-hidden shadow-sm border border-gray-200 relative">
@@ -80,32 +72,25 @@ export default function Map({ stations = [], vehicles = [] }) {
       {map &&
         stations.map((s, idx) => (
           <StationPin
-            key={`station-${s.id || s.charge_id || idx}`}
+            key={`station-${s.chargeId || idx}`}
             map={map}
-            lat={s.latitude ?? s.lat}
-            lng={s.longitude ?? s.lng}
-            name={s.name || s.address}
+            lat={s.latitude}
+            lng={s.longitude}
           />
         ))}
 
       {map &&
-        vehicles.map((v, idx) => {
-          const vehicleId = v.id || v.car_id;
-          return (
-            <CarPin
-              key={`vehicle-${vehicleId || idx}`}
-              map={map}
-              lat={v.latitude ?? v.lat}
-              lng={v.longitude ?? v.lng}
-              id={vehicleId}
-              name={v.name || v.car_number}
-              status={v.status || "danger"}
-              onClick={() => {
-                if (vehicleId) navigate(`/controller/stat/${vehicleId}`);
-              }}
-            />
-          );
-        })}
+        vehicles.map((v, idx) => (
+          <CarPin
+            key={`vehicle-${v.carId || idx}`}
+            map={map}
+            lat={v.latitude}
+            lng={v.longitude}
+            id={v.carId}
+            status={v.status || "danger"}
+            onClick={handleVehicleClick}
+          />
+        ))}
     </div>
   );
 }

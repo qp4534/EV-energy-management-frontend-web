@@ -1,3 +1,5 @@
+import { createPlaceholderImage } from "../utils/placeholder";
+
 // 이상 감지 로그 Mock Data
 export const MOCK_ANOMALY_LOGS = [
   {
@@ -36,11 +38,42 @@ export const MOCK_ANOMALY_LOGS = [
 export const MOCK_THERMAL_STREAMS = [
   {
     thermalId: "thermal-001",
+    carId: "car-uuid-001",
+    carNumber: "123가 4567",
     videoUrl: "https://example.com/streams/thermal-cam-01.m3u8",
+    imageUrl: createPlaceholderImage(640, 360, "#8B0000", "Car 001"),
     metadata: {
-      maxTemp: 58.4,
+      maxTemp: 88.5,
       minTemp: 24.1,
-      avgTemp: 32.5,
+      avgTemp: 52.3,
+      fps: 30,
+      resolution: "1920x1080",
+    },
+  },
+  {
+    thermalId: "thermal-002",
+    carId: "car-uuid-002",
+    carNumber: "89나 1234",
+    videoUrl: "https://example.com/streams/thermal-cam-02.m3u8",
+    imageUrl: createPlaceholderImage(640, 360, "#FF8C00", "Car 002"),
+    metadata: {
+      maxTemp: 62.1,
+      minTemp: 22.4,
+      avgTemp: 38.7,
+      fps: 30,
+      resolution: "1920x1080",
+    },
+  },
+  {
+    thermalId: "thermal-003",
+    carId: "car-uuid-003",
+    carNumber: "56다 9012",
+    videoUrl: "https://example.com/streams/thermal-cam-03.m3u8",
+    imageUrl: createPlaceholderImage(640, 360, "#00008B", "Car 003"),
+    metadata: {
+      maxTemp: 36.5,
+      minTemp: 20.1,
+      avgTemp: 28.3,
       fps: 30,
       resolution: "1920x1080",
     },
