@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { RISK_LEVEL_COLOR } from "@/constants/carList.constants";
+import StopChargingButton from "./StopChargingButton";
 
 export default function CarVehicleRow({ car, onStopCharging }) {
   const navigate = useNavigate();
-  const isStoppable = car.chargingStatus === "충전 중";
 
   const goToDetail = () => navigate(`/controller/cars/${car.carId}`);
 
   const handleStopClick = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // 행 클릭(상세 이동)으로 전파되지 않게 막음
     onStopCharging(car.carId);
   };
 
@@ -41,18 +41,10 @@ export default function CarVehicleRow({ car, onStopCharging }) {
         {car.chargingStatus}
       </td>
       <td className="py-3">
-        <button
-          type="button"
-          disabled={!isStoppable}
+        <StopChargingButton
+          chargingStatus={car.chargingStatus}
           onClick={handleStopClick}
-          className={
-            isStoppable
-              ? "rounded-md border border-[var(--color-primary-btn)] bg-[var(--color-footer-bg)] px-3 py-1 text-xs font-semibold text-[var(--color-header-text)] hover:bg-[var(--color-primary-btn)]"
-              : "cursor-not-allowed rounded-md border border-[var(--color-border)] bg-[var(--color-bg-main)] px-3 py-1 text-xs font-semibold text-[var(--color-btn-desc)]"
-          }
-        >
-          {isStoppable ? "충전 중단" : "중단 완료"}
-        </button>
+        />
       </td>
     </tr>
   );

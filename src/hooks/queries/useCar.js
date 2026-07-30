@@ -42,15 +42,25 @@ export const useCarTableList = (params) => {
   });
 };
 
-// CarVehicleRow "충전 중단" 버튼용 뮤테이션. 성공하면 테이블 쿼리를 무효화해서
-// 목록에 바뀐 충전 상태(중단됨)와 버튼 비활성화가 바로 반영되게 한다.
+// CarVehicleRow / CarDetail "충전 중단" 버튼용 뮤테이션. 성공하면 테이블 쿼리와
+// (있다면) 해당 차량의 상세 쿼리를 무효화해서 바뀐 충전 상태가 바로 반영되게 한다.
 export const useStopCharging = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (carId) => carService.stopCharging(carId),
-    onSuccess: () => {
+    onSuccess: (_, carId) => {
       queryClient.invalidateQueries({ queryKey: ["carTableList"] });
+      queryClient.invalidateQueries({ queryKey: ["carDetail", carId] });
     },
+  });
+};
+
+// CarDetail.jsx(/controller/cars/:id) 전용 차량 상세 조회 훅
+export const useCarDetail = (carId) => {
+  return useQuery({
+    queryKey: ["carDetail", carId],
+    queryFn: () => carService.getCarDetail(carId),
+    enabled: !!carId,
   });
 };
 
