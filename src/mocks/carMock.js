@@ -48,6 +48,7 @@ export const MOCK_CARS = [
 ];
 
 // 차량 테이블 요약 목록 (CarTableCard / CarList용)
+// chargingStatus: ERD CHARGING_SESSION.change_state 값 그대로 사용 (충전 중, 중단됨, 충전 완료, 대기 중)
 export const MOCK_CAR_LIST = [
   {
     carId: "car-uuid-001",
@@ -56,6 +57,7 @@ export const MOCK_CAR_LIST = [
     region: "대구",
     abnormalType: "온도 상승",
     chargingTime: "14:00:00",
+    chargingStatus: "충전 중",
   },
   {
     carId: "car-uuid-002",
@@ -64,6 +66,7 @@ export const MOCK_CAR_LIST = [
     region: "서울",
     abnormalType: "화재 위험",
     chargingTime: "14:00:00",
+    chargingStatus: "충전 중",
   },
   {
     carId: "car-uuid-003",
@@ -72,6 +75,7 @@ export const MOCK_CAR_LIST = [
     region: "부산",
     abnormalType: "온도 상승",
     chargingTime: "14:00:00",
+    chargingStatus: "중단됨",
   },
   {
     carId: "car-uuid-004",
@@ -80,6 +84,7 @@ export const MOCK_CAR_LIST = [
     region: "인천",
     abnormalType: "정상",
     chargingTime: "14:12:30",
+    chargingStatus: "충전 완료",
   },
   {
     carId: "car-uuid-005",
@@ -88,6 +93,7 @@ export const MOCK_CAR_LIST = [
     region: "광주",
     abnormalType: "과충전 경고",
     chargingTime: "14:25:10",
+    chargingStatus: "충전 중",
   },
   {
     carId: "car-uuid-006",
@@ -96,6 +102,7 @@ export const MOCK_CAR_LIST = [
     region: "대전",
     abnormalType: "정상",
     chargingTime: "14:30:00",
+    chargingStatus: "대기 중",
   },
   {
     carId: "car-uuid-007",
@@ -104,6 +111,7 @@ export const MOCK_CAR_LIST = [
     region: "울산",
     abnormalType: "화재 위험",
     chargingTime: "14:40:15",
+    chargingStatus: "충전 중",
   },
   {
     carId: "car-uuid-008",
@@ -112,6 +120,7 @@ export const MOCK_CAR_LIST = [
     region: "세종",
     abnormalType: "정상",
     chargingTime: "14:45:00",
+    chargingStatus: "충전 완료",
   },
   {
     carId: "car-uuid-009",
@@ -120,6 +129,7 @@ export const MOCK_CAR_LIST = [
     region: "경기",
     abnormalType: "온도 상승",
     chargingTime: "15:00:00",
+    chargingStatus: "충전 중",
   },
   {
     carId: "car-uuid-010",
@@ -128,5 +138,6 @@ export const MOCK_CAR_LIST = [
     region: "강원",
     abnormalType: "정상",
     chargingTime: "15:10:20",
+    chargingStatus: "대기 중",
   },
 ];
