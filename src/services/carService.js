@@ -101,6 +101,19 @@ export const carService = {
     return response.data;
   },
 
+  // CarVehicleRow의 "충전 중단" 버튼용. ERD상 CHARGING_SESSION.change_state를
+  // '중단됨'으로 바꾸는 액션에 해당. 실제 엔드포인트는 백엔드 스펙 확정 후 조정.
+  stopCharging: async (carId) => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const car = MOCK_CAR_LIST.find((c) => c.carId === carId);
+      if (car) car.chargingStatus = "중단됨";
+      return { carId, chargingStatus: "중단됨" };
+    }
+    const response = await api.patch(`/api/v1/cars/${carId}/stop-charging`);
+    return response.data;
+  },
+
   getHottestThermalStream: async () => {
     if (USE_MOCK) {
       await new Promise((resolve) => setTimeout(resolve, 300));

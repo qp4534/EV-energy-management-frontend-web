@@ -18,3 +18,24 @@ export const DEFAULT_REPORT_FILTERS = {
   dateFrom: "",
   dateTo: "",
 };
+
+// 상세 페이지 상단 위험도 뱃지 라벨. 기존 ANOMALY_LOGS.risk_level(긴급/경고/주의/정상) 값을 그대로 쓰되
+// 보고서 화면에서는 다른 문구로 보여준다. "긴급 -> 위험도 높음"만 실제 화면(스크린샷)에서 확인했고,
+// 나머지 세 값은 같은 톤으로 추정해서 채운 것 - 실제 문구 확정되면 여기만 고치면 됨.
+export const REPORT_RISK_BADGE_LABEL = {
+  긴급: "위험도 높음",
+  경고: "위험도 중간",
+  주의: "위험도 낮음",
+  정상: "정상",
+};
+
+// report_data(JSONB) 안 sections 배열의 각 항목이 가질 수 있는 type 값.
+// 프론트는 이 type만 보고 어떤 섹션 컴포넌트로 렌더링할지 결정한다.
+// (이상보고서/정기보고서가 이 다섯 가지 블록을 조합해서 서로 다른 내용을 채우는 구조)
+export const REPORT_SECTION_TYPES = {
+  SUMMARY: "summary", // 문단형 요약 텍스트
+  METRIC_GRID: "metricGrid", // 지표 카드 그리드 (label/value/unit/caption/emphasis)
+  LINE_CHART: "lineChart", // 시계열 라인 차트 (label/value 포인트 배열)
+  NUMBERED_LIST: "numberedList", // 번호 매긴 목록 (원인 분석 등)
+  BULLET_LIST: "bulletList", // 불릿 목록 (권장 조치 등)
+};

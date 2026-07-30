@@ -5,9 +5,6 @@ import { MOCK_AI_REPORTS } from "../mocks/reportMock";
 const USE_MOCK = true;
 
 export const reportService = {
-  // carId를 넘기면 특정 차량의 보고서만(/controller/cars/:id/reports),
-  // 안 넘기면 전체 차량 보고서(/controller/reports)를 조회한다.
-  // 실제 엔드포인트 경로는 백엔드 스펙 확정 후 조정.
   getReportList: async ({
     carId,
     page = 1,
@@ -26,8 +23,10 @@ export const reportService = {
       filtered = filtered.filter((r) => {
         if (search && !r.carNumber.includes(search.trim())) return false;
         if (reportType !== "all" && r.reportType !== reportType) return false;
-        if (dateFrom && r.createdAt < dateFrom) return false;
-        if (dateTo && r.createdAt > dateTo) return false;
+        // createdAt은 "YYYY-MM-DDTHH:mm:ss" 전체 시각이라 날짜만 비교하려면 앞 10자리만 사용
+        const date = r.createdAt.slice(0, 10);
+        if (dateFrom && date < dateFrom) return false;
+        if (dateTo && date > dateTo) return false;
         return true;
       });
 
@@ -47,9 +46,17 @@ export const reportService = {
     return response.data;
   },
 
-  // 보고서 상세 페이지를 열람했을 때 is_read = true로 표시.
-  // 상세 페이지 컴포넌트에서 useMutation으로 호출하고, 성공 시 ["reportList"] 쿼리를 invalidate 하면
-  // 목록의 NEW 뱃지가 자동으로 사라진다. (상세 페이지는 아직 미구현이라 여기 자리만 마련해둠)
+  getReportDetail: async (reportId) => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      const report = MOCK_AI_REPORTS.find((r) => r.reportId === reportId);
+      if (!report) throw new Error(`보고서를 찾을 수 없습니다: ${reportId}`);
+      return report;
+    }
+    const response = await api.get(`/api/v1/reports/${reportId}`);
+    return response.data;
+  },
+
   markReportAsRead: async (reportId) => {
     if (USE_MOCK) {
       await new Promise((resolve) => setTimeout(resolve, 200));

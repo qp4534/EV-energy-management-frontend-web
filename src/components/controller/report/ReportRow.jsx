@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
-// 날짜 "YYYY-MM-DD" -> "YYYY.MM.DD." 형식으로 변환
 function formatDate(dateStr) {
-  return `${dateStr.replaceAll("-", ".")}.`;
+  return `${dateStr.slice(0, 10).replaceAll("-", ".")}.`;
 }
 
 export default function ReportRow({ report, showCarNumber = true }) {

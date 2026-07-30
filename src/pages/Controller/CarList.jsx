@@ -4,7 +4,7 @@ import SearchFilterBar from "@/components/common/SearchFilterBar";
 import CarFilterPanel from "@/components/controller/carList/CarFilterPanel";
 import CarVehicleList from "@/components/controller/carList/CarVehicleList";
 import Pagination from "@/components/common/Pagination";
-import { useCarTableList } from "@/hooks/queries/useCar";
+import { useCarTableList, useStopCharging } from "@/hooks/queries/useCar";
 import { DEFAULT_CAR_FILTERS, PAGE_SIZE } from "@/constants/carList.constants";
 
 export default function CarList() {
@@ -29,8 +29,9 @@ export default function CarList() {
     ...filters,
   });
 
+  const stopChargingMutation = useStopCharging();
   const stopCharging = (carId) => {
-    console.warn("충전 중단 API 미연동:", carId);
+    stopChargingMutation.mutate(carId);
   };
 
   return (

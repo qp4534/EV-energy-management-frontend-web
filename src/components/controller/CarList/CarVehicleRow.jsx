@@ -5,7 +5,7 @@ export default function CarVehicleRow({ car, onStopCharging }) {
   const navigate = useNavigate();
   const isStoppable = car.chargingStatus === "충전 중";
 
-  const goToDetail = () => navigate(`/cars/${car.carId}`);
+  const goToDetail = () => navigate(`/controller/cars/${car.carId}`);
 
   const handleStopClick = (e) => {
     e.stopPropagation();
