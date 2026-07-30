@@ -1,5 +1,5 @@
 // carService 결과를 컴포넌트에 전달
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { carService } from "@/services/carService";
 // 1. 차량 상태 집계 훅 (StatCardList.jsx 전용)
 export const useCarStats = () => {
@@ -39,6 +39,28 @@ export const useCarTableList = (params) => {
     // 페이지 전환 시 깜빡임 방지용 옵션. react-query v5라면
     // `placeholderData: keepPreviousData` (from "@tanstack/react-query")로 교체.
     keepPreviousData: true,
+  });
+};
+
+// CarVehicleRow / CarDetail "충전 중단" 버튼용 뮤테이션. 성공하면 테이블 쿼리와
+// (있다면) 해당 차량의 상세 쿼리를 무효화해서 바뀐 충전 상태가 바로 반영되게 한다.
+export const useStopCharging = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (carId) => carService.stopCharging(carId),
+    onSuccess: (_, carId) => {
+      queryClient.invalidateQueries({ queryKey: ["carTableList"] });
+      queryClient.invalidateQueries({ queryKey: ["carDetail", carId] });
+    },
+  });
+};
+
+// CarDetail.jsx(/controller/cars/:id) 전용 차량 상세 조회 훅
+export const useCarDetail = (carId) => {
+  return useQuery({
+    queryKey: ["carDetail", carId],
+    queryFn: () => carService.getCarDetail(carId),
+    enabled: !!carId,
   });
 };
 

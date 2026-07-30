@@ -1,19 +1,13 @@
 import { useEffect, useState } from "react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
-import FilterButton from "@/components/common/FilterButton";
-import CarFilterPanel from "./CarFilterPanel";
+import FilterButton from "./FilterButton";
 
-/**
- * 차량번호 검색 인풋 + 검색 조건(필터) 버튼.
- *
- * 타이핑하는 동안은 로컬(draft) 상태만 바뀌고, 검색 버튼을 누르거나 Enter를 칠 때만
- * 부모(onSearchTextChange)에 반영 -> 그때 실제 쿼리가 나간다. 매 글자마다 요청이 나가지 않는다.
- */
-export default function CarSearchFilterBar({
+export default function SearchFilterBar({
   searchText,
   onSearchTextChange,
-  filters,
-  onFiltersChange,
+  placeholder = "검색",
+  filterAlign = "right",
+  children,
 }) {
   const [draft, setDraft] = useState(searchText);
 
@@ -28,17 +22,7 @@ export default function CarSearchFilterBar({
 
   return (
     <div className="flex items-center justify-end gap-2">
-      <FilterButton align="right">
-        {({ close }) => (
-          <CarFilterPanel
-            initialFilters={filters}
-            onApply={(next) => {
-              onFiltersChange(next);
-              close();
-            }}
-          />
-        )}
-      </FilterButton>
+      {children && <FilterButton align={filterAlign}>{children}</FilterButton>}
 
       <div className="flex h-10 w-64 items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-login-frame)] px-3">
         <input
@@ -48,7 +32,7 @@ export default function CarSearchFilterBar({
           onKeyDown={(e) => {
             if (e.key === "Enter") commit();
           }}
-          placeholder="차량번호 검색"
+          placeholder={placeholder}
           className="w-full text-sm text-[var(--color-header-text)] outline-none placeholder:text-[var(--color-btn-desc)]"
         />
       </div>

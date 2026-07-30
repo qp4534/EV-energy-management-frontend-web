@@ -47,8 +47,14 @@ export const MOCK_CARS = [
   },
 ];
 
-// 차량 테이블 요약 목록 (CarTableCard / CarList용)
+// 차량 테이블 요약 목록 (CarTableCard / CarList / CarDetail용)
 // chargingStatus: ERD CHARGING_SESSION.change_state 값 그대로 사용 (충전 중, 중단됨, 충전 완료, 대기 중)
+//
+// NOTE 1: model/vin/year는 CarDetail.jsx(차종 정보 카드)용으로 추가한 CAR 도메인 필드.
+// year(연식)는 ERD CAR 테이블에 없는 컬럼이라 추가 필요 (car_id, car_number, model, vin, user_id뿐).
+// NOTE 2: car-uuid-001의 model을 "넥쏘"로 넣었는데, 같은 carId를 쓰는 MOCK_CARS(지도용)와
+// chargingMock.js의 MOCK_CHARGING_SESSIONS(세션용)에는 model "아이오닉 5"/vin이 다르게 들어있음.
+// mock끼리 서로 안 맞는 상태라 실제 값 확정되면 세 군데를 같은 값으로 맞춰야 함.
 export const MOCK_CAR_LIST = [
   {
     carId: "car-uuid-001",
@@ -58,6 +64,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "온도 상승",
     chargingTime: "14:00:00",
     chargingStatus: "충전 중",
+    model: "넥쏘",
+    vin: "KMHX0000000000000",
+    year: 2026,
   },
   {
     carId: "car-uuid-002",
@@ -67,6 +76,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "화재 위험",
     chargingTime: "14:00:00",
     chargingStatus: "충전 중",
+    model: "EV6",
+    vin: "KNAE313C1M5000002",
+    year: 2024,
   },
   {
     carId: "car-uuid-003",
@@ -76,6 +88,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "온도 상승",
     chargingTime: "14:00:00",
     chargingStatus: "중단됨",
+    model: "레이 EV",
+    vin: "KNAE300C1M5000003",
+    year: 2023,
   },
   {
     carId: "car-uuid-004",
@@ -85,6 +100,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "정상",
     chargingTime: "14:12:30",
     chargingStatus: "충전 완료",
+    model: "니로 EV",
+    vin: "KNAE300C1M5000004",
+    year: 2022,
   },
   {
     carId: "car-uuid-005",
@@ -94,6 +112,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "과충전 경고",
     chargingTime: "14:25:10",
     chargingStatus: "충전 중",
+    model: "코나 일렉트릭",
+    vin: "KNAE300C1M5000005",
+    year: 2023,
   },
   {
     carId: "car-uuid-006",
@@ -103,6 +124,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "정상",
     chargingTime: "14:30:00",
     chargingStatus: "대기 중",
+    model: "포터2 일렉트릭",
+    vin: "KNAE300C1M5000006",
+    year: 2022,
   },
   {
     carId: "car-uuid-007",
@@ -112,6 +136,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "화재 위험",
     chargingTime: "14:40:15",
     chargingStatus: "충전 중",
+    model: "봉고3 EV",
+    vin: "KNAE300C1M5000007",
+    year: 2021,
   },
   {
     carId: "car-uuid-008",
@@ -121,6 +148,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "정상",
     chargingTime: "14:45:00",
     chargingStatus: "충전 완료",
+    model: "아이오닉 6",
+    vin: "KNAE300C1M5000008",
+    year: 2025,
   },
   {
     carId: "car-uuid-009",
@@ -130,6 +160,9 @@ export const MOCK_CAR_LIST = [
     abnormalType: "온도 상승",
     chargingTime: "15:00:00",
     chargingStatus: "충전 중",
+    model: "GV60",
+    vin: "KNAE300C1M5000009",
+    year: 2024,
   },
   {
     carId: "car-uuid-010",
@@ -139,5 +172,8 @@ export const MOCK_CAR_LIST = [
     abnormalType: "정상",
     chargingTime: "15:10:20",
     chargingStatus: "대기 중",
+    model: "EV9",
+    vin: "KNAE300C1M5000010",
+    year: 2025,
   },
 ];

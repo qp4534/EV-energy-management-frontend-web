@@ -101,6 +101,34 @@ export const carService = {
     return response.data;
   },
 
+  // CarVehicleRow / CarDetail의 "충전 중단" 버튼용. ERD상 CHARGING_SESSION.change_state를
+  // '중단됨'으로 바꾸는 액션에 해당. 실제 엔드포인트는 백엔드 스펙 확정 후 조정.
+  // CarDetail의 getCarDetail도 같은 MOCK_CAR_LIST를 보므로 별도 동기화가 필요 없다.
+  stopCharging: async (carId) => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const car = MOCK_CAR_LIST.find((c) => c.carId === carId);
+      if (car) car.chargingStatus = "중단됨";
+      return { carId, chargingStatus: "중단됨" };
+    }
+    const response = await api.patch(`/api/v1/cars/${carId}/stop-charging`);
+    return response.data;
+  },
+
+  // CarDetail.jsx(/controller/cars/:id)용 차량(CAR 도메인) 상세 조회.
+  // 배터리 여권은 batteryService.getBatteryByCarId, 충전 위치는 chargingService.getStationByCarId로
+  // 각 카드가 따로 조회한다(도메인별 분리) - 여기서는 CAR 테이블 성격의 필드만 반환.
+  getCarDetail: async (carId) => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const car = MOCK_CAR_LIST.find((c) => c.carId === carId);
+      if (!car) throw new Error(`차량을 찾을 수 없습니다: ${carId}`);
+      return car;
+    }
+    const response = await api.get(`/api/v1/cars/${carId}`);
+    return response.data;
+  },
+
   getHottestThermalStream: async () => {
     if (USE_MOCK) {
       await new Promise((resolve) => setTimeout(resolve, 300));
