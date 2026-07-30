@@ -3,8 +3,8 @@
 // 만약 counts를 props로 받는 형태라면 useCarStats()를 여기서 호출해서 넘겨주세요.
 import { useState } from "react";
 import StatCardList from "@/components/controller/StatCardList";
-import CarSearchFilterBar from "@/components/controller/carList/CarSearchFilterBar";
-import CarVehicleList from "@/components/controller/carList/CarVehicleList";
+import CarSearchFilterBar from "@/components/controller/CarList/CarSearchFilterBar";
+import CarVehicleList from "@/components/controller/CarList/CarVehicleList";
 import Pagination from "@/components/common/Pagination";
 import { useCarTableList } from "@/hooks/queries/useCar"; // 실제 프로젝트에서는 "@/hooks/useCar"
 import { DEFAULT_CAR_FILTERS, PAGE_SIZE } from "@/constants/carList.constants";
