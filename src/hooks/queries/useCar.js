@@ -10,7 +10,7 @@ export const useCarStats = () => {
   });
 };
 
-// 2. 차량 목록 조회 훅
+// 2. 차량 목록 조회 훅 (지도 마커 표시용 - MOCK_CARS 구조)
 export const useCarList = () => {
   return useQuery({
     queryKey: ["carList"],
@@ -19,13 +19,26 @@ export const useCarList = () => {
   });
 };
 
-// 차량 요약 목록 조회 훅 (상위 5개)
+// 차량 요약 목록 조회 훅 (상위 5개, 대시보드 위젯용)
 export const useCarSummaryList = () => {
   return useQuery({
     queryKey: ["carSummaryList"],
     queryFn: carService.getCarSummaryList,
     refetchInterval: 5000, // 실시간 갱신이 필요하다면 5초 간격 refetch (선택)
     staleTime: 1000 * 60, // 1분간 캐시 유지
+  });
+};
+
+// CarList.jsx 페이지 전용: 검색/필터/페이지네이션이 반영된 차량 테이블 목록 조회 훅.
+// useCarList(위 2번)는 지도용 MOCK_CARS를 반환하므로 테이블에는 이 훅을 사용한다.
+// params 예) { page, pageSize, search, riskLevel, region, abnormalType, chargingStatus, chargingTimeFrom }
+export const useCarTableList = (params) => {
+  return useQuery({
+    queryKey: ["carTableList", params],
+    queryFn: () => carService.getCarTableList(params),
+    // 페이지 전환 시 깜빡임 방지용 옵션. react-query v5라면
+    // `placeholderData: keepPreviousData` (from "@tanstack/react-query")로 교체.
+    keepPreviousData: true,
   });
 };
 
