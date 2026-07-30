@@ -1,16 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+
 import StationPin from "./pin/StationPin";
 import CarPin from "./pin/CarPin";
 
-export default function Map({ stations = [], vehicles = [] }) {
+export default function Map({
+  stations = [],
+  vehicles = [],
+  activeFilters = {},
+}) {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log("🚗 수신된 vehicles 데이터:", vehicles);
-  }, [vehicles]);
+  const hasFitBounds = useRef(false);
 
   // 지도 초기화
   useEffect(() => {
@@ -29,7 +32,8 @@ export default function Map({ stations = [], vehicles = [] }) {
   }, []);
 
   useEffect(() => {
-    if (!map || (!stations.length && !vehicles.length)) return;
+    if (!map || hasFitBounds.current) return;
+    if (!stations.length && !vehicles.length) return;
 
     const bounds = new window.kakao.maps.LatLngBounds();
     let hasValidCoords = false;
@@ -54,42 +58,48 @@ export default function Map({ stations = [], vehicles = [] }) {
 
     if (hasValidCoords) {
       map.setBounds(bounds);
+      hasFitBounds.current = true;
     }
   }, [map, stations, vehicles]);
+
+  const handleVehicleClick = useCallback(
+    (vehicleId) => {
+      if (vehicleId) navigate(`/controller/stat/${vehicleId}`);
+    },
+    [navigate],
+  );
+
+  const visibleStations = activeFilters.station === false ? [] : stations;
+  const visibleVehicles = vehicles.filter(
+    (v) => activeFilters[v.status || "danger"] !== false,
+  );
 
   return (
     <div className="w-full h-full rounded-xl overflow-hidden shadow-sm border border-gray-200 relative">
       <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
 
       {map &&
-        stations.map((s, idx) => (
+        visibleStations.map((s, idx) => (
           <StationPin
-            key={`station-${s.id || s.charge_id || idx}`}
+            key={`station-${s.chargeId || idx}`}
             map={map}
-            lat={s.latitude ?? s.lat}
-            lng={s.longitude ?? s.lng}
-            name={s.name || s.address}
+            lat={s.latitude}
+            lng={s.longitude}
           />
         ))}
 
       {map &&
-        vehicles.map((v, idx) => {
-          const vehicleId = v.id || v.car_id;
-          return (
-            <CarPin
-              key={`vehicle-${vehicleId || idx}`}
-              map={map}
-              lat={v.latitude ?? v.lat}
-              lng={v.longitude ?? v.lng}
-              id={vehicleId}
-              name={v.name || v.car_number}
-              status={v.status || "danger"}
-              onClick={() => {
-                if (vehicleId) navigate(`/controller/stat/${vehicleId}`);
-              }}
-            />
-          );
-        })}
+        visibleVehicles.map((v, idx) => (
+          <CarPin
+            key={`vehicle-${v.carId || idx}`}
+            map={map}
+            lat={v.latitude}
+            lng={v.longitude}
+            id={v.carId}
+            status={v.status || "danger"}
+            onClick={handleVehicleClick}
+          />
+        ))}
     </div>
   );
 }

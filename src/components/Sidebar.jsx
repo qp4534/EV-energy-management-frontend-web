@@ -62,7 +62,7 @@ function Sidebar({ role = "controller" }) {
               {isExpanded && <span className="nav-label">지도</span>}
             </NavLink>
             <NavLink
-              to="/controller/stat"
+              to="/controller/cars"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }

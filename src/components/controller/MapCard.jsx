@@ -11,6 +11,12 @@ export default function MapCard() {
   const { data: stations = [], isLoading: isStationsLoading } = useStations();
   const { data: vehicles = [], isLoading: isVehiclesLoading } = useCarList();
 
+  console.log("🔍 [2. MapCard] useCarList() Raw Data:", vehicles);
+  console.log(
+    "🔍 [2. MapCard] Is vehicles an Array?:",
+    Array.isArray(vehicles),
+  );
+
   const legendItems = [
     {
       icon: <FaGasPump className="text-white text-base" />,

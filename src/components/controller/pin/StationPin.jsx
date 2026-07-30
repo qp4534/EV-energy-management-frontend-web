@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BsFillLightningChargeFill } from "react-icons/bs";
 
-export default function StationPin({ map, lat, lng, name }) {
+export default function StationPin({ map, lat, lng }) {
   useEffect(() => {
     if (!map || !window.kakao || !window.kakao.maps) return;
 
@@ -52,7 +52,7 @@ export default function StationPin({ map, lat, lng, name }) {
       overlay.setMap(null);
       setTimeout(() => root.unmount(), 0);
     };
-  }, [map, lat, lng, name]);
+  }, [map, lat, lng]);
 
   return null;
 }
