@@ -130,12 +130,13 @@
   font-size: 14px;
 }
 
-.nav-label {
+.nav-label-prevwrite,
+.nav-label-nextwrite {
   flex-shrink: 0;
   white-space: nowrap;
   margin-right: 16px;
   font-weight: 700;
-  color: var(--color-header-text);
+  color: #0F3D2E;
 }
 
 .nav-link {
