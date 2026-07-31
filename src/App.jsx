@@ -16,6 +16,7 @@ import BatteryDiagnosis from "./pages/Administrator/BatteryDiagnosis";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
+import CarReportList from "./pages/Controller/CarReportList";
 
 function App() {
   // 사용자 역할 상태를 관리하는 state
@@ -40,6 +41,10 @@ function App() {
                 <Route
                   path="/controller/reports/:id"
                   element={<AiReportDetail />}
+                />
+                <Route
+                  path="/controller/cars/:id/reports"
+                  element={<CarReportList />}
                 />
               </>
             ) : (
