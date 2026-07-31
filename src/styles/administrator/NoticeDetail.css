@@ -130,8 +130,8 @@
   font-size: 14px;
 }
 
-.nav-label-prev,
-.nav-label-next {
+.nav-label-prevwrite,
+.nav-label-nextwrite {
   flex-shrink: 0;
   white-space: nowrap;
   margin-right: 16px;
