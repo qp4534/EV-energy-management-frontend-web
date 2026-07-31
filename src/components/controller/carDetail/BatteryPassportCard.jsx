@@ -40,18 +40,16 @@ export default function BatteryPassportCard({ carId }) {
   return (
     <div className="card flex h-full flex-col gap-3">
       <h2>배터리 여권</h2>
-      <dl className="flex flex-col gap-2">
+      <dl className="flex flex-col">
         {rows.map(({ label, value, emphasize }) => (
           <div
             key={label}
-            className="flex items-center justify-between text-base"
+            className="flex items-center justify-between font-medium text-xl border-b border-[var(--color-border)] py-3"
           >
             <dt className="text-[var(--color-sub-text)]">{label}</dt>
             <dd
               className={
-                emphasize
-                  ? "font-medium text-red-600"
-                  : "font-medium text-[var(--color-header-text)]"
+                emphasize ? "text-red-600" : "text-[var(--color-header-text)]"
               }
             >
               {value ?? "-"}

@@ -45,15 +45,8 @@ export default function LocationCard({ carId, riskLevel }) {
         <Map vehicles={vehicles} />
       </div>
       <dl className="flex flex-col gap-1 text-base">
-        <div className="flex justify-between gap-4">
-          <dt className="shrink-0 text-[var(--color-sub-text)]">지역</dt>
-          <dd className="text-right font-medium text-[var(--color-header-text)]">
-            {station.region}
-          </dd>
-        </div>
-        <div className="flex justify-between gap-4">
-          <dt className="shrink-0 text-[var(--color-sub-text)]">주소</dt>
-          <dd className="text-right font-medium text-[var(--color-header-text)]">
+        <div className="flex justify-end gap-4">
+          <dd className="text-right text-[var(--color-header-text)]">
             {station.address}
           </dd>
         </div>
