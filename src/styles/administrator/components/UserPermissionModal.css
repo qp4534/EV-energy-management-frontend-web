@@ -1,0 +1,235 @@
+.permission-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 61, 46, 0.35);
+  padding: 16px;
+}
+
+.permission-modal {
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 12px 40px rgba(15, 61, 46, 0.15);
+}
+
+.permission-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.permission-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-header-text);
+}
+
+.permission-modal-header .sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-sub-text);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--color-btn-desc);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--color-header-text);
+}
+
+.permission-section {
+  margin-top: 24px;
+}
+
+.permission-section h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-header-text);
+}
+
+.helper-text {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--color-btn-desc);
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.role-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  font-size: 13px;
+  color: var(--color-sub-text);
+  background: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.role-btn:hover {
+  background: var(--color-bg-main);
+}
+
+.role-btn.active {
+  background: var(--color-primary-btn);
+  border-color: var(--color-header-text);
+  color: var(--color-header-text);
+  font-weight: 600;
+}
+
+.role-icon {
+  font-size: 18px;
+}
+
+.permission-group {
+  margin-bottom: 14px;
+}
+
+.group-title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-sub-text);
+}
+
+.permission-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--color-header-text);
+  background: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.permission-row input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-header-text);
+}
+
+.account-section {
+  padding-top: 18px;
+  border-top: 1px solid var(--color-border);
+}
+
+.account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--color-bg-main);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.account-row.danger {
+  background: #fdecea;
+  border-color: #f2c4bd;
+}
+
+.account-title {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-header-text);
+}
+
+.account-row .sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--color-btn-desc);
+}
+
+.account-btn {
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.account-btn.primary {
+  background: var(--color-primary-btn);
+  color: var(--color-header-text);
+}
+
+.account-btn.primary:hover {
+  filter: brightness(0.95);
+}
+
+.account-btn.danger {
+  background: #e2574c;
+  color: #ffffff;
+}
+
+.account-btn.danger:hover {
+  filter: brightness(0.95);
+}
+
+.permission-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--color-sub-text);
+  background: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background: var(--color-bg-main);
+}
+
+.save-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-header-text);
+  background: var(--color-primary-btn);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  filter: brightness(0.95);
+}
