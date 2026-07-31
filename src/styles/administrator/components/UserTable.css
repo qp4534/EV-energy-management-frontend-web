@@ -1,0 +1,73 @@
+.table-container {
+  background-color: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.user-table thead tr {
+  background-color: var(--color-footer-bg);
+}
+
+.user-table th {
+  padding: 14px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-header-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.user-table td {
+  padding: 14px 20px;
+  font-size: 0.875rem;
+  color: var(--color-header-text);
+  border-top: 1px solid var(--color-border);
+}
+
+.user-table td.sub {
+  color: var(--color-sub-text);
+}
+
+.user-table tbody tr:hover {
+  background-color: var(--color-footer-bg);
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background-color: var(--color-primary-btn);
+  color: var(--color-header-text);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* 권한 관리 버튼 */
+.action-btn {
+  background-color: transparent;
+  color: var(--color-header-text);
+  border: 1px solid var(--color-sub-text);
+  border-radius: 9999px;
+  padding: 4px 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--color-primary-btn);
+  border-color: var(--color-primary-btn);
+}

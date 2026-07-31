@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { MdCarCrash } from "react-icons/md";
+import { MdBatteryChargingFull } from "react-icons/md";
 import "../styles/Sidebar.css";
 
 function Sidebar({ role = "controller" }) {
@@ -143,6 +144,16 @@ function Sidebar({ role = "controller" }) {
             >
               <FiFileText />
               {isExpanded && <span className="nav-label">로그 관리</span>}
+            </NavLink>
+            <NavLink
+              to="/admin/battery"
+              className={({ isActive }) =>
+                isActive ? "nav-item active" : "nav-item"
+              }
+              title="배터리 관리"
+            >
+              <MdBatteryChargingFull />
+              {isExpanded && <span className="nav-label">배터리 관리</span>}
             </NavLink>
           </nav>
         )}

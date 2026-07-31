@@ -1,0 +1,19 @@
+.user-management-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.user-management-page h1 {
+  color: var(--color-header-text);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
