@@ -2,7 +2,7 @@
 
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import "../../styles/administrator/components/DonutStat.css";
+import "../../../styles/administrator/components/DonutStat.css";
 
 const BORDER = "#e0e0e0";
 

@@ -1,6 +1,6 @@
 import React from "react";
-import CardShell from "../CardShell";
-import DonutStat from "../DonutStat";
+import CardShell from "../common/CardShell";
+import DonutStat from "../common/DonutStat";
 import "../../../styles/administrator/components/UserCard.css";
 
 export default function UserCard({

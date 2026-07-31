@@ -1,0 +1,10 @@
+.proposal-section {
+  margin-bottom: 20px;
+}
+
+.proposal-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin-bottom: 20px;
+}

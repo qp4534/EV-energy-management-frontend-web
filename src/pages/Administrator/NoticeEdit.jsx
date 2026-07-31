@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { MOCK_NOTICES } from "../../mocks/noticeMock";
-import NoticeForm from "../../components/administrator/NoticeForm";
+import NoticeForm from "../../components/administrator/notice/NoticeForm";
 import "../../styles/administrator/NoticeForm.css";
 
 const updateNoticeMock = async (noticeId, data) => {

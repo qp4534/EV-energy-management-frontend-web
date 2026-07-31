@@ -1,5 +1,7 @@
+import React from "react";
 import RankBadge from "../common/RankBadge";
 import StatusDot from "../common/StatusDot";
+import "../../../styles/administrator/components/BuyerCard.css";
 
 /**
  * 매입처별 예상 제안가 카드 (현대글로비스, 지자체 공개입찰 등)

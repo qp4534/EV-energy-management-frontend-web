@@ -1,5 +1,5 @@
-import CardShell from "../CardShell";
-import FlowChart from "../FlowChart";
+import CardShell from "../common/CardShell";
+import FlowChart from "../common/FlowChart";
 
 export default function FlowChartCard({
   title,

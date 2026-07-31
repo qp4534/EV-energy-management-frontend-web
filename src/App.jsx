@@ -6,11 +6,13 @@ import ControllMap from "./pages/Controller/ControllerMap";
 import CarDetail from "./pages/Controller/CarDetail";
 import AiReportList from "./pages/Controller/AiReportList";
 import AiReportDetail from "./pages/Controller/AiReportDetail";
-import AdministratorMain from "./pages/AdministratorMain";
+import AdministratorMain from "./pages/Administrator/AdministratorMain";
 import NoticeManage from "./pages/Administrator/NoticeManage";
 import NoticeWrite from "./pages/Administrator/NoticeWrite";
 import NoticeEdit from "./pages/Administrator/NoticeEdit";
 import NoticeDetail from "./pages/Administrator/NoticeDetail";
+import UserManage from "./pages/Administrator/UserManage";
+import BatteryDiagnosis from "./pages/Administrator/BatteryDiagnosis";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
@@ -47,6 +49,8 @@ function App() {
                 <Route path="/admin/notices/new" element={<NoticeWrite />} />
                 <Route path="/admin/notices/:id" element={<NoticeDetail />} />
                 <Route path="/admin/notices/:id/edit" element={<NoticeEdit />} />
+                <Route path="/admin/users" element={<UserManage />} />
+                <Route path="/admin/battery" element={<BatteryDiagnosis />} />
               </>
               
             )}

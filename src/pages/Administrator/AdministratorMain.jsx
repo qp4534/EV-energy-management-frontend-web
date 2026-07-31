@@ -1,21 +1,20 @@
-import UserCard from "../components/administrator/cards/UserCard";
-import NoticeCard from "../components/administrator/cards/NoticeCard";
-import FlowChartCard from "../components/administrator/cards/FlowChartCard";
+import UserCard from "../../components/administrator/main/UserCard";
+import NoticeCard from "../../components/administrator/main/NoticeCard";
+import FlowChartCard from "../../components/administrator/main/FlowChartCard";
 
-// 1. mock 데이터 파일 import 하기
 import {
   userData,
   staffData,
   accountStatusData,
   memberFlow,
-} from "../mocks/dashboard";
+} from "../../mocks/dashboard";
 
-import { MOCK_NOTICES } from "../mocks/noticeMock";
+import { MOCK_NOTICES } from "../../mocks/noticeMock";
 
-import "../styles/administrator/Administrator.css";
+import "../../styles/administrator/Administrator.css";
 
 export default function AdministratorMain() {
-  // 2. 혹시 자식 컴포넌트(UserCard 등)에서 ownerData를 찾을 수 있으므로 기본값 선언
+  // 임시 기본값 선언
   const ownerData = [
   {
     name: "아이오닉5",
@@ -64,11 +63,12 @@ const operatorData = [
             operatorData={operatorData}
           />
 
-          <NoticeCard 
+          <NoticeCard
             title="공지 사항"
             notices={MOCK_NOTICES}
             limit={5}
             importantOnly={true}
+            expandTo="/admin/notices"
           />
 
           <FlowChartCard

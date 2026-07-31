@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import NoticeForm from "../../components/administrator/NoticeForm";
+import NoticeForm from "../../components/administrator/notice/NoticeForm";
 //import { noticeService } from "../../services/noticeService";
 import "../../styles/administrator/NoticeForm.css";
 

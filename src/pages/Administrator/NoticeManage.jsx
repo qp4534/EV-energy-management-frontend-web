@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Pagination from "../../components/common/Pagination";
 import { MOCK_NOTICES } from "../../mocks/noticeMock";
 import "../../styles/administrator/NoticeManage.css";
 
@@ -101,26 +102,11 @@ function NoticeManage() {
         </tbody>
       </table>
 
-      <div className="notice-pagination">
-        <button disabled={page === 1} onClick={() => setPage(1)}>
-          {"<<"}
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-          <button
-            key={p}
-            className={p === page ? "page-active" : ""}
-            onClick={() => setPage(p)}
-          >
-            {p}
-          </button>
-        ))}
-        <button
-          disabled={page === totalPages}
-          onClick={() => setPage(totalPages)}
-        >
-          {">>"}
-        </button>
-      </div>
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../../styles/administrator/NoticeForm.css";
+import "../../../styles/administrator/NoticeForm.css";
 
 function NoticeForm({ initialData, onSubmit, onCancel, submitLabel = "등록" }) {
   const [title, setTitle] = useState(initialData?.title || "");

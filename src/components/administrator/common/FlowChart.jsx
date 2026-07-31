@@ -13,7 +13,7 @@ import {
 const BORDER = "#e0e0e0";
 const MUTED = "#6c757d";
 
-import "../../styles/administrator/components/FlowChart.css";
+import "../../../styles/administrator/components/FlowChart.css";
 
 export default function FlowChart({ data, seriesA, seriesB, colorA, colorB }) {
   return (
