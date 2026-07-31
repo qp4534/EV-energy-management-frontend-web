@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import LogTabs from "../../components/administrator/LogTabs";
-import DataTable from "../../components/administrator/DataTable";
+import TabBar from "../../components/administrator/common/TabBar";
+import DataTable from "../../components/administrator/common/DataTable";
+import Pagination from "../../components/common/Pagination";
 import {
   MOCK_LOGIN_LOGS,
   MOCK_CAR_CHANGE_LOGS,
@@ -13,6 +14,12 @@ const PAGE_SIZE = 10;
 
 const POSITIVE_STATUS = new Set(["성공", "승인"]);
 const NEGATIVE_STATUS = new Set(["실패", "반려"]);
+const LOG_TABS = [
+  { key: "login", label: "로그인 기록" },
+  { key: "carChange", label: "차량 등록/변경" },
+  { key: "userActivity", label: "이용자 활동" },
+  { key: "adminAction", label: "관리자 작업" },
+];
 
 function StatusBadge({ status }) {
   if (POSITIVE_STATUS.has(status)) {
@@ -123,7 +130,7 @@ export default function LogManage() {
       <div className="log-manage-header">
         <h2>로그 관리</h2>
 
-        <LogTabs activeTab={activeTab} onChange={handleTabChange} />
+        <TabBar tabs={LOG_TABS} activeTab={activeTab} onChange={handleTabChange} />
 
         <div className="log-search-bar">
           {config.showStatusFilter && (
@@ -153,23 +160,11 @@ export default function LogManage() {
 
       <DataTable columns={config.columns} rows={pageRows} />
 
-      <div className="log-pagination">
-        <button disabled={page === 1} onClick={() => setPage(1)}>
-          {"<<"}
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-          <button
-            key={p}
-            className={p === page ? "log-page-active" : ""}
-            onClick={() => setPage(p)}
-          >
-            {p}
-          </button>
-        ))}
-        <button disabled={page === totalPages} onClick={() => setPage(totalPages)}>
-          {">>"}
-        </button>
-      </div>
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

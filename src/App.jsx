@@ -14,6 +14,7 @@ import NoticeDetail from "./pages/Administrator/NoticeDetail";
 import LogManage from "./pages/Administrator/LogManage";
 import UserManage from "./pages/Administrator/UserManage";
 import BatteryDiagnosis from "./pages/Administrator/BatteryDiagnosis";
+import StatsReport from "./pages/Administrator/StatsReport";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
@@ -23,7 +24,7 @@ function App() {
   // 사용자 역할 상태를 관리하는 state
   // 'controller' | 'administrator'
   // 개발하실때 useState('controller')로 설정하시면 관리자 화면이 보여요!(백엔드랑 권한 설정 넣기 전까진 이렇게 해용!)
-  const [userRole, setUserRole] = useState("controller");
+  const [userRole, setUserRole] = useState("administrator");
 
   return (
     <div className="app-container">
@@ -58,6 +59,7 @@ function App() {
                 <Route path="/admin/logs" element={<LogManage />} />
                 <Route path="/admin/users" element={<UserManage />} />
                 <Route path="/admin/battery" element={<BatteryDiagnosis />} />
+                <Route path="/admin/reports" element={<StatsReport />} />
               </>
             )}
           </Routes>

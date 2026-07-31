@@ -2,6 +2,7 @@
   min-height: 100%;
 }
 
+/* Pill 형식의 탭으로 전환 위해 Tailwind로 탭 너비 수정 */
 .log-manage-header {
   display: flex;
   flex-direction: column;
