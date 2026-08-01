@@ -33,9 +33,11 @@ export default function Login() {
       <button type="button" onClick={() => setModalType("service")}>
         서비스 이용약관
       </button>
+      <span className="login-links-divider">|</span>
       <button type="button" onClick={() => setModalType("privacy")}>
         개인정보처리방침
       </button>
+      <span className="login-links-divider">|</span>
       <button type="button" onClick={() => setModalType("location")}>
         위치기반서비스 이용약관
       </button>
