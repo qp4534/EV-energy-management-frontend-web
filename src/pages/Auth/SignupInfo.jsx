@@ -49,6 +49,9 @@ export default function SignupInfo() {
         birth,
         password: form.password,
         passwordConfirm: form.passwordConfirm,
+        // 이 화면까지 왔다는 건 회원가입 약관동의 페이지에서 필수 항목에
+        // 이미 동의했다는 뜻 (ERD의 USER.is_agree 대응)
+        isAgree: true,
       });
       setSuccess(true);
       setError("");
