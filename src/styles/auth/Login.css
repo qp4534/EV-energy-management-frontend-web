@@ -79,11 +79,16 @@
   font-size: 0.85rem;
 }
 
-.login-terms-links a {
+.login-terms-links button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   color: var(--color-sub-text);
   text-decoration: none;
+  font-size: inherit;
 }
 
-.login-terms-links a:hover {
+.login-terms-links button:hover {
   text-decoration: underline;
 }

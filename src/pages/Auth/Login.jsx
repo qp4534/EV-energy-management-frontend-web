@@ -5,6 +5,7 @@ import StepIndicator from "../../components/auth/StepIndicator";
 import RoleSelectCards from "../../components/auth/RoleSelectCards";
 import PasswordInput from "../../components/auth/PasswordInput";
 import AuthButton from "../../components/auth/AuthButton";
+import TermsModal from "../../components/auth/TermsModal";
 import { mockLogin } from "../../services/userService";
 import "../../styles/auth/Login.css";
 
@@ -15,6 +16,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [modalType, setModalType] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +30,15 @@ export default function Login() {
 
   const termsLinks = (
     <div className="login-terms-links">
-      <Link to="/terms/service">서비스 이용약관</Link>
-      <Link to="/terms/privacy">개인정보처리방침</Link>
-      <Link to="/terms/location">위치기반서비스 이용약관</Link>
+      <button type="button" onClick={() => setModalType("service")}>
+        서비스 이용약관
+      </button>
+      <button type="button" onClick={() => setModalType("privacy")}>
+        개인정보처리방침
+      </button>
+      <button type="button" onClick={() => setModalType("location")}>
+        위치기반서비스 이용약관
+      </button>
     </div>
   );
 
@@ -90,6 +98,13 @@ export default function Login() {
             </AuthButton>
           </div>
         </form>
+      )}
+
+      {modalType && (
+        <TermsModal
+          initialType={modalType}
+          onClose={() => setModalType(null)}
+        />
       )}
     </AuthLayout>
   );

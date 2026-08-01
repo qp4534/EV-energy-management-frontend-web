@@ -56,6 +56,10 @@
   font-size: 0.85rem;
   color: var(--color-sub-text);
   text-decoration: underline;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .consent-next-btn {

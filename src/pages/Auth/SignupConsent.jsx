@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AuthLayout from "../../components/auth/AuthLayout";
 import AuthButton from "../../components/auth/AuthButton";
+import TermsModal from "../../components/auth/TermsModal";
 import "../../styles/auth/SignupConsent.css";
 
 const INITIAL_AGREEMENTS = {
@@ -14,6 +15,7 @@ const INITIAL_AGREEMENTS = {
 export default function SignupConsent() {
   const navigate = useNavigate();
   const [agreements, setAgreements] = useState(INITIAL_AGREEMENTS);
+  const [modalType, setModalType] = useState(null);
 
   const allChecked = Object.values(agreements).every(Boolean);
   const requiredChecked =
@@ -37,6 +39,11 @@ export default function SignupConsent() {
     if (requiredChecked) {
       navigate("/signup/info");
     }
+  };
+
+  const handleAgreeFromModal = (key) => {
+    setAgreements((prev) => ({ ...prev, [key]: true }));
+    setModalType(null);
   };
 
   return (
@@ -79,9 +86,13 @@ export default function SignupConsent() {
             onChange={() => toggleOne("service")}
           />
           <span>[필수] 서비스 이용약관 동의</span>
-          <Link to="/terms/service" className="consent-view-link">
+          <button
+            type="button"
+            className="consent-view-link"
+            onClick={() => setModalType("service")}
+          >
             보기
-          </Link>
+          </button>
         </label>
 
         <label className="consent-row">
@@ -91,9 +102,13 @@ export default function SignupConsent() {
             onChange={() => toggleOne("privacy")}
           />
           <span>[필수] 개인정보 수집 및 이용 동의</span>
-          <Link to="/terms/privacy" className="consent-view-link">
+          <button
+            type="button"
+            className="consent-view-link"
+            onClick={() => setModalType("privacy")}
+          >
             보기
-          </Link>
+          </button>
         </label>
 
         <label className="consent-row">
@@ -103,9 +118,13 @@ export default function SignupConsent() {
             onChange={() => toggleOne("location")}
           />
           <span>[선택] 위치기반서비스 이용약관</span>
-          <Link to="/terms/location" className="consent-view-link">
+          <button
+            type="button"
+            className="consent-view-link"
+            onClick={() => setModalType("location")}
+          >
             보기
-          </Link>
+          </button>
         </label>
       </div>
 
@@ -117,6 +136,14 @@ export default function SignupConsent() {
       >
         다음
       </AuthButton>
+
+      {modalType && (
+        <TermsModal
+          initialType={modalType}
+          onClose={() => setModalType(null)}
+          onAgree={handleAgreeFromModal}
+        />
+      )}
     </AuthLayout>
   );
 }
