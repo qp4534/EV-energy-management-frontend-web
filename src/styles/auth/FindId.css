@@ -1,0 +1,68 @@
+.find-id-title {
+  margin: 24px 0 20px;
+  color: var(--color-header-text);
+  font-size: 1.1rem;
+}
+
+.find-id-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 220px;
+}
+
+.find-id-form input {
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.938rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.find-id-form input:focus {
+  outline: none;
+  border-color: var(--color-primary-btn);
+}
+
+.find-id-code-row {
+  display: flex;
+  gap: 12px;
+}
+
+.find-id-code-row input {
+  flex: 1;
+}
+
+.find-id-error {
+  color: #d64545;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.find-id-result {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+  color: var(--color-header-text);
+  line-height: 1.8;
+}
+
+.find-id-result strong {
+  color: #3355dd;
+}
+
+.find-id-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.find-id-actions button {
+  flex: 1;
+}

@@ -1,0 +1,76 @@
+.terms-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.terms-title {
+  color: var(--color-header-text);
+  margin: 0 0 24px;
+}
+
+.terms-tabs {
+  display: flex;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+
+.terms-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16px 0;
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--color-btn-desc);
+  background-color: var(--color-footer-bg);
+}
+
+.terms-tab--active {
+  background-color: var(--color-primary-btn);
+  color: var(--color-header-text);
+}
+
+.terms-body {
+  background: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 32px 40px 48px;
+}
+
+.terms-section {
+  margin-bottom: 20px;
+}
+
+.terms-section h3 {
+  color: var(--color-header-text);
+  margin: 0 0 8px;
+}
+
+.terms-section p {
+  margin: 0 0 8px;
+  color: #333;
+}
+
+.terms-section ol {
+  margin: 0 0 8px;
+  padding-left: 1.25rem;
+}
+
+.terms-section ol > li {
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.terms-section ul {
+  margin: 6px 0;
+  padding-left: 1.25rem;
+}
+
+.terms-closing {
+  margin-top: 24px;
+  color: var(--color-sub-text);
+  font-size: 0.85rem;
+}

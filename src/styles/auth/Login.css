@@ -1,0 +1,89 @@
+.login-title {
+  text-align: center;
+  color: var(--color-header-text);
+  margin: 8px 0 24px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-header-text);
+}
+
+.login-field input[type="email"] {
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.938rem;
+}
+
+.login-field input[type="email"]:focus {
+  outline: none;
+  border-color: var(--color-primary-btn);
+}
+
+.login-error {
+  color: #d64545;
+  font-size: 0.85rem;
+  margin: -8px 0 0;
+}
+
+.login-links {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--color-sub-text);
+}
+
+.login-links a {
+  color: var(--color-sub-text);
+  text-decoration: none;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+.login-links-divider {
+  color: var(--color-border);
+}
+
+.login-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.login-actions--end {
+  justify-content: flex-end;
+}
+
+.login-terms-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+  font-size: 0.85rem;
+}
+
+.login-terms-links a {
+  color: var(--color-sub-text);
+  text-decoration: none;
+}
+
+.login-terms-links a:hover {
+  text-decoration: underline;
+}
