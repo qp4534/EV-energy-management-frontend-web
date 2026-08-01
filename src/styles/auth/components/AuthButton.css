@@ -15,8 +15,7 @@
 }
 
 .auth-btn--primary:hover:not(:disabled) {
-  background-color: #47895f;
-  color: #ffffff;
+  filter: brightness(0.9);
 }
 
 .auth-btn--neutral {
