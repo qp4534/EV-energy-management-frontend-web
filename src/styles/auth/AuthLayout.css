@@ -29,7 +29,6 @@
 .auth-page-logo-icon {
   font-size: 32px;
   color: var(--color-primary-btn);
-  fill: currentColor;
   transform: rotate(-10deg);
 }
 
