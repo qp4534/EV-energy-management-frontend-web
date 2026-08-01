@@ -13,6 +13,11 @@
   font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.role-tab:hover:not(.role-tab--active) {
+  background-color: var(--color-bg-main);
 }
 
 .role-tab--active {
