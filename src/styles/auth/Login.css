@@ -34,7 +34,7 @@
 }
 
 .login-error {
-  color: #d64545;
+  color: var(--color-error);
   font-size: 0.85rem;
   margin: -8px 0 0;
 }
