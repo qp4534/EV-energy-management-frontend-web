@@ -18,6 +18,7 @@ export default function AuthLayout({
         </header>
       ) : (
         <div className="auth-page-logo auth-page-logo--plain">
+          <FiZap className="auth-page-logo-icon auth-page-logo-icon--plain" />
           <span>MijungE</span>
         </div>
       )}

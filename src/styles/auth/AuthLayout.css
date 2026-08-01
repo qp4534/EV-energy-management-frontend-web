@@ -38,6 +38,10 @@
   padding: 56px 0 32px;
 }
 
+.auth-page-logo-icon--plain {
+  font-size: 2.25rem;
+}
+
 .auth-page-main {
   flex: 1;
   display: flex;
