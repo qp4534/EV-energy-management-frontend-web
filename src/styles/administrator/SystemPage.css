@@ -196,12 +196,24 @@
   display: inline-flex;
 }
 
-.matrix-check-on {
-  color: var(--color-sub-text);
+.matrix-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-login-frame);
 }
 
-.matrix-check-off {
-  color: var(--color-border);
+.matrix-checkbox--checked {
+  background-color: var(--color-sub-text);
+  border-color: var(--color-sub-text);
+}
+
+.matrix-checkbox-icon {
+  color: #ffffff;
 }
 
 /* ---------------- 외부 연동 ---------------- */

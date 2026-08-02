@@ -1,5 +1,5 @@
 import React from "react";
-import { SquareCheck, Square } from "lucide-react";
+import { Check } from "lucide-react";
 import ToggleSwitch from "./ToggleSwitch";
 import {
   useNotificationChannels,
@@ -69,11 +69,15 @@ export default function SystemAlertChannel() {
                         })
                       }
                     >
-                      {row[channel.key] ? (
-                        <SquareCheck size={18} className="matrix-check-on" />
-                      ) : (
-                        <Square size={18} className="matrix-check-off" />
-                      )}
+                      <span
+                        className={`matrix-checkbox ${
+                          row[channel.key] ? "matrix-checkbox--checked" : ""
+                        }`}
+                      >
+                        {row[channel.key] && (
+                          <Check size={12} className="matrix-checkbox-icon" />
+                        )}
+                      </span>
                     </button>
                   </td>
                 ))}
