@@ -13,6 +13,7 @@ import NoticeEdit from "./pages/Administrator/NoticeEdit";
 import NoticeDetail from "./pages/Administrator/NoticeDetail";
 import UserManage from "./pages/Administrator/UserManage";
 import BatteryDiagnosis from "./pages/Administrator/BatteryDiagnosis";
+import SystemPage from "./pages/Administrator/SystemPage";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
@@ -59,6 +60,7 @@ function App() {
                 />
                 <Route path="/admin/users" element={<UserManage />} />
                 <Route path="/admin/battery" element={<BatteryDiagnosis />} />
+                <Route path="/admin/system" element={<SystemPage />} />
               </>
             )}
           </Routes>

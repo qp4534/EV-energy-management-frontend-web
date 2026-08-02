@@ -1,3 +1,5 @@
+import "../../../styles/administrator/components/DataTable.css";
+
 /**
  * 컬럼 정의 기반 공용 테이블. "그 외 매입처" 표, "건전성 세부지표" 표, 배터리 목록 등에서 재사용.
  *
