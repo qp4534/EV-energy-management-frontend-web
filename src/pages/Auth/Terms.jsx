@@ -9,7 +9,7 @@ export default function Terms() {
   const content = TERMS_CONTENT[type];
 
   if (!content) {
-    return <Navigate to="/terms/service" replace />;
+    return <Navigate to="/terms/privacy" replace />;
   }
 
   return (

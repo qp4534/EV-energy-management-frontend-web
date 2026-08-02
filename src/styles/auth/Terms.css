@@ -40,6 +40,25 @@
   padding: 32px 40px 48px;
 }
 
+.terms-intro {
+  margin: 0 0 20px;
+  color: #333;
+}
+
+.terms-chapter {
+  margin: 28px 0 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-header-text);
+  font-size: 1.05rem;
+}
+
+.terms-section:first-child .terms-chapter {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 .terms-section {
   margin-bottom: 20px;
 }
@@ -54,19 +73,63 @@
   color: #333;
 }
 
-.terms-section ol {
+.terms-list {
+  list-style: none;
   margin: 0 0 8px;
-  padding-left: 1.25rem;
+  padding-left: 0;
 }
 
-.terms-section ol > li {
+.terms-list > li {
+  display: flex;
+  gap: 6px;
   margin-bottom: 6px;
   color: #333;
 }
 
-.terms-section ul {
-  margin: 6px 0;
+.terms-list-mark {
+  flex-shrink: 0;
+}
+
+.terms-sublist {
+  list-style: disc;
+  margin: 6px 0 0;
   padding-left: 1.25rem;
+}
+
+.terms-list--lettered.terms-sublist {
+  list-style: none;
+  padding-left: 0;
+}
+
+.terms-list--lettered.terms-sublist > li {
+  display: flex;
+  gap: 6px;
+}
+
+.terms-table-wrap {
+  overflow-x: auto;
+  margin: 4px 0 12px;
+}
+
+.terms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.terms-table th,
+.terms-table td {
+  border: 1px solid var(--color-border);
+  padding: 10px 12px;
+  text-align: left;
+  color: #333;
+}
+
+.terms-table th {
+  background-color: var(--color-footer-bg);
+  color: var(--color-header-text);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .terms-closing {

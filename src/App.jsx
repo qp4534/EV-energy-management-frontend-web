@@ -54,7 +54,7 @@ function App() {
         <Route path="/signup" element={<SignupConsent />} />
         <Route path="/signup/info" element={<SignupInfo />} />
         <Route path="/terms/:type" element={<Terms />} />
-        <Route path="/terms" element={<Navigate to="/terms/service" replace />} />
+        <Route path="/terms" element={<Navigate to="/terms/privacy" replace />} />
       </Routes>
     );
   }

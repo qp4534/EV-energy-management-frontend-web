@@ -30,12 +30,16 @@ export default function Login() {
 
   const termsLinks = (
     <div className="login-terms-links">
-      <button type="button" onClick={() => setModalType("service")}>
-        서비스 이용약관
+      <button
+        type="button"
+        className="login-terms-links-bold"
+        onClick={() => setModalType("privacy")}
+      >
+        개인정보처리방침
       </button>
       <span className="login-links-divider">|</span>
-      <button type="button" onClick={() => setModalType("privacy")}>
-        개인정보처리방침
+      <button type="button" onClick={() => setModalType("service")}>
+        서비스 이용약관
       </button>
       <span className="login-links-divider">|</span>
       <button type="button" onClick={() => setModalType("location")}>
