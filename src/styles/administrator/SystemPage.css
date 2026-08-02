@@ -227,6 +227,8 @@
   font-size: 0.8125rem;
   color: var(--color-sub-text);
   margin: 2px 0 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .integration-key-row {
