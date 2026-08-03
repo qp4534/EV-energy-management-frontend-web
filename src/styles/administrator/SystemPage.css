@@ -383,13 +383,18 @@
   gap: 20px;
 }
 
+.resource-usage-icon {
+  color: var(--color-btn-desc);
+}
+
 .resource-usage-label {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-header-text);
+  /* :root에 순수 검정 토큰이 없어 하드코딩 */
+  color: #000000;
   margin-bottom: 8px;
 }
 
@@ -433,7 +438,8 @@
 .deploy-history-version {
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--color-header-text);
+  /* :root에 순수 검정 토큰이 없어 하드코딩 */
+  color: #000000;
   margin-right: 8px;
 }
 
@@ -444,6 +450,6 @@
 
 .deploy-history-desc {
   font-size: 0.8125rem;
-  color: var(--color-sub-text);
+  color: var(--color-btn-desc);
   margin: 2px 0 0;
 }

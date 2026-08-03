@@ -41,7 +41,7 @@ export default function SystemStatus() {
             return (
               <div key={item.key} className="resource-usage-row">
                 <div className="resource-usage-label">
-                  {Icon && <Icon size={16} />}
+                  {Icon && <Icon size={16} className="resource-usage-icon" />}
                   <span>{item.label}</span>
                   <span className="resource-usage-percent">{item.percent}%</span>
                 </div>
