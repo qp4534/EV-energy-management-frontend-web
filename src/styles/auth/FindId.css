@@ -25,13 +25,28 @@
   border-color: var(--color-primary-btn);
 }
 
-.find-id-code-row {
+.find-id-birth-row {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 6px;
 }
 
-.find-id-code-row input {
+.find-id-birth-row select {
   flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.938rem;
+}
+
+.find-id-birth-row select:focus {
+  outline: none;
+  border-color: var(--color-primary-btn);
+}
+
+.find-id-submit-row {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .find-id-error {

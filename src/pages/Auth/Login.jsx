@@ -65,11 +65,12 @@ export default function Login() {
       ) : (
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="login-field">
-            <span>이메일 입력</span>
+            <span>아이디 입력</span>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일 입력"
               autoFocus
             />
           </label>

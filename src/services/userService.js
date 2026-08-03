@@ -18,9 +18,9 @@ export function mockLogin({ role, email, password }) {
   return Promise.resolve({ role: ROLE_DB_VALUE[role], email });
 }
 
-export function mockFindId({ role, email }) {
-  if (!email) {
-    return Promise.reject(new Error("이메일을 입력해주세요."));
+export function mockFindId({ role, name, birth, phone }) {
+  if (!name || !birth || !phone) {
+    return Promise.reject(new Error("이름, 생년월일, 휴대폰 번호를 입력해주세요."));
   }
   return Promise.resolve({
     role: ROLE_DB_VALUE[role],

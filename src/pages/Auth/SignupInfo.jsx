@@ -5,12 +5,8 @@ import RoleSideToggle from "../../components/auth/RoleSideToggle";
 import PasswordInput from "../../components/auth/PasswordInput";
 import AuthButton from "../../components/auth/AuthButton";
 import { mockSignup } from "../../services/userService";
+import { YEARS, MONTHS, DAYS } from "../../constants/birthDate.constants";
 import "../../styles/auth/SignupInfo.css";
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 80 }, (_, i) => CURRENT_YEAR - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 
 export default function SignupInfo() {
   const navigate = useNavigate();

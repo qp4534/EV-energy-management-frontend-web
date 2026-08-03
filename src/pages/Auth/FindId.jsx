@@ -3,14 +3,18 @@ import { useNavigate } from "react-router-dom";
 import AuthLayout from "../../components/auth/AuthLayout";
 import RoleTabs from "../../components/auth/RoleTabs";
 import AuthButton from "../../components/auth/AuthButton";
+import { YEARS, MONTHS, DAYS } from "../../constants/birthDate.constants";
 import { mockFindId } from "../../services/userService";
 import "../../styles/auth/FindId.css";
 
 export default function FindId() {
   const navigate = useNavigate();
   const [role, setRole] = useState("administrator");
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
+  const [phone, setPhone] = useState("");
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
@@ -23,7 +27,11 @@ export default function FindId() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await mockFindId({ role, email });
+      const birth =
+        birthYear && birthMonth && birthDay
+          ? `${birthYear}-${String(birthMonth).padStart(2, "0")}-${String(birthDay).padStart(2, "0")}`
+          : "";
+      const res = await mockFindId({ role, name, birth, phone });
       setResult(res);
       setError("");
     } catch (err) {
@@ -47,23 +55,52 @@ export default function FindId() {
       ) : (
         <form className="find-id-form" onSubmit={handleSubmit}>
           <input
-            type="email"
-            placeholder="이메일 입력"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="이름 입력"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-          <div className="find-id-code-row">
-            <input
-              type="text"
-              placeholder="암호 입력"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
+          <div className="find-id-birth-row">
+            <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)}>
+              <option value=""></option>
+              {YEARS.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+            <span>년</span>
+            <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
+              <option value=""></option>
+              {MONTHS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <span>월</span>
+            <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)}>
+              <option value=""></option>
+              {DAYS.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+            <span>일</span>
+          </div>
+          <input
+            type="text"
+            placeholder="휴대폰 번호 입력"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          {error && <p className="find-id-error">{error}</p>}
+          <div className="find-id-submit-row">
             <AuthButton variant="primary" type="submit">
-              재전송
+              아이디 찾기
             </AuthButton>
           </div>
-          {error && <p className="find-id-error">{error}</p>}
         </form>
       )}
 
