@@ -11,18 +11,26 @@ export default function SystemBatchJob() {
 
   const columns = [
     { key: "name", header: "작업명" },
-    { key: "cycle", header: "주기" },
+    {
+      key: "cycle",
+      header: "주기",
+      render: (row) => <span className="batch-job-muted">{row.cycle}</span>,
+    },
     {
       key: "lastRun",
       header: "마지막 실행",
       render: (row) => (
         <div className="batch-job-last-run">
-          <span>{row.lastRun}</span>
+          <span className="batch-job-muted">{row.lastRun}</span>
           <span className="batch-job-last-run-sub">{row.lastRunResult}</span>
         </div>
       ),
     },
-    { key: "nextRun", header: "다음 실행" },
+    {
+      key: "nextRun",
+      header: "다음 실행",
+      render: (row) => <span className="batch-job-muted">{row.nextRun}</span>,
+    },
     {
       key: "status",
       header: "상태",

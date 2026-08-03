@@ -293,6 +293,10 @@
   color: var(--color-btn-desc);
 }
 
+.batch-job-muted {
+  color: var(--color-btn-desc);
+}
+
 .batch-job-run-btn {
   display: inline-flex;
   align-items: center;
