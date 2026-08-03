@@ -11,7 +11,11 @@ export default function StatusBadge({ status, successLabel = "정상", errorLabe
   const isSuccess = status === "success";
   return (
     <span className={`status-badge ${isSuccess ? "status-badge--success" : "status-badge--error"}`}>
-      {isSuccess ? <CircleCheck size={14} /> : <CircleAlert size={14} />}
+      {isSuccess ? (
+        <CircleCheck size={14} />
+      ) : (
+        <CircleAlert size={14} fill="#ca2b2e" color="#ffffff" />
+      )}
       {isSuccess ? successLabel : errorLabel}
     </span>
   );
