@@ -293,8 +293,13 @@
   color: var(--color-btn-desc);
 }
 
-.batch-job-muted {
+.system-text-muted {
   color: var(--color-btn-desc);
+}
+
+/* :root에 순수 검정 토큰이 없어 하드코딩 */
+.system-text-black {
+  color: #000000;
 }
 
 .batch-job-run-btn {

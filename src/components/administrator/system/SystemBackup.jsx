@@ -8,10 +8,28 @@ export default function SystemBackup() {
   const { data: backups } = useBackups();
 
   const columns = [
-    { key: "id", header: "백업 ID" },
-    { key: "type", header: "유형" },
-    { key: "size", header: "크기" },
-    { key: "completedAt", header: "완료 시각" },
+    {
+      key: "id",
+      header: "백업 ID",
+      render: (row) => <span className="system-text-black">{row.id}</span>,
+    },
+    {
+      key: "type",
+      header: "유형",
+      render: (row) => <span className="system-text-muted">{row.type}</span>,
+    },
+    {
+      key: "size",
+      header: "크기",
+      render: (row) => <span className="system-text-muted">{row.size}</span>,
+    },
+    {
+      key: "completedAt",
+      header: "완료 시각",
+      render: (row) => (
+        <span className="system-text-muted">{row.completedAt}</span>
+      ),
+    },
     {
       key: "status",
       header: "상태",

@@ -14,14 +14,14 @@ export default function SystemBatchJob() {
     {
       key: "cycle",
       header: "주기",
-      render: (row) => <span className="batch-job-muted">{row.cycle}</span>,
+      render: (row) => <span className="system-text-muted">{row.cycle}</span>,
     },
     {
       key: "lastRun",
       header: "마지막 실행",
       render: (row) => (
         <div className="batch-job-last-run">
-          <span className="batch-job-muted">{row.lastRun}</span>
+          <span className="system-text-muted">{row.lastRun}</span>
           <span className="batch-job-last-run-sub">{row.lastRunResult}</span>
         </div>
       ),
@@ -29,7 +29,7 @@ export default function SystemBatchJob() {
     {
       key: "nextRun",
       header: "다음 실행",
-      render: (row) => <span className="batch-job-muted">{row.nextRun}</span>,
+      render: (row) => <span className="system-text-muted">{row.nextRun}</span>,
     },
     {
       key: "status",
