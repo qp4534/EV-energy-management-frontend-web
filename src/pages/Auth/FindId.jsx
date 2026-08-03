@@ -7,6 +7,13 @@ import { YEARS, MONTHS, DAYS } from "../../constants/birthDate.constants";
 import { mockFindId } from "../../services/userService";
 import "../../styles/auth/FindId.css";
 
+// 이메일 아이디의 개인정보 보호를 위해 앞 3자만 노출하고 나머지는 마스킹
+function maskEmailId(email) {
+  const [local, domain] = email.split("@");
+  if (!domain) return email;
+  return `${local.slice(0, 3)}*****@${domain}`;
+}
+
 export default function FindId() {
   const navigate = useNavigate();
   const [role, setRole] = useState("administrator");
@@ -49,7 +56,7 @@ export default function FindId() {
           <p>
             {result.name}님의 아이디는
             <br />
-            <strong>{result.userId}</strong> 입니다.
+            <strong>{maskEmailId(result.userId)}</strong> 입니다.
           </p>
         </div>
       ) : (

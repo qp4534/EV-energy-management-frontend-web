@@ -53,7 +53,7 @@ export default function ResetPasswordRequest() {
 
         <div className="reset-resend-row">
           <AuthButton variant="primary" type="submit">
-            재전송
+            {sent ? "재전송" : "찾기"}
           </AuthButton>
         </div>
 

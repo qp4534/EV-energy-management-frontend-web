@@ -24,7 +24,7 @@ export function mockFindId({ role, name, birth, phone }) {
   }
   return Promise.resolve({
     role: ROLE_DB_VALUE[role],
-    userId: "gogildong123",
+    userId: "gogildong123@naver.com",
     name: "고길동",
   });
 }
