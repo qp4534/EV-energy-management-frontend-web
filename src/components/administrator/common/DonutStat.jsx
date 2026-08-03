@@ -1,8 +1,5 @@
-// src/components/dashboard/DonutStat.jsx
-
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import "../../../styles/administrator/components/DonutStat.css";
 
 const BORDER = "#e0e0e0";
 
@@ -22,8 +19,8 @@ export default function DonutStat({ title, data = [] }) {
     : data;
 
   return (
-    <div className="donut-stat">
-      <div className="donut-chart-wrap">
+    <div className="flex flex-1 flex-col items-center">
+      <div className="relative h-[130px] w-[130px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -48,7 +45,7 @@ export default function DonutStat({ title, data = [] }) {
           </PieChart>
         </ResponsiveContainer>
 
-        <div className="donut-center-label">
+        <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center text-[15px] leading-relaxed font-semibold whitespace-nowrap text-[var(--color-sub-text)] [&>span]:text-[13px] [&>span]:leading-tight [&>span]:font-bold [&>span]:text-[var(--color-header-text)]">
           {Array.isArray(title) ? (
             title.map((text) => (
               <span key={text}>{text}</span>
@@ -59,26 +56,26 @@ export default function DonutStat({ title, data = [] }) {
         </div>
       </div>
 
-      <div className="donut-legend">
+      <div className="mt-3 flex w-full flex-col gap-1">
         {data.map((item) => (
           <div
             key={item.name}
-            className="donut-legend-item"
+            className="flex items-center justify-between text-xs"
           >
-            <span className="legend-left">
+            <span className="flex items-center gap-1.5">
               <span
-                className="legend-dot"
+                className="inline-block h-2 w-2 rounded-sm"
                 style={{
                   backgroundColor: item.color,
                 }}
               />
 
-              <span className="legend-name">
+              <span className="text-[var(--color-sub-text)]">
                 {item.name}
               </span>
             </span>
 
-            <span className="legend-value">
+            <span className="font-semibold text-[var(--color-header-text)]">
               {item.value}명
             </span>
           </div>

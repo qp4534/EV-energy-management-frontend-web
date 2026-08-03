@@ -1,36 +1,35 @@
 import React from 'react';
-import '../../../styles/administrator/components/UserTable.css';
 
 export default function UserTable({ users, onManageRole }) {
   return (
-    <div className="table-container">
-      <table className="user-table">
+    <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-login-frame)]">
+      <table className="w-full border-collapse text-left">
         <thead>
-          <tr>
-            <th>이름</th>
-            <th>이메일</th>
-            <th>유형</th>
-            <th>생일</th>
-            <th className="text-center">관리</th>
+          <tr className="bg-[var(--color-footer-bg)]">
+            <th className="border-b border-[var(--color-border)] px-5 py-3.5 text-sm font-semibold text-[var(--color-header-text)]">이름</th>
+            <th className="border-b border-[var(--color-border)] px-5 py-3.5 text-sm font-semibold text-[var(--color-header-text)]">이메일</th>
+            <th className="border-b border-[var(--color-border)] px-5 py-3.5 text-sm font-semibold text-[var(--color-header-text)]">유형</th>
+            <th className="border-b border-[var(--color-border)] px-5 py-3.5 text-sm font-semibold text-[var(--color-header-text)]">생일</th>
+            <th className="border-b border-[var(--color-border)] px-5 py-3.5 text-center text-sm font-semibold text-[var(--color-header-text)]">관리</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.name}</td>
-              <td className="sub">{user.email}</td>
-              <td>
-                <span className="role-badge">
+            <tr key={user.id} className="hover:bg-[var(--color-footer-bg)]">
+              <td className="border-t border-[var(--color-border)] px-5 py-3.5 text-sm text-[var(--color-header-text)]">{user.name}</td>
+              <td className="border-t border-[var(--color-border)] px-5 py-3.5 text-sm text-[var(--color-sub-text)]">{user.email}</td>
+              <td className="border-t border-[var(--color-border)] px-5 py-3.5 text-sm text-[var(--color-header-text)]">
+                <span className="inline-flex items-center justify-center rounded-full bg-[var(--color-primary-btn)] px-3 py-1 text-[0.8125rem] font-semibold text-[var(--color-header-text)]">
                   {user.role === '관리자' && '🛡️ '}
                   {user.role === '관제사' && '📡 '}
                   {user.role === '차주' && '🚚 '}
                   {user.role}
                 </span>
               </td>
-              <td className="sub">{user.birth}</td>
-              <td className="text-center">
-                <button 
-                  className="action-btn"
+              <td className="border-t border-[var(--color-border)] px-5 py-3.5 text-sm text-[var(--color-sub-text)]">{user.birth}</td>
+              <td className="border-t border-[var(--color-border)] px-5 py-3.5 text-center text-sm text-[var(--color-header-text)]">
+                <button
+                  className="rounded-full border border-[var(--color-sub-text)] bg-transparent px-3.5 py-1 text-[0.8125rem] font-medium text-[var(--color-header-text)] transition-colors hover:border-[var(--color-primary-btn)] hover:bg-[var(--color-primary-btn)]"
                   onClick={() => onManageRole && onManageRole(user)}
                 >
                   권한 관리

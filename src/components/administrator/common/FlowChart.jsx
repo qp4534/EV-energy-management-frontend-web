@@ -13,11 +13,9 @@ import {
 const BORDER = "#e0e0e0";
 const MUTED = "#6c757d";
 
-import "../../../styles/administrator/components/FlowChart.css";
-
 export default function FlowChart({ data, seriesA, seriesB, colorA, colorB }) {
   return (
-    <div className="flow-chart-wrap">
+    <div className="flex flex-1 flex-col">
       <ResponsiveContainer width="100%" height={150}>
         <AreaChart
           data={data}
@@ -83,13 +81,13 @@ export default function FlowChart({ data, seriesA, seriesB, colorA, colorB }) {
           />
         </AreaChart>
       </ResponsiveContainer>
-      <div className="flow-legend">
-        <div className="flow-legend-item">
-          <span className="flow-dot" style={{ backgroundColor: colorA }} />
+      <div className="mt-1 flex items-center justify-center gap-5">
+        <div className="flex items-center gap-1.5 text-[11px] text-[var(--color-sub-text)]">
+          <span className="inline-block h-[7px] w-[7px] rounded-full" style={{ backgroundColor: colorA }} />
           {seriesA}
         </div>
-        <div className="flow-legend-item">
-          <span className="flow-dot" style={{ backgroundColor: colorB }} />
+        <div className="flex items-center gap-1.5 text-[11px] text-[var(--color-sub-text)]">
+          <span className="inline-block h-[7px] w-[7px] rounded-full" style={{ backgroundColor: colorB }} />
           {seriesB}
         </div>
       </div>

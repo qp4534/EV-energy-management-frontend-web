@@ -1,36 +1,44 @@
 import React from 'react';
-import '../../../styles/administrator/components/SearchFilterSection.css';
 
-export default function SearchFilterSection({ 
-  searchTerm, 
-  onSearchChange, 
-  onSearchSubmit, 
-  activeFilter, 
-  onFilterChange 
+export default function SearchFilterSection({
+  searchTerm,
+  onSearchChange,
+  onSearchSubmit,
+  activeFilter,
+  onFilterChange
 }) {
   const filters = ['전체', '관리자', '관제사', '차주'];
 
   return (
-    <div className="search-bar">
-      <form className="search-bar-left" onSubmit={onSearchSubmit}>
-        <div className="search-input-wrap">
-          <span className="search-icon">🔍</span>
+    <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+      <form className="flex min-w-[280px] flex-1 items-center gap-3" onSubmit={onSearchSubmit}>
+        <div className="flex h-[38px] max-w-[360px] flex-1 items-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-login-frame)] px-2.5 py-2">
+          <span className="mr-1 text-[var(--color-sub-text)]">🔍</span>
           <input
             type="text"
-            className="search-input"
+            className="w-full flex-1 border-none bg-transparent text-sm text-[var(--color-header-text)] outline-none placeholder:text-[var(--color-sub-text)]"
             placeholder="이름 또는 이메일 검색"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <button type="submit" className="search-btn">검색</button>
+        <button
+          type="submit"
+          className="rounded-2xl border-none bg-[var(--color-primary-btn)] px-6 py-2 text-sm font-semibold whitespace-nowrap text-[var(--color-header-text)] transition-[filter] hover:brightness-95"
+        >
+          검색
+        </button>
       </form>
 
-      <div className="filter-tabs">
+      <div className="flex items-center gap-2">
         {filters.map((filter) => (
           <button
             key={filter}
-            className={`filter-tab ${activeFilter === filter ? 'active' : ''}`}
+            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+              activeFilter === filter
+                ? 'border-[var(--color-header-text)] bg-[var(--color-header-text)] text-white'
+                : 'border-[var(--color-border)] bg-transparent text-[var(--color-sub-text)] hover:bg-[var(--color-footer-bg)]'
+            }`}
             onClick={() => onFilterChange(filter)}
           >
             {filter}
