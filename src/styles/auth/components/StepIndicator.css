@@ -1,0 +1,35 @@
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 0 auto 32px;
+  background-color: var(--color-primary-btn);
+  border-radius: 999px;
+  padding: 8px;
+}
+
+.step-indicator-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 40px;
+  height: 40px;
+  color: var(--color-header-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.step-indicator-item--active {
+  background-color: #fff;
+  border-radius: 999px;
+  padding: 0 20px;
+}
+
+.step-indicator-divider {
+  width: 32px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.7);
+}

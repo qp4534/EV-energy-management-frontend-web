@@ -65,6 +65,7 @@
   --color-footer-border: #e2e6d8; /* 푸터 외곽선 */
   --color-footer-desc: #6b8064; /* 푸터 설명글 */
   --color-btn-desc: #acacac; /* 버튼 설명글 */
+  --color-error: #d63b2f; /* 경고 레드 - 폼 에러 문구, 카드 라벨 */
 
   /* 차량 위험도 상태 색상. 기존 StatCardItem.jsx에 하드코딩돼 있던 값을 그대로 변수화함.
      CarList 테이블의 위험도 스와치(RISK_LEVEL_COLOR)도 동일한 변수를 참조한다. */
