@@ -14,6 +14,7 @@ import NoticeDetail from "./pages/Administrator/NoticeDetail";
 import LogManage from "./pages/Administrator/LogManage";
 import UserManage from "./pages/Administrator/UserManage";
 import BatteryDiagnosis from "./pages/Administrator/BatteryDiagnosis";
+import SystemPage from "./pages/Administrator/SystemPage";
 import StatsReport from "./pages/Administrator/StatsReport";
 import Login from "./pages/Auth/Login";
 import FindId from "./pages/Auth/FindId";
@@ -94,6 +95,7 @@ function DashboardLayout() {
                 <Route path="/admin/logs" element={<LogManage />} />
                 <Route path="/admin/users" element={<UserManage />} />
                 <Route path="/admin/battery" element={<BatteryDiagnosis />} />
+                <Route path="/admin/system" element={<SystemPage />} />
                 <Route path="/admin/reports" element={<StatsReport />} />
               </>
             )}

@@ -1,0 +1,460 @@
+.system-page {
+  padding: 32px;
+  background-color: var(--color-bg-main);
+  min-height: 100vh;
+}
+
+.system-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin-bottom: 20px;
+}
+
+/* ---------------- Tabs ---------------- */
+.system-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background-color: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.system-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-btn-desc);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.system-tab:hover {
+  color: var(--color-header-text);
+}
+
+.system-tab.active {
+  background-color: var(--color-border);
+  color: var(--color-header-text);
+  box-shadow: inset 0 2px 4px #b8b8b8;
+}
+
+/* ---------------- Layout ---------------- */
+.system-tab-columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.system-tab-columns > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------------- Card ---------------- */
+.system-card {
+  background-color: var(--color-login-frame);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.system-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin-bottom: 20px;
+}
+
+.system-card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.system-card-header-row .system-card-title {
+  margin-bottom: 0;
+}
+
+/* ---------------- 알림 채널: 채널 활성화 ---------------- */
+.channel-toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.channel-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background-color: var(--color-footer-bg);
+  border-radius: 10px;
+}
+
+.channel-toggle-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-header-text);
+  margin: 0;
+}
+
+.channel-toggle-desc {
+  font-size: 0.8125rem;
+  color: var(--color-sub-text);
+  margin: 2px 0 0;
+}
+
+/* ---------------- Toggle switch ---------------- */
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-border);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.toggle-switch.on {
+  background-color: var(--color-primary-btn);
+}
+
+.toggle-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.toggle-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-login-frame);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.toggle-switch.on .toggle-switch-knob {
+  transform: translateX(20px);
+}
+
+/* ---------------- 시스템 관리 공용 테이블 (매트릭스 등) ---------------- */
+.system-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.system-table th {
+  padding: 12px 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-sub-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.system-table td {
+  padding: 14px 16px;
+  font-size: 0.875rem;
+  color: var(--color-header-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.system-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.system-table__th--center {
+  text-align: center;
+}
+
+.system-table__td--center {
+  text-align: center;
+}
+
+.matrix-check-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.matrix-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-login-frame);
+}
+
+.matrix-checkbox--checked {
+  background-color: var(--color-sub-text);
+  border-color: var(--color-sub-text);
+}
+
+.matrix-checkbox-icon {
+  color: #ffffff;
+}
+
+/* ---------------- 외부 연동 ---------------- */
+.integration-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.integration-card {
+  padding: 18px 20px;
+  background-color: var(--color-footer-bg);
+  border-radius: 10px;
+}
+
+.integration-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin: 0;
+}
+
+.integration-desc {
+  font-size: 0.8125rem;
+  color: var(--color-sub-text);
+  margin: 2px 0 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.integration-key-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.integration-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-sub-text);
+  font-family: monospace;
+}
+
+.integration-reissue-btn {
+  padding: 6px 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-header-text);
+  background-color: var(--color-login-frame);
+  border: 1px solid var(--color-sub-text);
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.integration-reissue-btn:hover {
+  background-color: var(--color-primary-btn);
+  border-color: var(--color-primary-btn);
+}
+
+.integration-reissue-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---------------- 배치 작업 ---------------- */
+.batch-job-last-run {
+  display: flex;
+  flex-direction: column;
+}
+
+.batch-job-last-run-sub {
+  font-size: 0.75rem;
+  color: var(--color-btn-desc);
+}
+
+.system-text-muted {
+  color: var(--color-btn-desc);
+}
+
+/* :root에 순수 검정 토큰이 없어 하드코딩 */
+.system-text-black {
+  color: #000000;
+}
+
+.batch-job-run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-sub-text);
+  background-color: var(--color-login-frame);
+  border: 1px solid var(--color-sub-text);
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.batch-job-run-btn:hover {
+  background-color: var(--color-primary-btn);
+  border-color: var(--color-primary-btn);
+}
+
+.batch-job-run-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---------------- 상태 뱃지 ---------------- */
+/* TODO: :root에 --color-success / --color-danger 토큰이 생기면 아래 hex를 교체 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.status-badge--success {
+  color: #2f9e5c;
+}
+
+.status-badge--error {
+  color: #ca2b2e;
+}
+
+/* ---------------- 시스템 상태 ---------------- */
+.resource-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-sub-text);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.resource-refresh-btn:hover {
+  background-color: var(--color-footer-bg);
+}
+
+.resource-refresh-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.resource-refresh-btn .spinning {
+  animation: system-spin 0.8s linear infinite;
+}
+
+@keyframes system-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resource-usage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.resource-usage-icon {
+  color: var(--color-btn-desc);
+}
+
+.resource-usage-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  /* :root에 순수 검정 토큰이 없어 하드코딩 */
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.resource-usage-percent {
+  margin-left: auto;
+}
+
+.resource-usage-bar-track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.resource-usage-bar-fill {
+  height: 100%;
+  background-color: var(--color-sub-text);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.deploy-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.deploy-history-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.deploy-history-icon {
+  color: var(--color-btn-desc);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.deploy-history-version {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  /* :root에 순수 검정 토큰이 없어 하드코딩 */
+  color: #000000;
+  margin-right: 8px;
+}
+
+.deploy-history-date {
+  font-size: 0.8125rem;
+  color: var(--color-btn-desc);
+}
+
+.deploy-history-desc {
+  font-size: 0.8125rem;
+  color: var(--color-btn-desc);
+  margin: 2px 0 0;
+}

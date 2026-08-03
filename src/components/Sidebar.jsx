@@ -162,7 +162,7 @@ function Sidebar({ role = "controller" }) {
       {/* 하단 고정 메뉴 (설정) */}
       <div className="sidebar-bottom">
         <NavLink
-          to={role === "admin" ? "/admin/settings" : "/controller/settings"}
+          to={role === "administrator" ? "/admin/system" : "/controller/settings"}
           className={({ isActive }) =>
             isActive ? "nav-item active" : "nav-item"
           }
