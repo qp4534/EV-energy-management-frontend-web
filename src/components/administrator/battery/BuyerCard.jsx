@@ -26,7 +26,8 @@ export default function BuyerCard({
 }) {
   return (
     <div className="mb-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-login-frame)] px-6 py-5">
-      <div className="mb-3.5 flex items-start justify-between gap-4">
+      {/* 헤더 영역 + 구분선 */}
+      <div className="mb-3.5 flex items-start justify-between gap-4 border-b border-[var(--color-border)] pb-3.5">
         <div>
           <p className="text-[1.0625rem] font-bold text-[var(--color-header-text)]">
             {name}
@@ -36,10 +37,13 @@ export default function BuyerCard({
           </p>
         </div>
         <div className="flex-shrink-0 text-right">
-          <RankBadge rank={rank} />
-          <p className="mt-1.5 text-[1.375rem] font-bold text-[var(--color-header-text)]">
-            {price}만원
-          </p>
+          {/* 배지 + 가격 나란히 */}
+          <div className="flex items-center justify-end gap-2">
+            <RankBadge rank={rank} />
+            <p className="text-[1.375rem] font-bold text-[var(--color-header-text)]">
+              {price}만원
+            </p>
+          </div>
           <p className="mt-0.5 text-xs text-[var(--color-btn-desc)]">
             {priceSubtext}
           </p>

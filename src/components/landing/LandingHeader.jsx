@@ -1,16 +1,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FiZap } from "react-icons/fi";
+import useAuth, { clearAuth } from "../../hooks/common/useAuth";
 
-/**
- * 랜딩(메인) 페이지 전용 헤더
- * - 내부 대시보드 Header.jsx와 달리 로그인 전 방문자에게 노출되는 헤더입니다.
- * - 어두운 초록 히어로 배경 위에 올라가므로 배경은 투명하게 둡니다.
- */
 export default function LandingHeader({ onLoginClick }) {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
 
-  const handleLogin = () => {
+  const handleClick = () => {
+    if (isLoggedIn) {
+      clearAuth();
+      navigate("/");
+      return;
+    }
     if (onLoginClick) {
       onLoginClick();
       return;
@@ -30,9 +32,9 @@ export default function LandingHeader({ onLoginClick }) {
       <button
         type="button"
         className="bg-[var(--color-primary-btn)] text-[var(--color-header-text)] border-none rounded-full py-2 px-5 text-sm font-bold transition-[filter] duration-150 hover:brightness-95"
-        onClick={handleLogin}
+        onClick={handleClick}
       >
-        로그인
+        {isLoggedIn ? "로그아웃" : "로그인"}
       </button>
     </header>
   );

@@ -1,4 +1,12 @@
 import React from 'react';
+import TabBar from '../common/TabBar';
+
+const FILTER_TABS = [
+  { key: '전체', label: '전체' },
+  { key: '관리자', label: '관리자' },
+  { key: '관제사', label: '관제사' },
+  { key: '차주', label: '차주' },
+];
 
 export default function SearchFilterSection({
   searchTerm,
@@ -7,8 +15,6 @@ export default function SearchFilterSection({
   activeFilter,
   onFilterChange
 }) {
-  const filters = ['전체', '관리자', '관제사', '차주'];
-
   return (
     <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
       <form className="flex min-w-[280px] flex-1 items-center gap-3" onSubmit={onSearchSubmit}>
@@ -30,21 +36,7 @@ export default function SearchFilterSection({
         </button>
       </form>
 
-      <div className="flex items-center gap-2">
-        {filters.map((filter) => (
-          <button
-            key={filter}
-            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-              activeFilter === filter
-                ? 'border-[var(--color-header-text)] bg-[var(--color-header-text)] text-white'
-                : 'border-[var(--color-border)] bg-transparent text-[var(--color-sub-text)] hover:bg-[var(--color-footer-bg)]'
-            }`}
-            onClick={() => onFilterChange(filter)}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={FILTER_TABS} activeTab={activeFilter} onChange={onFilterChange} />
     </div>
   );
 }

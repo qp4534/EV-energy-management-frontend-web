@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-//import { getNoticeById, deleteNotice, getNotices } from "../services/noticeApi";
-import { MOCK_NOTICES } from "../../mocks/noticeMock";
+import { getNoticeDetail } from '../../services/noticeService';
 import "../../styles/administrator/NoticeDetail.css";
 
 function NoticeDetail() {
@@ -11,24 +10,19 @@ function NoticeDetail() {
   const [prevNext, setPrevNext] = useState({ prev: null, next: null });
 
   useEffect(() => {
-    const found = MOCK_NOTICES.find((n) => n.noticeId === id);
-    setNotice(found || null);
-
-    const sorted = [...MOCK_NOTICES].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-    const idx = sorted.findIndex((n) => n.noticeId === id);
-
-    setPrevNext({
-      prev: idx > 0 ? sorted[idx - 1] : null,
-      next: idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null,
-    });
+    const fetchDetail = async () => {
+      try {
+        const data = await getNoticeDetail(id);
+        setNotice(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchDetail();
   }, [id]);
 
   const handleDelete = () => {
     if (!window.confirm("이 공지사항을 삭제하시겠습니까?")) return;
-    // 실제 mock 배열 mutate는 지금 단계에선 화면 확인용으로 목록 이동만 처리
-    // 백엔드 붙으면 여기서 DELETE API 호출로 교체
     navigate("/admin/notices");
   };
 
@@ -40,7 +34,7 @@ function NoticeDetail() {
 
   return (
     <div className="notice-detail">
-      <h2 className="notice-detail-page-title">공지사항 상세</h2>
+      <h2>공지사항 상세</h2>
 
       <div className="notice-detail-box">
         <div className="detail-badges">
