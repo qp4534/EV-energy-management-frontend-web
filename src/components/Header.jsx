@@ -1,8 +1,17 @@
 import React from "react";
-import { FiZap, FiUser } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { FiZap, FiUser, FiLogOut } from "react-icons/fi";
+import { clearAuth } from "../hooks/common/useAuth";
 import "../styles/Header.css";
 
 function Header({ role = "controller" }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate("/");
+  };
+
   return (
     <header className="header">
       {/* 좌측: 서브 타이틀 & 로고 영역 */}
@@ -23,6 +32,10 @@ function Header({ role = "controller" }) {
             {role === "admin" ? "최고 관리자" : "관제 운용자"}
           </span>
         </div>
+        <button type="button" className="logout-btn" onClick={handleLogout}>
+          <FiLogOut />
+          로그아웃
+        </button>
       </div>
     </header>
   );

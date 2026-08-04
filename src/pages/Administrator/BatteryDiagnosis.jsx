@@ -31,7 +31,7 @@ export default function BatteryDiagnosis() {
  
   return (
     <div className="battery-diagnosis-page">
-      <h1 className="battery-diagnosis-title">배터리 진단</h1>
+      <h2 className="battery-diagnosis-title">배터리 진단</h2>
  
       <TabBar tabs={DIAGNOSIS_TABS} activeTab={activeTab} onChange={setActiveTab} />
  

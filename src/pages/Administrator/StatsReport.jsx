@@ -45,7 +45,7 @@ export default function StatsReport() {
     <div className="min-h-screen bg-[var(--color-bg-main)] p-8">
       {/* 헤더: 타이틀 + 기간 선택 */}
       <div className="mb-5 flex items-center justify-between">
-        <h1 className="text-[var(--color-header-text)]">통계 / 리포트 조회</h1>
+        <h2 className="text-[var(--color-header-text)]">통계 / 리포트 조회</h2>
 
         <button
           type="button"
