@@ -8,7 +8,7 @@ import {
   Tooltip, 
   CartesianGrid
 } from "recharts";
-import DiagnosisTabs from "../../components/administrator/battery/DiagnosisTabs";
+import TabBar from "../../components/administrator/common/TabBar";
 import ReuseJudgementCard from "../../components/administrator/battery/ReuseJudgementCard";
 import BatteryStatCard from "../../components/administrator/battery/BatteryStatCard";
 import BuyerCard from "../../components/administrator/battery/BuyerCard";
@@ -17,6 +17,12 @@ import ProposalContent from "../../components/administrator/battery/ProposalCont
 import { diagnosisMock } from "../../mocks/diagnosisMock";
 import { valueMock } from "../../mocks/valueMock";
 import "../../styles/administrator/BatteryDiagnosis.css";
+
+const DIAGNOSIS_TABS = [
+  { key: "diagnosis", label: "배터리 진단" },
+  { key: "value", label: "배터리 잔존가치/판매처" },
+  { key: "proposal", label: "배터리 매도 제안서" },
+];
 
 export default function BatteryDiagnosis() {
   const [activeTab, setActiveTab] = useState("diagnosis");
@@ -27,7 +33,7 @@ export default function BatteryDiagnosis() {
     <div className="battery-diagnosis-page">
       <h1 className="battery-diagnosis-title">배터리 진단</h1>
  
-      <DiagnosisTabs activeTab={activeTab} onChange={setActiveTab} />
+      <TabBar tabs={DIAGNOSIS_TABS} activeTab={activeTab} onChange={setActiveTab} />
  
       {activeTab === "diagnosis" && (
         <>

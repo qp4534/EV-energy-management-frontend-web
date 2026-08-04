@@ -1,0 +1,135 @@
+.signup-info-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-main);
+  padding: 40px 24px;
+  box-sizing: border-box;
+}
+
+.signup-info-card {
+  display: flex;
+  width: 100%;
+  max-width: 940px;
+  background: var(--color-login-frame);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.08);
+}
+
+.signup-info-side {
+  width: 300px;
+  flex-shrink: 0;
+  background-color: var(--color-header-text);
+  color: #fff;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.signup-info-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-primary-btn);
+}
+
+.signup-info-role p {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.signup-info-form {
+  flex: 1;
+  padding: 40px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.signup-info-form h2 {
+  margin: 0 0 8px;
+  color: var(--color-header-text);
+}
+
+.signup-info-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-sub-text);
+}
+
+.signup-info-form input,
+.signup-info-form select {
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.signup-info-form input:focus,
+.signup-info-form select:focus {
+  outline: none;
+  border-color: var(--color-primary-btn);
+}
+
+.signup-info-inline {
+  display: flex;
+  gap: 10px;
+}
+
+.signup-info-inline input {
+  flex: 1;
+}
+
+.signup-info-inline button {
+  padding: 11px 16px;
+  white-space: nowrap;
+}
+
+.signup-info-birth {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.signup-info-birth select {
+  flex: 1;
+}
+
+.signup-info-error {
+  color: var(--color-error);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.signup-info-submit {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.signup-success-card {
+  background: var(--color-login-frame);
+  border-radius: 18px;
+  box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.08);
+  padding: 48px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.signup-success-sub {
+  margin: 0;
+  color: var(--color-sub-text);
+}

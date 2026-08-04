@@ -1,0 +1,52 @@
+name: Build and Deploy
+
+on:
+  push:
+    # dev_nh added temporarily to test this workflow before merging; remove once verified
+    branches: [main, dev_nh]
+  workflow_dispatch:
+
+env:
+  IMAGE: qp4534/ev-energy-management-frontend-web
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: qp4534
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            VITE_API_URL=/
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+
+      - name: Checkout gitops repo
+        uses: actions/checkout@v4
+        with:
+          repository: qp4534/EV-energy-management-gitops
+          # dev_nh pinned temporarily for testing; switch to main once merged
+          ref: dev_nh
+          token: ${{ secrets.GITOPS_PUSH_TOKEN }}
+          path: gitops
+
+      - name: Update image tag in gitops repo
+        run: |
+          sed -i "s#image: ${{ env.IMAGE }}:.*#image: ${{ env.IMAGE }}:${{ github.sha }}#" gitops/apps/frontend/deployment.yaml
+          cd gitops
+          git config user.name "frontend-deploy-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -am "frontend image -> ${{ github.sha }}" || echo "no changes"
+          git push

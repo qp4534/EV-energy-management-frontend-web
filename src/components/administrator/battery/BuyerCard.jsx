@@ -1,7 +1,6 @@
 import React from "react";
 import RankBadge from "../common/RankBadge";
 import StatusDot from "../common/StatusDot";
-import "../../../styles/administrator/components/BuyerCard.css";
 
 /**
  * 매입처별 예상 제안가 카드 (현대글로비스, 지자체 공개입찰 등)
@@ -26,24 +25,38 @@ export default function BuyerCard({
   tag,
 }) {
   return (
-    <div className="buyer-card">
-      <div className="buyer-card__top">
+    <div className="mb-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-login-frame)] px-6 py-5">
+      <div className="mb-3.5 flex items-start justify-between gap-4">
         <div>
-          <p className="buyer-card__name">{name}</p>
-          <p className="buyer-card__category">{category}</p>
+          <p className="text-[1.0625rem] font-bold text-[var(--color-header-text)]">
+            {name}
+          </p>
+          <p className="mt-0.5 text-[0.8125rem] text-[var(--color-sub-text)]">
+            {category}
+          </p>
         </div>
-        <div className="buyer-card__price-block">
+        <div className="flex-shrink-0 text-right">
           <RankBadge rank={rank} />
-          <p className="buyer-card__price">{price}만원</p>
-          <p className="buyer-card__price-sub">{priceSubtext}</p>
+          <p className="mt-1.5 text-[1.375rem] font-bold text-[var(--color-header-text)]">
+            {price}만원
+          </p>
+          <p className="mt-0.5 text-xs text-[var(--color-btn-desc)]">
+            {priceSubtext}
+          </p>
         </div>
       </div>
 
       <StatusDot tone="success" label={gradeLabel} size="sm" />
 
-      <p className="buyer-card__desc">{description}</p>
+      <p className="my-1.5 mb-3.5 text-sm leading-normal text-[var(--color-sub-text)]">
+        {description}
+      </p>
 
-      {tag && <span className="buyer-card__tag">{tag}</span>}
+      {tag && (
+        <span className="inline-block rounded-lg border border-[var(--color-footer-border)] bg-[var(--color-footer-bg)] px-3.5 py-1.5 text-[0.8125rem] font-medium text-[var(--color-footer-desc)]">
+          {tag}
+        </span>
+      )}
     </div>
   );
 }

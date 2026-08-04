@@ -73,7 +73,7 @@ function NoticeDetail() {
 
         <div className="detail-navigation">
           <div className="nav-row">
-            <span className="nav-label">이전글</span>
+            <span className="nav-label-prevwrite">이전글</span>
             <span
               className={prevNext.prev ? "nav-link" : "nav-disabled"}
               onClick={() =>
@@ -85,7 +85,7 @@ function NoticeDetail() {
             </span>
           </div>
           <div className="nav-row">
-            <span className="nav-label">다음글</span>
+            <span className="nav-label-nextwrite">다음글</span>
             <span
               className={prevNext.next ? "nav-link" : "nav-disabled"}
               onClick={() =>

@@ -1,3 +1,5 @@
+import "../../../styles/administrator/components/DataTable.css";
+
 /**
  * 컬럼 정의 기반 공용 테이블. "그 외 매입처" 표, "건전성 세부지표" 표, 배터리 목록 등에서 재사용.
  *
@@ -9,14 +11,22 @@
  * @param {(row:Object) => void} [onRowClick] - 있으면 행 클릭 가능(커서/hover 스타일 적용)
  */
 export default function DataTable({ columns, rows, onRowClick }) {
+  const alignClass = {
+    left: "text-left",
+    center: "text-center",
+    right: "text-right",
+  };
+
   return (
-    <table className="data-table">
+    <table className="w-full border-collapse bg-transparent">
       <thead>
         <tr>
           {columns.map((col) => (
             <th
               key={col.key}
-              className={`data-table__th data-table__th--${col.align ?? "left"}`}
+              className={`border-b-2 border-[var(--color-sub-text)] px-3 py-3.5 text-[15px] font-bold text-[var(--color-header-text)] ${
+                alignClass[col.align ?? "left"]
+              }`}
             >
               {col.header}
             </th>
@@ -28,8 +38,10 @@ export default function DataTable({ columns, rows, onRowClick }) {
           <tr
             key={row.id ?? row.batteryId ?? idx}
             className={[
-              row.summary ? "data-table__row--summary" : "",
-              onRowClick && !row.summary ? "data-table__row--clickable" : "",
+              row.summary ? "bg-[var(--color-bg-main)] font-bold" : "",
+              onRowClick && !row.summary
+                ? "cursor-pointer transition-colors duration-150 hover:bg-[#eef3ea]"
+                : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -39,9 +51,11 @@ export default function DataTable({ columns, rows, onRowClick }) {
           >
             {row.summary ? (
               <>
-                <td className="data-table__td">{row[columns[0].key]}</td>
+                <td className="whitespace-nowrap border-b border-[var(--color-border)] px-3 py-3.5 text-sm text-[#333] text-left">
+                  {row[columns[0].key]}
+                </td>
                 <td
-                  className="data-table__td data-table__td--right"
+                  className="whitespace-nowrap border-b border-[var(--color-border)] px-3 py-3.5 text-sm text-[#333] text-right"
                   colSpan={columns.length - 1}
                 >
                   {row[columns[columns.length - 1].key]}
@@ -51,7 +65,9 @@ export default function DataTable({ columns, rows, onRowClick }) {
               columns.map((col) => (
                 <td
                   key={col.key}
-                  className={`data-table__td data-table__td--${col.align ?? "left"}`}
+                  className={`whitespace-nowrap border-b border-[var(--color-border)] px-3 py-3.5 text-sm text-[#333] ${
+                    alignClass[col.align ?? "left"]
+                  }`}
                 >
                   {col.render ? col.render(row) : row[col.key]}
                 </td>
