@@ -16,19 +16,48 @@ export default function Map({
   const hasFitBounds = useRef(false);
 
   // 지도 초기화
+  // 카카오맵 SDK(index.html의 <script>, autoload=false)는 네트워크를 통해 비동기로 로드되므로
+  // 이 컴포넌트가 먼저 마운트되면 window.kakao가 아직 없을 수 있다. 그 상태에서 그냥 return하면
+  // 이 effect는 다시 실행되지 않아(deps: []) 지도가 영원히 안 뜨고 에러도 안 나는 문제가 있었다.
+  // SDK가 준비될 때까지 폴링해서 이 레이스 컨디션을 없앤다.
   useEffect(() => {
-    if (!mapContainer.current || !window.kakao || !window.kakao.maps) return;
+    if (!mapContainer.current) return;
 
-    window.kakao.maps.load(() => {
-      const centerPos = new window.kakao.maps.LatLng(37.5665, 126.978);
-      const mapInstance = new window.kakao.maps.Map(mapContainer.current, {
-        center: centerPos,
-        level: 8,
+    let cancelled = false;
+
+    const initMap = () => {
+      if (cancelled || !mapContainer.current) return;
+      window.kakao.maps.load(() => {
+        if (cancelled || !mapContainer.current) return;
+        const centerPos = new window.kakao.maps.LatLng(37.5665, 126.978);
+        const mapInstance = new window.kakao.maps.Map(mapContainer.current, {
+          center: centerPos,
+          level: 8,
+        });
+
+        setTimeout(() => mapInstance.relayout(), 100);
+        setMap(mapInstance);
       });
+    };
 
-      setTimeout(() => mapInstance.relayout(), 100);
-      setMap(mapInstance);
-    });
+    if (window.kakao && window.kakao.maps) {
+      initMap();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const intervalId = setInterval(() => {
+      if (window.kakao && window.kakao.maps) {
+        clearInterval(intervalId);
+        initMap();
+      }
+    }, 100);
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
   }, []);
 
   useEffect(() => {
