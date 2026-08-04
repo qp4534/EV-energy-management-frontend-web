@@ -23,6 +23,7 @@ import ResetPasswordNew from "./pages/Auth/ResetPasswordNew";
 import SignupConsent from "./pages/Auth/SignupConsent";
 import SignupInfo from "./pages/Auth/SignupInfo";
 import Terms from "./pages/Auth/Terms";
+import Landing from "./pages/Landing";
 import "./App.css";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -30,7 +31,7 @@ import CarReportList from "./pages/Controller/CarReportList";
 
 const AUTH_ROUTE_PATTERN = /^\/(login|find-id|reset-password|signup|terms)/;
 
-function App() {
+function DashboardLayout() {
   // 사용자 역할 상태를 관리하는 state
   // 'controller' | 'administrator'
   // 개발하실때 useState('controller')로 설정하시면 관리자 화면이 보여요!(백엔드랑 권한 설정 넣기 전까진 이렇게 해용!)
@@ -59,6 +60,7 @@ function App() {
       </Routes>
     );
   }
+  //const [userRole, setUserRole] = useState("administrator");
 
   return (
     <div className="app-container">
@@ -101,6 +103,15 @@ function App() {
         </main>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/*" element={<DashboardLayout />} />
+    </Routes>
   );
 }
 

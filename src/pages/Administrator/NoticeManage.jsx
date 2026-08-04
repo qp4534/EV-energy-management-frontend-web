@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/common/Pagination";
-import { MOCK_NOTICES } from "../../mocks/noticeMock";
+//import { MOCK_NOTICES } from "../../mocks/noticeMock";
+import { getNotices } from '../../services/noticeService';
 import "../../styles/administrator/NoticeManage.css";
 
 const PAGE_SIZE = 10;
@@ -13,9 +14,13 @@ function NoticeManage() {
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   setNotices(MOCK_NOTICES);
+  // }, []);
+
   useEffect(() => {
-    setNotices(MOCK_NOTICES);
-  }, []);
+  getNotices().then(setNotices).catch(console.error);
+}, []);
 
   const filtered = notices.filter((n) =>
     n.title.includes(keyword) || n.content.includes(keyword)
