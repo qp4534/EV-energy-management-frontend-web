@@ -159,19 +159,24 @@ function Sidebar({ role = "controller" }) {
         )}
       </div>
 
-      {/* 하단 고정 메뉴 (설정) */}
-      <div className="sidebar-bottom">
-        <NavLink
-          to={role === "administrator" ? "/admin/system" : "/controller/settings"}
-          className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
-          }
-          title="시스템 설정"
-        >
-          <FiSettings />
-          {isExpanded && <span className="nav-label">시스템 설정</span>}
-        </NavLink>
-      </div>
+      {role === "administrator" && (
+        <div className="sidebar-bottom">
+          <NavLink
+            to={
+              role === "administrator"
+                ? "/admin/system"
+                : "/controller/settings"
+            }
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+            title="시스템 설정"
+          >
+            <FiSettings />
+            {isExpanded && <span className="nav-label">시스템 설정</span>}
+          </NavLink>
+        </div>
+      )}
     </aside>
   );
 }
