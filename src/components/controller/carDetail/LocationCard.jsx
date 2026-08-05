@@ -5,7 +5,7 @@ const RISK_TO_MAP_STATUS = {
   긴급: "danger",
   경고: "warning",
   주의: "caution",
-  정상: "caution",
+  정상: "normal",
 };
 
 export default function LocationCard({ carId, riskLevel }) {
