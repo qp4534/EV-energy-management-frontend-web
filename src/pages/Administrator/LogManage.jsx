@@ -1,13 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TabBar from "../../components/administrator/common/TabBar";
 import DataTable from "../../components/administrator/common/DataTable";
 import Pagination from "../../components/common/Pagination";
-import {
-  MOCK_LOGIN_LOGS,
-  MOCK_CAR_CHANGE_LOGS,
-  MOCK_USER_ACTIVITY_LOGS,
-  MOCK_ADMIN_ACTION_LOGS,
-} from "../../mocks/logMock";
+import { logService } from "../../services/logService";
 import "../../styles/administrator/LogManage.css";
 
 const PAGE_SIZE = 10;
@@ -33,7 +28,7 @@ function StatusBadge({ status }) {
 
 const TAB_CONFIG = {
   login: {
-    data: MOCK_LOGIN_LOGS,
+    fetcher: logService.getLoginLogs,
     searchPlaceholder: "이용자, IP로 검색",
     searchKeys: ["user", "ip"],
     showStatusFilter: true,
@@ -47,7 +42,7 @@ const TAB_CONFIG = {
     ],
   },
   carChange: {
-    data: MOCK_CAR_CHANGE_LOGS,
+    fetcher: logService.getCarChangeLogs,
     searchPlaceholder: "차량 번호, 소유자로 검색",
     searchKeys: ["carNumber", "owner"],
     showStatusFilter: true,
@@ -60,7 +55,7 @@ const TAB_CONFIG = {
     ],
   },
   userActivity: {
-    data: MOCK_USER_ACTIVITY_LOGS,
+    fetcher: logService.getUserActivityLogs,
     searchPlaceholder: "이용자, 대상으로 검색",
     searchKeys: ["user", "target"],
     showStatusFilter: false,
@@ -72,7 +67,7 @@ const TAB_CONFIG = {
     ],
   },
   adminAction: {
-    data: MOCK_ADMIN_ACTION_LOGS,
+    fetcher: logService.getAdminActionLogs,
     searchPlaceholder: "관리자, 작업 내용으로 검색",
     searchKeys: ["admin", "action"],
     showStatusFilter: false,
@@ -92,7 +87,35 @@ export default function LogManage() {
   const [statusValue, setStatusValue] = useState("all");
   const [page, setPage] = useState(1);
 
+  const [rows, setRows] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const config = TAB_CONFIG[activeTab];
+
+  // 탭이 바뀔 때마다 해당 탭의 로그를 새로 불러옴
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchLogs = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await config.fetcher();
+        if (!cancelled) setRows(data);
+      } catch (err) {
+        console.error("로그 조회 실패:", err);
+        if (!cancelled) setError("로그를 불러오지 못했습니다.");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    fetchLogs();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
 
   const handleTabChange = (key) => {
     setActiveTab(key);
@@ -108,7 +131,7 @@ export default function LogManage() {
   };
 
   const filteredRows = useMemo(() => {
-    return config.data.filter((row) => {
+    return rows.filter((row) => {
       const matchesKeyword =
         !appliedKeyword ||
         config.searchKeys.some((key) =>
@@ -120,7 +143,7 @@ export default function LogManage() {
         (statusValue === "fail" && NEGATIVE_STATUS.has(row.status));
       return matchesKeyword && matchesStatus;
     });
-  }, [config, appliedKeyword, statusValue]);
+  }, [rows, config, appliedKeyword, statusValue]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const pageRows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -158,13 +181,20 @@ export default function LogManage() {
         </div>
       </div>
 
-      <DataTable columns={config.columns} rows={pageRows} />
-
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
+      {isLoading ? (
+        <div className="log-manage-status">불러오는 중...</div>
+      ) : error ? (
+        <div className="log-manage-status log-manage-status--error">{error}</div>
+      ) : (
+        <>
+          <DataTable columns={config.columns} rows={pageRows} />
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
+      )}
     </div>
   );
 }

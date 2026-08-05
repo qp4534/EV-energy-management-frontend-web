@@ -17,4 +17,32 @@ export const batteryService = {
     const batteries = response.data;
     return batteries.find((b) => b.carId === carId) ?? batteries[0] ?? null;
   },
+  getBatteryDiagnosis: async (batteryId) => {
+    const res = await api.get(`/api/battery-passports/${batteryId}`);
+    const d = res.data;
+
+    let probabilities = { unusable: 0, reusable: 0, remanufacturable: 0 };
+    try {
+      probabilities = JSON.parse(d.reuseProbabilities);
+    } catch (e) {
+      console.error("reuseProbabilities 파싱 실패:", e);
+    }
+
+    return {
+      grade: d.gradeDetail,
+      remainingCycle: d.remainingCycles,
+      newCycle: d.totalCycles,
+      healthScore: Number(d.sohScore),
+      judgement: {
+        label: d.gradeDetail,
+        description: "", // TEMP: 백엔드에 판정 사유 필드 없음
+        confidence: Number(d.reliabilityScore),
+      },
+      distribution: [
+        { name: "재사용 불가", value: probabilities.unusable },
+        { name: "재사용 가능", value: probabilities.reusable },
+        { name: "재제조 가능", value: probabilities.remanufacturable },
+      ],
+    };
+  },
 };

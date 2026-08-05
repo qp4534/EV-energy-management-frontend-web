@@ -12,7 +12,7 @@ export default function SystemPage() {
 
   return (
     <div className="system-page">
-      <h1 className="system-page-title">시스템 관리</h1>
+      <h2 className="system-page-title">시스템 관리</h2>
 
       <SystemTabs activeTab={activeTab} onChange={setActiveTab} />
 
