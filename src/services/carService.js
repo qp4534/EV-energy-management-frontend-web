@@ -2,6 +2,7 @@
 // CAR를 관리할 예정
 import api from "../api/axios";
 import {
+  MOCK_CAR_STATS,
   MOCK_CARS,
   MOCK_ANOMALY_DAILY_COUNTS,
   MOCK_CAR_LIST,
@@ -37,6 +38,10 @@ export const carService = {
   // riskLevel이 지금은 항상 "정상"으로 채워지므로 emergency/warning/caution은 0으로 고정되고
   // normal에 전체 대수가 몰린다 — 진짜 위험도 분류가 필요하면 ANOMALY_LOGS 조인이 필요하다.
   getCarStats: async () => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return MOCK_CAR_STATS;
+    }
     const cars = await fetchMappedCars();
     return {
       total: cars.length,
@@ -72,6 +77,10 @@ export const carService = {
 
   // TEMP: USE_MOCK과 무관하게 항상 실제 API 호출 (getCarTableList와 동일한 매핑 재사용).
   getCarSummaryList: async () => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return MOCK_CAR_LIST.slice(0, 5);
+    }
     const cars = await fetchMappedCars();
     return cars.slice(0, 5);
   },
@@ -91,7 +100,11 @@ export const carService = {
     abnormalType = "all",
     chargingStatus = "all",
   } = {}) => {
-    const cars = await fetchMappedCars();
+    const cars = USE_MOCK
+      ? await new Promise((resolve) => {
+          setTimeout(() => resolve([...MOCK_CAR_LIST]), 200);
+        })
+      : await fetchMappedCars();
 
     const filtered = cars.filter((car) => {
       if (search && !car.carNumber.includes(search.trim())) return false;
@@ -133,6 +146,12 @@ export const carService = {
   //
   // TEMP: USE_MOCK과 무관하게 항상 실제 API 호출. 매핑 설명은 파일 상단 mapCarWithPlaceholders 참고.
   getCarDetail: async (carId) => {
+    if (USE_MOCK) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      const car = MOCK_CAR_LIST.find((item) => item.carId === carId);
+      if (!car) throw new Error(`차량을 찾을 수 없습니다: ${carId}`);
+      return { ...car };
+    }
     const response = await api.get(`/api/cars/${carId}`);
     return mapCarWithPlaceholders(response.data);
   },

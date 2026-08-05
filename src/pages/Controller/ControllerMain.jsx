@@ -1,10 +1,9 @@
 // 관제자 메인 대시 보드
-import React from "react";
 import StatCardList from "../../components/controller/StatCardList";
 import MapCard from "../../components/controller/MapCard";
 import ChartCard from "../../components/controller/ChartCard";
 import CarTableCard from "../../components/controller/CarTableCard";
-import ThermalVideoCard from "../../components/controller/ThermalVideoCard";
+import CarDigitalTwinCard from "../../components/controller/carDetail/CarDigitalTwinCard";
 
 import "../../styles/controller/ControllerMain.css";
 
@@ -20,9 +19,13 @@ export default function ControllerMain() {
         <ChartCard />
       </section>
 
-      <section className="dashboard-grid grid-2col">
+      <section className="dashboard-row">
         <CarTableCard />
-        <ThermalVideoCard />
+      </section>
+
+      <section className="dashboard-grid grid-2col">
+        <CarDigitalTwinCard mode="live" />
+        <CarDigitalTwinCard mode="history" />
       </section>
     </div>
   );
