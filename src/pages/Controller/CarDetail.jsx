@@ -4,7 +4,7 @@ import { useCarDetail, useStopCharging } from "@/hooks/queries/useCar";
 import { useReportList } from "@/hooks/queries/useReport";
 import { RISK_LEVEL_COLOR } from "@/constants/carList.constants";
 import { REPORT_RISK_BADGE_LABEL } from "@/constants/report.constants";
-import CarThermalCard from "@/components/controller/carDetail/CarThermalCard";
+import CarDigitalTwinCard from "@/components/controller/carDetail/CarDigitalTwinCard";
 import VehicleInfoCard from "@/components/controller/carDetail/VehicleInfoCard";
 import BatteryPassportCard from "@/components/controller/carDetail/BatteryPassportCard";
 import StatusCard from "@/components/controller/carDetail/StatusCard";
@@ -64,7 +64,11 @@ export default function CarDetail() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <CarThermalCard carId={car.carId} />
+        <CarDigitalTwinCard mode="live" vehicleId={car.carId} />
+        <CarDigitalTwinCard mode="history" vehicleId={car.carId} />
+      </div>
+
+      <div>
         <VehicleInfoCard car={car} />
       </div>
 

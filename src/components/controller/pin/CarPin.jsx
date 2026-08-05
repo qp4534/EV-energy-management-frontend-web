@@ -7,12 +7,14 @@ const bgColors = {
   danger: "#EF4444",
   warning: "#F97316",
   caution: "#EAB308",
+  normal: "var(--color-risk-normal)",
 };
 
 const zIndexMap = {
   danger: 30, // 긴급 차량이 가장 위에 가도록
   warning: 20,
   caution: 10,
+  normal: 5,
 };
 
 export default function CarPin({
