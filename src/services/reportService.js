@@ -1,29 +1,81 @@
 // AI 보고서 관련 API를 관리
 import api from "../api/axios";
 
-// TEMP: 백엔드 AI_REPORTS.car_id가 추가되면서 carId는 이제 실제 값이다.
-// carNumber/carModel은 여전히 AI_REPORTS에 없어서 /api/cars에서 carId로 찾아 채운다
-// (백엔드가 아직 더미 데이터라 carId가 요청마다 랜덤이라 지금은 거의 항상 매칭이 안 되고
-// "-"로 남지만, 실제 DB가 연결되면 자동으로 채워진다).
-// riskLevel도 AI_REPORTS엔 없어서(진짜론 anomaly_id -> ANOMALY_LOGS.risk_level을 조인해야
-// 함) 임시로 "정상" 고정.
-// reportData는 백엔드가 { summary: "..." } 같은 임의 문자열만 주는데, 프론트는
-// { isAiGenerated, sections, actions } 구조를 기대해서 그대로 쓰면 상세 화면이 깨진다.
-// 실제 스펙이 정해지기 전까진 null로 채워 "본문 없음" 상태로 안전하게 보여준다.
+const REPORT_TYPE_ALIAS = {
+  MONTHLY: "MONTHLY",
+  월간: "MONTHLY",
+  월간보고서: "MONTHLY",
+  ANOMALY: "ANOMALY",
+  이상: "ANOMALY",
+  이상보고서: "ANOMALY",
+};
+
+const RISK_LEVEL_ALIAS = {
+  EMERGENCY: "EMERGENCY",
+  긴급: "EMERGENCY",
+  위험: "EMERGENCY",
+  WARNING: "WARNING",
+  경고: "WARNING",
+  CAUTION: "CAUTION",
+  주의: "CAUTION",
+  NORMAL: "NORMAL",
+  정상: "NORMAL",
+  UNKNOWN: "UNKNOWN",
+};
+
+const legacyReportData = (content) => ({
+  schemaVersion: "legacy",
+  isAiGenerated: true,
+  riskLevel: "UNKNOWN",
+  sections: [
+    {
+      type: "summary",
+      title: "보고서 요약",
+      content,
+    },
+  ],
+  sources: [],
+  missingFields: [],
+  actions: [],
+});
+
+const normalizeReportData = (value) => {
+  if (!value) return null;
+
+  let parsed = value;
+  if (typeof value === "string") {
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      return legacyReportData(value);
+    }
+  }
+
+  if (typeof parsed !== "object" || Array.isArray(parsed)) return null;
+  if (Array.isArray(parsed.sections)) return parsed;
+  if (typeof parsed.summary === "string" && parsed.summary.trim()) {
+    return { ...legacyReportData(parsed.summary), ...parsed };
+  }
+  return null;
+};
+
 const mapReports = (reports, carsById) =>
   reports.map((report) => {
     const car = carsById.get(report.carId);
+    const reportData = normalizeReportData(report.reportData);
     return {
       reportId: report.reportId,
       title: report.title,
-      reportType: report.reportType,
-      riskLevel: "정상",
+      reportType:
+        REPORT_TYPE_ALIAS[report.reportType] ?? report.reportType ?? "MONTHLY",
+      riskLevel:
+        RISK_LEVEL_ALIAS[reportData?.riskLevel] ?? reportData?.riskLevel ?? "UNKNOWN",
       carId: report.carId,
       carNumber: car?.carNumber ?? "-",
       carModel: car?.model ?? "-",
       createdAt: report.createdAt,
-      isRead: report.isRead,
-      reportData: null,
+      isRead: Boolean(report.isRead),
+      reportData,
     };
   });
 
@@ -83,10 +135,7 @@ export const reportService = {
   },
 
   markReportAsRead: async (reportId) => {
-    // 백엔드가 아직 진짜 DB가 아니라서 저장은 안 되지만(다음 조회 때 초기화), 요청 자체는 실제로 간다.
-    const response = await api.put(`/api/ai-reports/${reportId}`, {
-      isRead: true,
-    });
+    const response = await api.patch(`/api/ai-reports/${reportId}/read`);
     return response.data;
   },
 };

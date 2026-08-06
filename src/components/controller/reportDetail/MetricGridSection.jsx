@@ -2,10 +2,10 @@ export default function MetricGridSection({ section }) {
   return (
     <section className="card">
       <h3 className="mb-3 text-base font-bold text-[var(--color-header-text)]">
-        {section.heading}
+        {section.title ?? section.heading}
       </h3>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {section.items.map((item) => {
+        {(section.items ?? []).map((item) => {
           const isDanger = item.emphasis === "danger";
           return (
             <div

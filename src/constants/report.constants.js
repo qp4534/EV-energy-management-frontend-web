@@ -1,8 +1,8 @@
-export const REPORT_TYPES = ["월간보고서", "이상"];
+export const REPORT_TYPES = ["MONTHLY", "ANOMALY"];
 
 export const REPORT_TYPE_LABEL = {
-  월간보고서: "정기 보고서",
-  이상: "이상 보고서",
+  MONTHLY: "정기 보고서",
+  ANOMALY: "이상 보고서",
 };
 
 export const PAGE_SIZE = 10;
@@ -18,10 +18,23 @@ export const DEFAULT_CAR_REPORT_FILTERS = {
 };
 
 export const REPORT_RISK_BADGE_LABEL = {
+  EMERGENCY: "위험도 높음",
   긴급: "위험도 높음",
+  WARNING: "위험도 중간",
   경고: "위험도 중간",
+  CAUTION: "위험도 낮음",
   주의: "위험도 낮음",
+  NORMAL: "정상",
   정상: "정상",
+  UNKNOWN: "위험도 미확인",
+};
+
+export const REPORT_RISK_COLOR = {
+  EMERGENCY: "bg-[var(--color-risk-emergency)]",
+  WARNING: "bg-[var(--color-risk-warning)]",
+  CAUTION: "bg-[var(--color-risk-caution)]",
+  NORMAL: "bg-[var(--color-risk-normal)]",
+  UNKNOWN: "bg-slate-500",
 };
 
 export const REPORT_SECTION_TYPES = {
