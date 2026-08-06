@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { FiCamera, FiUser } from "react-icons/fi";
 import { useProfile, useUpdateProfile } from "../hooks/queries/useUser";
 import PasswordInput from "../components/auth/PasswordInput";
 import AuthButton from "../components/auth/AuthButton";
@@ -18,6 +19,12 @@ export default function MyPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  // 파일 업로드 저장소(S3 등)가 아직 정해지지 않아서, 고른 사진은 지금은 화면
+  // 미리보기로만 보여준다. 실제 서버 저장은 저장소가 정해지면 연결한다.
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [showUrlField, setShowUrlField] = useState(false);
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
     if (profile) {
       setForm({
@@ -28,9 +35,24 @@ export default function MyPage() {
     }
   }, [profile]);
 
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
   const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
   const updatePassword = (key) => (e) =>
     setPasswordForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+  const handleAvatarFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarPreview(URL.createObjectURL(file));
+    setMessage("");
+    setError("사진 업로드 저장소 연동 전이라 지금은 미리보기만 가능해요. 저장하려면 아래 이미지 URL을 직접 입력해주세요.");
+  };
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
@@ -72,9 +94,40 @@ export default function MyPage() {
     return <div className="mypage">불러오는 중...</div>;
   }
 
+  const avatarSrc = avatarPreview || form.profileImageUrl || null;
+
   return (
     <div className="mypage">
-      <h1 className="mypage-title">마이페이지</h1>
+      <div className="mypage-profile-header">
+        <div className="mypage-avatar-wrap">
+          {avatarSrc ? (
+            <img src={avatarSrc} alt="프로필 사진" className="mypage-avatar" />
+          ) : (
+            <div className="mypage-avatar mypage-avatar-placeholder">
+              <FiUser />
+            </div>
+          )}
+          <button
+            type="button"
+            className="mypage-avatar-edit-btn"
+            onClick={() => fileInputRef.current?.click()}
+            aria-label="프로필 사진 변경"
+          >
+            <FiCamera />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="mypage-avatar-file-input"
+            onChange={handleAvatarFileChange}
+          />
+        </div>
+        <div className="mypage-profile-summary">
+          <p className="mypage-profile-name">{profile?.name}</p>
+          <p className="mypage-profile-email">{profile?.email}</p>
+        </div>
+      </div>
 
       <form className="mypage-section" onSubmit={handleProfileSubmit}>
         <h2>기본 정보</h2>
@@ -97,10 +150,22 @@ export default function MyPage() {
             maxLength={13}
           />
         </label>
-        <label>
-          <span>프로필 이미지 URL</span>
-          <input value={form.profileImageUrl} onChange={update("profileImageUrl")} placeholder="https://..." />
-        </label>
+
+        {showUrlField ? (
+          <label>
+            <span>이미지 URL</span>
+            <input value={form.profileImageUrl} onChange={update("profileImageUrl")} placeholder="https://..." />
+          </label>
+        ) : (
+          <button
+            type="button"
+            className="mypage-url-toggle"
+            onClick={() => setShowUrlField(true)}
+          >
+            이미지 URL 직접 입력하기
+          </button>
+        )}
+
         <AuthButton variant="primary" type="submit">
           저장
         </AuthButton>
