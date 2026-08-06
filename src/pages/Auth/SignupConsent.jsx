@@ -37,7 +37,7 @@ export default function SignupConsent() {
 
   const handleNext = () => {
     if (requiredChecked) {
-      navigate("/signup/info");
+      navigate("/signup/info", { state: { agreements } });
     }
   };
 

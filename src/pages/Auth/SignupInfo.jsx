@@ -1,15 +1,25 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FiZap } from "react-icons/fi";
 import RoleSideToggle from "../../components/auth/RoleSideToggle";
 import PasswordInput from "../../components/auth/PasswordInput";
 import AuthButton from "../../components/auth/AuthButton";
-import { mockSignup } from "../../services/userService";
+import { userService } from "../../services/userService";
 import { YEARS, MONTHS, DAYS } from "../../constants/birthDate.constants";
+import { formatPhoneNumber } from "../../utils/phone";
 import "../../styles/auth/SignupInfo.css";
 
 export default function SignupInfo() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const agreements = location.state?.agreements;
+
+  useEffect(() => {
+    if (!agreements) {
+      navigate("/signup", { replace: true });
+    }
+  }, [agreements, navigate]);
+
   const [role, setRole] = useState("controller");
   const [form, setForm] = useState({
     name: "",
@@ -37,7 +47,10 @@ export default function SignupInfo() {
               form.birthDay
             ).padStart(2, "0")}`
           : "";
-      await mockSignup({
+      const consentedTerms = Object.entries(agreements ?? {})
+        .filter(([, agreed]) => agreed)
+        .map(([key]) => key);
+      await userService.signup({
         role,
         name: form.name,
         email: form.email,
@@ -45,16 +58,18 @@ export default function SignupInfo() {
         birth,
         password: form.password,
         passwordConfirm: form.passwordConfirm,
-        // 이 화면까지 왔다는 건 회원가입 약관동의 페이지에서 필수 항목에
-        // 이미 동의했다는 뜻 (ERD의 USER.is_agree 대응)
-        isAgree: true,
+        consentedTerms,
       });
       setSuccess(true);
       setError("");
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
+
+  if (!agreements) {
+    return null;
+  }
 
   if (success) {
     return (
@@ -125,8 +140,11 @@ export default function SignupInfo() {
             <span>전화번호</span>
             <input
               value={form.phone}
-              onChange={update("phone")}
-              placeholder="전화번호 입력"
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, phone: formatPhoneNumber(e.target.value) }))
+              }
+              placeholder="010-0000-0000"
+              maxLength={13}
             />
           </label>
 
@@ -168,7 +186,7 @@ export default function SignupInfo() {
             <PasswordInput
               value={form.password}
               onChange={update("password")}
-              placeholder="8자리 이상 입력"
+              placeholder="8자리 이상, 대/소문자·숫자·특수문자 포함"
             />
           </label>
 
