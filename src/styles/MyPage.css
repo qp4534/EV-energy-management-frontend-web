@@ -1,0 +1,62 @@
+.mypage {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.mypage-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-header-text);
+  margin-bottom: 24px;
+}
+
+.mypage-section {
+  background-color: var(--color-login-frame);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mypage-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin-bottom: 4px;
+}
+
+.mypage-section label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-sub-text);
+}
+
+.mypage-section input {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.mypage-section input:disabled {
+  background-color: var(--color-footer-bg);
+  color: var(--color-sub-text);
+}
+
+.mypage-message {
+  color: var(--color-primary-btn);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mypage-error {
+  color: #e0403f;
+  font-size: 14px;
+  font-weight: 600;
+}

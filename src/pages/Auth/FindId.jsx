@@ -5,6 +5,7 @@ import RoleTabs from "../../components/auth/RoleTabs";
 import AuthButton from "../../components/auth/AuthButton";
 import { YEARS, MONTHS, DAYS } from "../../constants/birthDate.constants";
 import { mockFindId } from "../../services/userService";
+import { formatPhoneNumber } from "../../utils/phone";
 import "../../styles/auth/FindId.css";
 
 // 이메일 아이디의 개인정보 보호를 위해 앞 3자만 노출하고 나머지는 마스킹
@@ -100,7 +101,7 @@ export default function FindId() {
             type="text"
             placeholder="휴대폰 번호 입력"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
           />
           {error && <p className="find-id-error">{error}</p>}
           <div className="find-id-submit-row">

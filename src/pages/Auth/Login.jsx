@@ -6,7 +6,8 @@ import RoleSelectCards from "../../components/auth/RoleSelectCards";
 import PasswordInput from "../../components/auth/PasswordInput";
 import AuthButton from "../../components/auth/AuthButton";
 import TermsModal from "../../components/auth/TermsModal";
-import { mockLogin } from "../../services/userService";
+import { userService, DB_ROLE_TO_UI } from "../../services/userService";
+import { setAuth } from "../../hooks/common/useAuth";
 import "../../styles/auth/Login.css";
 
 export default function Login() {
@@ -21,10 +22,16 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await mockLogin({ role, email, password });
+      const data = await userService.login({ email, password });
+      const actualUiRole = DB_ROLE_TO_UI[data.role];
+      if (actualUiRole !== role) {
+        setError("이 계정은 선택한 구분과 일치하지 않습니다.");
+        return;
+      }
+      setAuth({ token: data.token, role: actualUiRole });
       navigate(role === "administrator" ? "/administrator" : "/controller");
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
 
