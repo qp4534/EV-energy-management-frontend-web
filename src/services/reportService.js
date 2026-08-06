@@ -2,12 +2,12 @@
 import api from "../api/axios";
 
 const REPORT_TYPE_ALIAS = {
-  MONTHLY: "MONTHLY",
-  월간: "MONTHLY",
-  월간보고서: "MONTHLY",
-  ANOMALY: "ANOMALY",
-  이상: "ANOMALY",
-  이상보고서: "ANOMALY",
+  MONTHLY: "월간보고서",
+  월간: "월간보고서",
+  월간보고서: "월간보고서",
+  ANOMALY: "이상",
+  이상: "이상",
+  이상보고서: "이상",
 };
 
 const RISK_LEVEL_ALIAS = {
@@ -67,7 +67,7 @@ const mapReports = (reports, carsById) =>
       reportId: report.reportId,
       title: report.title,
       reportType:
-        REPORT_TYPE_ALIAS[report.reportType] ?? report.reportType ?? "MONTHLY",
+        REPORT_TYPE_ALIAS[report.reportType] ?? report.reportType ?? "월간보고서",
       riskLevel:
         RISK_LEVEL_ALIAS[reportData?.riskLevel] ?? reportData?.riskLevel ?? "UNKNOWN",
       carId: report.carId,

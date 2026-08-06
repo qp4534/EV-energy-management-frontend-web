@@ -1,8 +1,8 @@
-export const REPORT_TYPES = ["MONTHLY", "ANOMALY"];
+export const REPORT_TYPES = ["월간보고서", "이상"];
 
 export const REPORT_TYPE_LABEL = {
-  MONTHLY: "정기 보고서",
-  ANOMALY: "이상 보고서",
+  월간보고서: "정기 보고서",
+  이상: "이상 보고서",
 };
 
 export const PAGE_SIZE = 10;
