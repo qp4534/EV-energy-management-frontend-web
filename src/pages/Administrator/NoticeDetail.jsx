@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useNoticeDetail, useDeleteNotice, useMarkNoticeAsRead } from "../../hooks/queries/useNotice";
+import { useNotices, useNoticeDetail, useDeleteNotice, useMarkNoticeAsRead } from "../../hooks/queries/useNotice";
 import "../../styles/administrator/NoticeDetail.css";
 
 function NoticeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: notice, isLoading } = useNoticeDetail(id);
+  const { data: allNotices } = useNotices();
   const deleteNoticeMutation = useDeleteNotice();
   const markAsReadMutation = useMarkNoticeAsRead();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -20,9 +21,21 @@ function NoticeDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notice?.noticeId, notice?.isRead]);
 
-  // TODO: 이전글/다음글 이동 기능. 백엔드에 목록 순서 기준 prev/next를
-  // 내려주는 API가 없어서 아직 비활성 상태로 둠.
-  const prevNext = { prev: null, next: null };
+  // 이전글/다음글: 별도 API 없이 목록 조회 결과를 NoticeManage.jsx와 동일한 기준
+  // (상단 고정 우선 -> 등록일 최신순)으로 정렬해서, 그 안에서 현재 글의 앞/뒤를 찾음.
+  const prevNext = useMemo(() => {
+    if (!allNotices || !id) return { prev: null, next: null };
+    const sorted = [...allNotices].sort((a, b) => {
+      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+    const index = sorted.findIndex((n) => n.noticeId === id);
+    if (index === -1) return { prev: null, next: null };
+    return {
+      prev: index > 0 ? sorted[index - 1] : null,
+      next: index < sorted.length - 1 ? sorted[index + 1] : null,
+    };
+  }, [allNotices, id]);
 
   const handleDelete = async () => {
     if (!window.confirm("이 공지사항을 삭제하시겠습니까?")) return;
