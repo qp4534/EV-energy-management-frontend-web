@@ -278,21 +278,30 @@
 }
 
 .digital-twin-time-axis {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  padding-left: 132px;
+  position: relative;
+  height: 14px;
+  margin-left: 132px;
+  margin-right: 74px;
   color: var(--color-sub-text);
   font-size: 9px;
 }
 
-.digital-twin-time-axis strong {
-  color: #c55225;
-  font-weight: 800;
-  text-align: left;
+.digital-twin-time-axis span:first-child {
+  position: absolute;
+  left: 0;
 }
 
 .digital-twin-time-axis span:last-child {
-  justify-self: end;
+  position: absolute;
+  right: 0;
+}
+
+.digital-twin-time-axis strong {
+  position: absolute;
+  left: 33.333%;
+  transform: translateX(-50%);
+  color: #c55225;
+  font-weight: 800;
 }
 
 .digital-twin-live-summary {
