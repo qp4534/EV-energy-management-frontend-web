@@ -63,16 +63,18 @@ const mapReports = (reports, carsById) =>
   reports.map((report) => {
     const car = carsById.get(report.carId);
     const reportData = normalizeReportData(report.reportData);
+    const normalizedType =
+      REPORT_TYPE_ALIAS[report.reportType] ?? report.reportType ?? "월간보고서";
+    const isFleetMonthly = normalizedType === "월간보고서" && !report.carId;
     return {
       reportId: report.reportId,
       title: report.title,
-      reportType:
-        REPORT_TYPE_ALIAS[report.reportType] ?? report.reportType ?? "월간보고서",
+      reportType: normalizedType,
       riskLevel:
         RISK_LEVEL_ALIAS[reportData?.riskLevel] ?? reportData?.riskLevel ?? "UNKNOWN",
       carId: report.carId,
-      carNumber: car?.carNumber ?? "-",
-      carModel: car?.model ?? "-",
+      carNumber: isFleetMonthly ? "전체 차량" : (car?.carNumber ?? "-"),
+      carModel: isFleetMonthly ? "통합 월간" : (car?.model ?? "-"),
       createdAt: report.createdAt,
       isRead: Boolean(report.isRead),
       reportData,
