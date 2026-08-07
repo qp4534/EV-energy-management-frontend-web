@@ -72,6 +72,7 @@ export default function CarList() {
           onPageChange={setCurrentPage}
         />
       </div>
+
     </div>
   );
 }

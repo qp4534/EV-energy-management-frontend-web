@@ -2,8 +2,6 @@
 // USER, LOGIN_LOGS, ACTION_LOGS 등과 관련된 api를 관리할 예정
 import api from "../api/axios";
 
-// 백엔드 연동 전까지 사용하는 mock 함수들 (로그인/회원가입 화면 UI 흐름 확인용)
-
 // ERD의 USER.role ENUM 실제 값('관리자','관제자','이용자' 중 웹에서 쓰는 2개).
 // 화면 내부 라우팅은 Sidebar/Header/App.jsx가 이미 쓰고 있는 영문 값
 // (administrator/controller)을 그대로 쓰고, 여기서 DB로 나가는 값만 한글로 변환.
@@ -18,12 +16,22 @@ export const DB_ROLE_TO_UI = {
 };
 
 // 8자리 이상 + 대문자/소문자/숫자/특수문자 모두 포함 (백엔드 AuthService의 PASSWORD_POLICY와 동일한 규칙)
-const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+const PASSWORD_POLICY =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 export const PASSWORD_POLICY_MESSAGE =
   "비밀번호는 8자리 이상이며 대문자, 소문자, 숫자, 특수문자를 모두 포함해야 합니다.";
 
 export const userService = {
-  async signup({ role, name, email, phone, birth, password, passwordConfirm, consentedTerms }) {
+  async signup({
+    role,
+    name,
+    email,
+    phone,
+    birth,
+    password,
+    passwordConfirm,
+    consentedTerms,
+  }) {
     if (!name || !email || !phone || !password) {
       return Promise.reject(new Error("필수 항목을 모두 입력해주세요."));
     }
@@ -57,6 +65,22 @@ export const userService = {
     await api.post("/api/auth/logout");
   },
 
+  async sendVerificationCode(email) {
+    if (!email) {
+      return Promise.reject(new Error("이메일을 입력해주세요."));
+    }
+    // 메일 발송(SMTP 핸드셰이크 포함)은 일반 API 호출보다 오래 걸릴 수 있어서
+    // 기본 5초 타임아웃 대신 이 호출만 넉넉하게 준다.
+    await api.post("/api/auth/email/send-code", { email }, { timeout: 15000 });
+  },
+
+  async verifyEmailCode(email, code) {
+    if (!code) {
+      return Promise.reject(new Error("인증번호를 입력해주세요."));
+    }
+    await api.post("/api/auth/email/verify-code", { email, code });
+  },
+
   async getMe() {
     const response = await api.get("/api/auth/me");
     return response.data;
@@ -69,97 +93,94 @@ export const userService = {
     const response = await api.patch("/api/auth/me", payload);
     return response.data;
   },
-};
 
-// 백엔드 연동 전까지 사용하는 mock 함수들 (아이디 찾기/비밀번호 재설정 화면 UI 흐름 확인용)
-// 이번 작업 범위 밖 - 그대로 유지
+  async deleteAccount(currentPassword) {
+    if (!currentPassword) {
+      return Promise.reject(new Error("비밀번호를 입력해주세요."));
+    }
+    await api.delete("/api/auth/me", { data: { currentPassword } });
+  },
 
-export function mockFindId({ role, name, birth, phone }) {
-  if (!name || !birth || !phone) {
-    return Promise.reject(new Error("이름, 생년월일, 휴대폰 번호를 입력해주세요."));
-  }
-  return Promise.resolve({
-    role: ROLE_DB_VALUE[role],
-    userId: "gogildong123@naver.com",
-    name: "고길동",
-  });
-}
+  async findEmail({ role, name, birth, phone }) {
+    if (!name || !birth || !phone) {
+      return Promise.reject(
+        new Error("이름, 생년월일, 휴대폰 번호를 입력해주세요."),
+      );
+    }
+    const response = await api.post("/api/auth/find-email", {
+      name,
+      phone,
+      birth,
+      role: ROLE_DB_VALUE[role],
+    });
+    return response.data;
+  },
 
-export function mockRequestPasswordReset({ role, userId, email }) {
-  if (!userId || !email) {
-    return Promise.reject(new Error("아이디와 이메일을 입력해주세요."));
-  }
-  return Promise.resolve({ role: ROLE_DB_VALUE[role], sent: true });
-}
+  async requestPasswordReset(email) {
+    if (!email) {
+      return Promise.reject(new Error("이메일을 입력해주세요."));
+    }
+    // 회원가입 이메일 인증과 동일하게 메일 발송이 걸려서 타임아웃을 넉넉하게 준다.
+    await api.post(
+      "/api/auth/password/reset/send-code",
+      { email },
+      { timeout: 15000 },
+    );
+  },
 
-export function mockResetPassword({ password, passwordConfirm }) {
-  if (!password || password.length < 8) {
-    return Promise.reject(new Error("비밀번호는 8자리 이상 입력해주세요."));
-  }
-  if (password !== passwordConfirm) {
-    return Promise.reject(new Error("비밀번호가 일치하지 않습니다."));
-  }
-  return Promise.resolve({ success: true });
-}
+  async resetPassword({ email, password, passwordConfirm }) {
+    if (password !== passwordConfirm) {
+      return Promise.reject(new Error("비밀번호가 일치하지 않습니다."));
+    }
+    if (!PASSWORD_POLICY.test(password)) {
+      return Promise.reject(new Error(PASSWORD_POLICY_MESSAGE));
+    }
+    await api.post("/api/auth/password/reset", {
+      email,
+      newPassword: password,
+    });
+  },
 
-// isAgree: ERD의 USER.is_agree(단일 boolean)에 대응.
-// 화면에서는 항목별(만14세/서비스약관/개인정보/위치기반)로 따로 체크하지만,
-// 회원가입 정보입력 화면까지 왔다는 건 필수 항목에는 이미 동의했다는 뜻이라
-// 여기서는 항상 true로 넘어옴 (SignupInfo.jsx 참고)
-export function mockSignup({ role, name, email, phone, birth, password, passwordConfirm, isAgree }) {
-  if (!name || !email || !phone || !password) {
-    return Promise.reject(new Error("필수 항목을 모두 입력해주세요."));
-  }
-  if (password !== passwordConfirm) {
-    return Promise.reject(new Error("비밀번호가 일치하지 않습니다."));
-  }
-  return Promise.resolve({
-    role: ROLE_DB_VALUE[role],
-    name,
-    email,
-    phone,
-    birth,
-    isAgree,
-  });
-}
+  // ============================================================
+  // 아래부터는 관리자 이용자 관리(UserManage.jsx) 전용 실제 API 함수.
+  //
+  // 알려진 이슈 (백엔드 확인 필요):
+  // 1) UserDto에 name 필드가 없어서 목록 화면에 이름을 못 채운다.
+  //    GET /api/users 응답에서 email 앞부분을 임시 표시 이름으로 대체 중.
+  // 2) role 값 체계가 백엔드 mock("이용자"/"관리자")과 프론트 필터
+  //    ("전체"/"관리자"/"관제자"/"차주")가 다르다. 실제 ENUM 확정 전까지
+  //    "관제자"/"차주" 필터는 정상 동작하지 않을 수 있다.
+  // 3) UserDto.passwordHash가 응답에 그대로 노출된다 — 보안 이슈,
+  //    백엔드에 응답 전용 DTO 분리 요청 필요.
+  // ============================================================
 
-// ================================================================
-// 아래부터는 관리자 이용자 관리(UserManage.jsx) 전용 실제 API 함수.
-// 위 mock 함수들과 달리 실제 백엔드(UserController)를 호출한다.
-//
-// 알려진 이슈 (백엔드 확인 필요):
-// 1) UserDto에 name 필드가 없어서 목록 화면에 이름을 못 채운다.
-//    GET /api/users 응답에서 email 앞부분을 임시 표시 이름으로 대체 중.
-// 2) role 값 체계가 백엔드 mock("이용자"/"관리자")과 프론트 필터
-//    ("전체"/"관리자"/"관제자"/"차주")가 다르다. 실제 ENUM 확정 전까지
-//    "관제자"/"차주" 필터는 정상 동작하지 않을 수 있다.
-// 3) UserDto.passwordHash가 응답에 그대로 노출된다 — 보안 이슈,
-//    백엔드에 응답 전용 DTO 분리 요청 필요.
-// ================================================================
+  async getUsers() {
+    const { data } = await api.get("/api/users");
+    return data;
+  },
 
-export const getUsers = async () => {
-  const { data } = await api.get("/api/users");
-  return data;
-};
+  async getUser(userId) {
+    const { data } = await api.get(`/api/users/${userId}`);
+    return data;
+  },
 
-export const getUser = async (userId) => {
-  const { data } = await api.get(`/api/users/${userId}`);
-  return data;
-};
+  async updateUser(userId, payload) {
+    const { data } = await api.put(`/api/users/${userId}`, payload);
+    return data;
+  },
 
-export const updateUser = async (userId, payload) => {
-  const { data } = await api.put(`/api/users/${userId}`, payload);
-  return data;
-};
+  async deleteUser(userId) {
+    await api.delete(`/api/users/${userId}`);
+  },
 
-export const deleteUser = async (userId) => {
-  await api.delete(`/api/users/${userId}`);
-};
-
-// TODO: 백엔드에 아직 이 엔드포인트가 없음. UserController에
-// POST /api/users/{userId}/password-reset 추가 요청 필요.
-// 그 전까지는 호출하면 404가 날 수 있음(정상 — 백엔드 작업 후 해결됨).
-export const requestPasswordReset = async (userId) => {
-  const { data } = await api.post(`/api/users/${userId}/password-reset`);
-  return data;
+  // TODO: 백엔드에 아직 이 엔드포인트가 없음. UserController에
+  // POST /api/users/{userId}/password-reset 추가 요청 필요.
+  // 그 전까지는 호출하면 404가 날 수 있음(정상 — 백엔드 작업 후 해결됨).
+  // 이름 앞에 admin이 붙은 이유: 위 requestPasswordReset(email)은 본인이 비밀번호를
+  // 잊었을 때 이메일로 인증코드를 받는 함수라 시그니처(이메일 vs userId)와 용도가 달라서
+  // 이름이 같으면 헷갈리기 때문.
+  async adminRequestPasswordReset(userId) {
+    const { data } = await api.post(`/api/users/${userId}/password-reset`);
+    return data;
+  },
 };

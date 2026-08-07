@@ -1,6 +1,6 @@
 // userService 결과를 컴포넌트에 전달 (UserManage.jsx 전용)
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { userService, getUsers, updateUser, deleteUser, requestPasswordReset } from "../../services/userService";
+import { userService } from "../../services/userService";
 
 // 내 프로필 조회/수정 (MyPage.jsx 전용)
 export const useProfile = () => {
@@ -22,7 +22,7 @@ export const useUpdateProfile = () => {
 export const useUsers = () => {
   return useQuery({
     queryKey: ["users"],
-    queryFn: getUsers,
+    queryFn: userService.getUsers,
   });
 };
 
@@ -30,7 +30,7 @@ export const useUsers = () => {
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, payload }) => updateUser(userId, payload),
+    mutationFn: ({ userId, payload }) => userService.updateUser(userId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
@@ -41,7 +41,7 @@ export const useUpdateUser = () => {
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userId) => deleteUser(userId),
+    mutationFn: (userId) => userService.deleteUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
@@ -52,6 +52,6 @@ export const useDeleteUser = () => {
 // TODO: 백엔드에 POST /api/users/{userId}/password-reset 아직 없음 (userService.js 참고)
 export const useRequestPasswordReset = () => {
   return useMutation({
-    mutationFn: (userId) => requestPasswordReset(userId),
+    mutationFn: (userId) => userService.adminRequestPasswordReset(userId),
   });
 };

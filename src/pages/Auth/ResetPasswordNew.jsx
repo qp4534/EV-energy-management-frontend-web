@@ -1,13 +1,22 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "../../components/auth/AuthLayout";
 import PasswordInput from "../../components/auth/PasswordInput";
 import AuthButton from "../../components/auth/AuthButton";
-import { mockResetPassword } from "../../services/userService";
+import { userService } from "../../services/userService";
 import "../../styles/auth/ResetPassword.css";
 
 export default function ResetPasswordNew() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
+
+  useEffect(() => {
+    if (!email) {
+      navigate("/reset-password", { replace: true });
+    }
+  }, [email, navigate]);
+
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState("");
@@ -15,12 +24,16 @@ export default function ResetPasswordNew() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await mockResetPassword({ password, passwordConfirm });
+      await userService.resetPassword({ email, password, passwordConfirm });
       navigate("/login");
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
+
+  if (!email) {
+    return null;
+  }
 
   return (
     <AuthLayout variant="plain">
@@ -28,7 +41,7 @@ export default function ResetPasswordNew() {
 
       <form className="reset-new-form" onSubmit={handleSubmit}>
         <PasswordInput
-          placeholder="새 비밀번호 입력"
+          placeholder="8자리 이상, 대/소문자·숫자·특수문자 포함"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
