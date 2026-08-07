@@ -19,3 +19,14 @@ export const useBatteryDiagnosisByCarId = (carId) => {
     enabled: !!carId,
   });
 };
+
+// BatteryDiagnosis.jsx "배터리 매도 제안서" 탭 전용.
+// "배터리 진단" 탭과 같은 carId(diagnosedCarId)를 공유해서, 선택한 차량이
+// 바뀌면 진단 탭과 매도 제안서 탭이 함께 갱신되게 한다.
+export const useProposalByCarId = (carId) => {
+  return useQuery({
+    queryKey: ["batteryProposal", carId],
+    queryFn: () => batteryService.getProposalByCarId(carId),
+    enabled: !!carId,
+  });
+};

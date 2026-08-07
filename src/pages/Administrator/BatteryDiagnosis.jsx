@@ -14,10 +14,12 @@ import BatteryStatCard from "../../components/administrator/battery/BatteryStatC
 import BuyerCard from "../../components/administrator/battery/BuyerCard";
 import BuyerTable from "../../components/administrator/battery/BuyerTable";
 import ProposalContent from "../../components/administrator/battery/ProposalContent";
-import { diagnosisMock } from "../../mocks/diagnosisMock";
 import { valueMock } from "../../mocks/valueMock";
 import { useCarOptions } from "../../hooks/queries/useCar";
-import { useBatteryDiagnosisByCarId } from "../../hooks/queries/useBattery";
+import {
+  useBatteryDiagnosisByCarId,
+  useProposalByCarId,
+} from "../../hooks/queries/useBattery";
 import "../../styles/administrator/BatteryDiagnosis.css";
 
 const DIAGNOSIS_TABS = [
@@ -28,10 +30,13 @@ const DIAGNOSIS_TABS = [
 
 export default function BatteryDiagnosis() {
   const [activeTab, setActiveTab] = useState("diagnosis");
-  const data = diagnosisMock; // "배터리 매도 제안서" 탭(ProposalContent)은 아직 mock 유지
+  // "배터리 잔존가치/판매처" 탭은 아직 mock 유지 (별도 이슈 - 실제 API 연결 시 위와 동일 패턴 적용)
   const value = valueMock;
 
   // "배터리 진단" 탭 - 차량을 선택하고 "진단 실행"을 눌러야 실제 조회가 실행된다.
+  // "배터리 매도 제안서" 탭도 같은 diagnosedCarId를 그대로 써서, 여기서 고른 차량이
+  // 바뀌면 매도 제안서도 같이 바뀐다(예전엔 제안서 탭이 proposalMock 고정값이라
+  // 차량을 바꿔도 내용이 그대로였음 - 이제 실제 API로 연결).
   const [selectedCarId, setSelectedCarId] = useState("");
   const [diagnosedCarId, setDiagnosedCarId] = useState(null);
   const { data: carOptions = [] } = useCarOptions();
@@ -40,6 +45,11 @@ export default function BatteryDiagnosis() {
     isFetching: isDiagnosing,
     isError: isDiagnosisError,
   } = useBatteryDiagnosisByCarId(diagnosedCarId);
+  const {
+    data: proposalData,
+    isFetching: isProposalFetching,
+    isError: isProposalError,
+  } = useProposalByCarId(diagnosedCarId);
 
   const handleDiagnose = () => {
     if (!selectedCarId) return;
@@ -165,7 +175,37 @@ export default function BatteryDiagnosis() {
         </>
       )}
  
-      {activeTab === "proposal" && <ProposalContent diagnosisData={data} />}
+      {activeTab === "proposal" && (
+        <>
+          {!diagnosedCarId && (
+            <div className="placeholder-card">
+              "배터리 진단" 탭에서 차량을 선택하고 "진단 실행"을 누르면
+              그 차량의 매도 제안서가 표시됩니다.
+            </div>
+          )}
+
+          {diagnosedCarId && (isDiagnosing || isProposalFetching) && (
+            <div className="placeholder-card">제안서를 불러오는 중...</div>
+          )}
+
+          {diagnosedCarId &&
+            !isDiagnosing &&
+            !isProposalFetching &&
+            (isDiagnosisError || isProposalError || !diagnosisData || !proposalData) && (
+              <div className="placeholder-card">
+                매도 제안서 정보를 불러오지 못했습니다. 다시 시도해주세요.
+              </div>
+            )}
+
+          {diagnosedCarId &&
+            !isDiagnosing &&
+            !isProposalFetching &&
+            diagnosisData &&
+            proposalData && (
+              <ProposalContent diagnosisData={diagnosisData} proposalData={proposalData} />
+            )}
+        </>
+      )}
     </div>
   );
 }
