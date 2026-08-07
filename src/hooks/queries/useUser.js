@@ -2,6 +2,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userService } from "../../services/userService";
 
+// 내 프로필 조회/수정 (MyPage.jsx 전용)
+export const useProfile = () => {
+  return useQuery({
+    queryKey: ["me"],
+    queryFn: userService.getMe,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: userService.updateProfile,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["me"] }),
+  });
+};
+
 // 회원 목록 조회
 export const useUsers = () => {
   return useQuery({
