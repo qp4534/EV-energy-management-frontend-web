@@ -4,7 +4,7 @@ import AuthLayout from "../../components/auth/AuthLayout";
 import RoleTabs from "../../components/auth/RoleTabs";
 import AuthButton from "../../components/auth/AuthButton";
 import { YEARS, MONTHS, DAYS } from "../../constants/birthDate.constants";
-import { mockFindId } from "../../services/userService";
+import { userService } from "../../services/userService";
 import { formatPhoneNumber } from "../../utils/phone";
 import "../../styles/auth/FindId.css";
 
@@ -39,11 +39,11 @@ export default function FindId() {
         birthYear && birthMonth && birthDay
           ? `${birthYear}-${String(birthMonth).padStart(2, "0")}-${String(birthDay).padStart(2, "0")}`
           : "";
-      const res = await mockFindId({ role, name, birth, phone });
+      const res = await userService.findEmail({ role, name, birth, phone });
       setResult(res);
       setError("");
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
 
@@ -57,7 +57,7 @@ export default function FindId() {
           <p>
             {result.name}님의 아이디는
             <br />
-            <strong>{maskEmailId(result.userId)}</strong> 입니다.
+            <strong>{maskEmailId(result.email)}</strong> 입니다.
           </p>
         </div>
       ) : (

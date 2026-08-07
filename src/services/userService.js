@@ -90,35 +90,35 @@ export const userService = {
     }
     await api.delete("/api/auth/me", { data: { currentPassword } });
   },
+
+  async findEmail({ role, name, birth, phone }) {
+    if (!name || !birth || !phone) {
+      return Promise.reject(new Error("이름, 생년월일, 휴대폰 번호를 입력해주세요."));
+    }
+    const response = await api.post("/api/auth/find-email", {
+      name,
+      phone,
+      birth,
+      role: ROLE_DB_VALUE[role],
+    });
+    return response.data;
+  },
+
+  async requestPasswordReset(email) {
+    if (!email) {
+      return Promise.reject(new Error("이메일을 입력해주세요."));
+    }
+    // 회원가입 이메일 인증과 동일하게 메일 발송이 걸려서 타임아웃을 넉넉하게 준다.
+    await api.post("/api/auth/password/reset/send-code", { email }, { timeout: 15000 });
+  },
+
+  async resetPassword({ email, password, passwordConfirm }) {
+    if (password !== passwordConfirm) {
+      return Promise.reject(new Error("비밀번호가 일치하지 않습니다."));
+    }
+    if (!PASSWORD_POLICY.test(password)) {
+      return Promise.reject(new Error(PASSWORD_POLICY_MESSAGE));
+    }
+    await api.post("/api/auth/password/reset", { email, newPassword: password });
+  },
 };
-
-// 백엔드 연동 전까지 사용하는 mock 함수들 (아이디 찾기/비밀번호 재설정 화면 UI 흐름 확인용)
-// 이번 작업 범위 밖 - 그대로 유지
-
-export function mockFindId({ role, name, birth, phone }) {
-  if (!name || !birth || !phone) {
-    return Promise.reject(new Error("이름, 생년월일, 휴대폰 번호를 입력해주세요."));
-  }
-  return Promise.resolve({
-    role: ROLE_DB_VALUE[role],
-    userId: "gogildong123@naver.com",
-    name: "고길동",
-  });
-}
-
-export function mockRequestPasswordReset({ role, userId, email }) {
-  if (!userId || !email) {
-    return Promise.reject(new Error("아이디와 이메일을 입력해주세요."));
-  }
-  return Promise.resolve({ role: ROLE_DB_VALUE[role], sent: true });
-}
-
-export function mockResetPassword({ password, passwordConfirm }) {
-  if (!password || password.length < 8) {
-    return Promise.reject(new Error("비밀번호는 8자리 이상 입력해주세요."));
-  }
-  if (password !== passwordConfirm) {
-    return Promise.reject(new Error("비밀번호가 일치하지 않습니다."));
-  }
-  return Promise.resolve({ success: true });
-}
