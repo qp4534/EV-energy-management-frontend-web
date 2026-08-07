@@ -1,16 +1,16 @@
 export default function BulletListSection({ section }) {
   return (
-    <section className="card">
-      <h3 className="mb-2 text-base font-bold text-[var(--color-header-text)]">
-        {section.heading}
+    <section className="border-t border-[var(--color-border)] py-6">
+      <h3 className="mb-3 text-lg font-bold text-[var(--color-header-text)]">
+        {section.title ?? section.heading}
       </h3>
-      <ul className="flex flex-col gap-1.5">
-        {section.items.map((item, i) => (
+      <ul className="flex list-none flex-col gap-2 p-0">
+        {(section.items ?? []).map((item, index) => (
           <li
-            key={i}
-            className="flex gap-2 text-sm text-[var(--color-sub-text)]"
+            key={`${index}-${item}`}
+            className="flex gap-3 text-[15px] leading-6 text-[var(--color-header-text)]"
           >
-            <span className="shrink-0 text-[var(--color-header-text)]">•</span>
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-sub-text)]" />
             <span>{item}</span>
           </li>
         ))}

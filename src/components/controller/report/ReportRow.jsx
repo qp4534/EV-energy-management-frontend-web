@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 function formatDate(dateStr) {
+  if (!dateStr) return "-";
   return `${dateStr.slice(0, 10).replaceAll("-", ".")}.`;
 }
 

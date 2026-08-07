@@ -28,6 +28,7 @@ jobs:
           push: true
           build-args: |
             VITE_API_URL=/
+            VITE_KAKAO_MAP_KEY=${{ secrets.VITE_KAKAO_MAP_KEY }}
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
             ${{ env.IMAGE }}:latest
@@ -41,7 +42,10 @@ jobs:
 
       - name: Update image tag in gitops repo
         run: |
+          # Both Argo Applications currently manage the same frontend Deployment.
+          # Keep their desired image tags identical until the legacy application is retired.
           sed -i "s#image: ${{ env.IMAGE }}:.*#image: ${{ env.IMAGE }}:${{ github.sha }}#" gitops/apps/frontend/deployment.yaml
+          sed -i "s#image: ${{ env.IMAGE }}:.*#image: ${{ env.IMAGE }}:${{ github.sha }}#" gitops/apps/frontend-eks/deployment.yaml
           cd gitops
           git config user.name "frontend-deploy-bot"
           git config user.email "actions@users.noreply.github.com"

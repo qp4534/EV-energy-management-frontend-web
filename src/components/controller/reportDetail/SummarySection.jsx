@@ -1,10 +1,10 @@
 export default function SummarySection({ section }) {
   return (
-    <section className="card">
-      <h3 className="mb-2 text-base font-bold text-[var(--color-header-text)]">
-        {section.heading}
+    <section className="border-t border-[var(--color-border)] py-6">
+      <h3 className="mb-3 text-lg font-bold text-[var(--color-header-text)]">
+        {section.title ?? section.heading}
       </h3>
-      <p className="text-sm leading-relaxed text-[var(--color-sub-text)]">
+      <p className="whitespace-pre-line text-[15px] leading-7 text-[var(--color-header-text)]">
         {section.content}
       </p>
     </section>
