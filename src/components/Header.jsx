@@ -1,12 +1,21 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiZap, FiUser, FiLogOut } from "react-icons/fi";
-import { clearAuth } from "../hooks/common/useAuth";
+import useAuth, { clearAuth } from "../hooks/common/useAuth";
 import { userService } from "../services/userService";
 import "../styles/Header.css";
 
 function Header({ role = "controller" }) {
   const navigate = useNavigate();
+  const { isLoggedIn, role: authRole } = useAuth();
+
+  const handleLogoClick = () => {
+    if (isLoggedIn) {
+      navigate(authRole === "administrator" ? "/administrator" : "/controller");
+    } else {
+      navigate("/");
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -22,10 +31,10 @@ function Header({ role = "controller" }) {
     <header className="header">
       {/* 좌측: 서브 타이틀 & 로고 영역 */}
       <div className="header-left">
-        <div className="logo">
+        <button type="button" className="logo" onClick={handleLogoClick}>
           <FiZap className="logo-icon" />
           <span className="logo-text">MijungE</span>
-        </div>
+        </button>
       </div>
 
       {/* 우측: 사용자 프로필 정보 영역 */}
@@ -35,7 +44,7 @@ function Header({ role = "controller" }) {
             <FiUser />
           </div>
           <span className="user-name">
-            {role === "admin" ? "최고 관리자" : "관제 운용자"}
+            {role === "administrator" ? "관리 운용자" : "관제 운용자"}
           </span>
         </Link>
         <button type="button" className="logout-btn" onClick={handleLogout}>

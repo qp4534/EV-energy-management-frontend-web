@@ -5,14 +5,16 @@ import ProposalSection from "./ProposalSection";
 import BuyerTable from "./BuyerTable";
 import BulletList from "../common/BulletList";
 import PdfDownloadButton from "./PdfDownloadBtn";
-import { proposalMock } from "../../../mocks/proposalMock";
 
 /**
- * diagnosisData: diagnosisMock (BatteryDiagnosisPage에서 이미 갖고 있는 grade/remainingCycle/newCycle/healthScore)
- * 섹션 2는 진단 탭이랑 같은 데이터라 별도 mock 없이 그대로
+ * diagnosisData: "배터리 진단" 탭과 같은 carId로 조회한 실제 진단 데이터
+ *   (grade/remainingCycle/newCycle/healthScore) - 섹션 2는 진단 탭이랑 같은 데이터라 그대로 재사용
+ * proposalData: batteryService.getProposalByCarId() 결과 (price/healthMetrics/reasons/cautions)
+ *   과거엔 이 값이 proposalMock 고정값이라 차량을 바꿔도 내용이 안 바뀌었다 - 이제 부모가
+ *   선택된 차량 기준으로 조회한 실제 데이터를 넘겨준다.
  */
-export default function ProposalContent({ diagnosisData }) {
-  const p = proposalMock;
+export default function ProposalContent({ diagnosisData, proposalData }) {
+  const p = proposalData;
 
   return (
     <>

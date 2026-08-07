@@ -35,11 +35,65 @@ export default function SignupInfo() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [emailCodeSent, setEmailCodeSent] = useState(false);
+  const [emailBusy, setEmailBusy] = useState(false);
+  const [emailMessage, setEmailMessage] = useState("");
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
   const update = (key) => (e) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
+  const updateEmail = (e) => {
+    setForm((prev) => ({ ...prev, email: e.target.value }));
+    if (emailVerified) {
+      setEmailVerified(false);
+      setEmailCodeSent(false);
+      setEmailMessage("");
+    }
+  };
+
+  const handleSendCode = async () => {
+    setEmailMessage("");
+    setEmailBusy(true);
+    try {
+      await userService.sendVerificationCode(form.email);
+      setEmailCodeSent(true);
+      setEmailMessage("인증번호를 보냈어요. 이메일을 확인해주세요.");
+      setCooldown(60);
+    } catch (err) {
+      setEmailMessage(err.response?.data?.message || err.message);
+    } finally {
+      setEmailBusy(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    setEmailMessage("");
+    setEmailBusy(true);
+    try {
+      await userService.verifyEmailCode(form.email, form.emailCode);
+      setEmailVerified(true);
+      setEmailMessage("이메일 인증이 완료되었습니다.");
+    } catch (err) {
+      setEmailMessage(err.response?.data?.message || err.message);
+    } finally {
+      setEmailBusy(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!emailVerified) {
+      setError("이메일 인증을 먼저 완료해주세요.");
+      return;
+    }
     try {
       const birth =
         form.birthYear && form.birthMonth && form.birthDay
@@ -116,11 +170,23 @@ export default function SignupInfo() {
             <div className="signup-info-inline">
               <input
                 value={form.email}
-                onChange={update("email")}
+                onChange={updateEmail}
                 placeholder="123@mijungE.com"
+                disabled={emailVerified}
               />
-              <AuthButton variant="primary" type="button">
-                이메일 인증
+              <AuthButton
+                variant="primary"
+                type="button"
+                onClick={handleSendCode}
+                disabled={emailBusy || emailVerified || cooldown > 0 || !form.email}
+              >
+                {emailVerified
+                  ? "인증완료"
+                  : cooldown > 0
+                    ? `재전송 (${cooldown}s)`
+                    : emailCodeSent
+                      ? "재전송"
+                      : "이메일 인증"}
               </AuthButton>
             </div>
           </label>
@@ -130,11 +196,23 @@ export default function SignupInfo() {
               value={form.emailCode}
               onChange={update("emailCode")}
               placeholder="인증번호 입력"
+              disabled={emailVerified || !emailCodeSent}
             />
-            <AuthButton variant="primary" type="button">
-              인증번호 확인
+            <AuthButton
+              variant="primary"
+              type="button"
+              onClick={handleVerifyCode}
+              disabled={emailBusy || emailVerified || !emailCodeSent || !form.emailCode}
+            >
+              {emailVerified ? "인증완료" : "인증번호 확인"}
             </AuthButton>
           </div>
+
+          {emailMessage && (
+            <p className={emailVerified ? "signup-info-email-success" : "signup-info-error"}>
+              {emailMessage}
+            </p>
+          )}
 
           <label>
             <span>전화번호</span>
