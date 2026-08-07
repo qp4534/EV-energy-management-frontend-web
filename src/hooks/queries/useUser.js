@@ -52,6 +52,6 @@ export const useDeleteUser = () => {
 // TODO: 백엔드에 POST /api/users/{userId}/password-reset 아직 없음 (userService.js 참고)
 export const useRequestPasswordReset = () => {
   return useMutation({
-    mutationFn: (userId) => userService.requestPasswordReset(userId),
+    mutationFn: (userId) => userService.adminRequestPasswordReset(userId),
   });
 };
