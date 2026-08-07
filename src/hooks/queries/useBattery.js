@@ -9,3 +9,13 @@ export const useBatteryByCarId = (carId) => {
     enabled: !!carId,
   });
 };
+
+// BatteryDiagnosis.jsx(/admin/battery "배터리 진단" 탭) 전용.
+// carId는 드롭다운 선택만으로는 세팅되지 않고, "진단 실행" 버튼을 눌렀을 때만 상위에서 넘어온다.
+export const useBatteryDiagnosisByCarId = (carId) => {
+  return useQuery({
+    queryKey: ["batteryDiagnosis", carId],
+    queryFn: () => batteryService.getDiagnosisByCarId(carId),
+    enabled: !!carId,
+  });
+};
