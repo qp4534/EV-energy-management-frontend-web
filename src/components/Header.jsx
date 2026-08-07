@@ -35,7 +35,7 @@ function Header({ role = "controller" }) {
             <FiUser />
           </div>
           <span className="user-name">
-            {role === "admin" ? "최고 관리자" : "관제 운용자"}
+            {role === "administrator" ? "관리 운용자" : "관제 운용자"}
           </span>
         </Link>
         <button type="button" className="logout-btn" onClick={handleLogout}>

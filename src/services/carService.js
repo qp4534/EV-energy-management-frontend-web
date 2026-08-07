@@ -146,4 +146,15 @@ export const carService = {
       MOCK_THERMAL_STREAMS[0]
     );
   },
+
+  // BatteryDiagnosis.jsx(/admin/battery) 상단 차량 선택 드롭다운 전용.
+  // 진단 대상을 고르는 용도라 riskLevel 등 placeholder 필드 없이 최소 정보만 반환한다.
+  getCarOptions: async () => {
+    const response = await api.get("/api/cars");
+    return response.data.map((car) => ({
+      carId: car.carId,
+      carNumber: car.carNumber,
+      model: car.model,
+    }));
+  },
 };

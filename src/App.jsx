@@ -80,7 +80,7 @@ function DashboardLayout() {
 
   return (
     <div className="app-container">
-      <Header />
+      <Header role={activeRole} />
       <div className="main-layout">
         <Sidebar role={activeRole} />
         <main className="content-area">

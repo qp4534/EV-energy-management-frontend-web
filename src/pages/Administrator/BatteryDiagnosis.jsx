@@ -16,6 +16,8 @@ import BuyerTable from "../../components/administrator/battery/BuyerTable";
 import ProposalContent from "../../components/administrator/battery/ProposalContent";
 import { diagnosisMock } from "../../mocks/diagnosisMock";
 import { valueMock } from "../../mocks/valueMock";
+import { useCarOptions } from "../../hooks/queries/useCar";
+import { useBatteryDiagnosisByCarId } from "../../hooks/queries/useBattery";
 import "../../styles/administrator/BatteryDiagnosis.css";
 
 const DIAGNOSIS_TABS = [
@@ -26,37 +28,102 @@ const DIAGNOSIS_TABS = [
 
 export default function BatteryDiagnosis() {
   const [activeTab, setActiveTab] = useState("diagnosis");
-  const data = diagnosisMock; // 추후: const { data } = useBatteryDiagnosis(batteryId);
+  const data = diagnosisMock; // "배터리 매도 제안서" 탭(ProposalContent)은 아직 mock 유지
   const value = valueMock;
- 
+
+  // "배터리 진단" 탭 - 차량을 선택하고 "진단 실행"을 눌러야 실제 조회가 실행된다.
+  const [selectedCarId, setSelectedCarId] = useState("");
+  const [diagnosedCarId, setDiagnosedCarId] = useState(null);
+  const { data: carOptions = [] } = useCarOptions();
+  const {
+    data: diagnosisData,
+    isFetching: isDiagnosing,
+    isError: isDiagnosisError,
+  } = useBatteryDiagnosisByCarId(diagnosedCarId);
+
+  const handleDiagnose = () => {
+    if (!selectedCarId) return;
+    setDiagnosedCarId(selectedCarId);
+  };
+
   return (
     <div className="battery-diagnosis-page">
       <h2 className="battery-diagnosis-title">배터리 진단</h2>
- 
+
       <TabBar tabs={DIAGNOSIS_TABS} activeTab={activeTab} onChange={setActiveTab} />
- 
+
       {activeTab === "diagnosis" && (
         <>
-          <div className="stat-card-row">
-            <BatteryStatCard label="판별 등급" value={data.grade} showDot />
-            <BatteryStatCard
-              label="예측 잔여수명"
-              value={data.remainingCycle ?? 0}
-              unit="사이클"
-              sub={data.newCycle ? `(신품 ${data.newCycle.toLocaleString()})` : null}
-            />
-            <BatteryStatCard
-              label="배터리 건강도"
-              value={data.healthScore}
-              suffix="%"
-              sub="(추정)"
-            />
+          <div className="battery-diagnosis-selector">
+            <select
+              className="battery-diagnosis-select"
+              value={selectedCarId}
+              onChange={(e) => setSelectedCarId(e.target.value)}
+            >
+              <option value="">차량 선택</option>
+              {carOptions.map((car) => (
+                <option key={car.carId} value={car.carId}>
+                  {car.carNumber}
+                  {car.model ? ` (${car.model})` : ""}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="battery-diagnosis-run-btn"
+              onClick={handleDiagnose}
+              disabled={!selectedCarId || isDiagnosing}
+            >
+              {isDiagnosing ? "진단 중..." : "진단 실행"}
+            </button>
           </div>
- 
-          <ReuseJudgementCard
-            judgement={data.judgement}
-            distribution={data.distribution}
-          />
+
+          {!diagnosedCarId && (
+            <div className="placeholder-card">
+              차량을 선택하고 "진단 실행"을 눌러주세요.
+            </div>
+          )}
+
+          {diagnosedCarId && isDiagnosisError && (
+            <div className="placeholder-card">
+              진단 정보를 불러오지 못했습니다. 다시 시도해주세요.
+            </div>
+          )}
+
+          {diagnosedCarId && !isDiagnosing && !isDiagnosisError && !diagnosisData && (
+            <div className="placeholder-card">
+              해당 차량의 배터리 진단 데이터가 없습니다.
+            </div>
+          )}
+
+          {diagnosedCarId && !isDiagnosisError && diagnosisData && (
+            <>
+              <div className="stat-card-row">
+                <BatteryStatCard label="판별 등급" value={diagnosisData.grade} showDot />
+                <BatteryStatCard
+                  label="예측 잔여수명"
+                  value={diagnosisData.remainingCycle ?? 0}
+                  unit="사이클"
+                  sub={
+                    diagnosisData.newCycle
+                      ? `(신품 ${diagnosisData.newCycle.toLocaleString()})`
+                      : null
+                  }
+                />
+                <BatteryStatCard
+                  label="배터리 건강도"
+                  value={diagnosisData.healthScore}
+                  suffix="%"
+                  sub="(추정)"
+                />
+              </div>
+
+              <ReuseJudgementCard
+                judgement={diagnosisData.judgement}
+                distribution={diagnosisData.distribution}
+              />
+            </>
+          )}
         </>
       )}
  
