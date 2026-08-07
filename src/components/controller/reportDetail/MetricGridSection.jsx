@@ -1,3 +1,38 @@
+const RISK_LABEL = {
+  EMERGENCY: "긴급",
+  WARNING: "경고",
+  CAUTION: "주의",
+  NORMAL: "정상",
+  UNKNOWN: "미확인",
+};
+
+function formatKst(value) {
+  if (typeof value !== "string" || !value.includes("T")) return value;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const part = (type) => parts.find((item) => item.type === type)?.value;
+  return `${part("year")}-${part("month")}-${part("day")} ${part("hour")}:${part("minute")}:${part("second")} KST`;
+}
+
+function displayValue(item) {
+  const label = String(item.label ?? "");
+  if (label.includes("시각")) return formatKst(item.value);
+  if (label.includes("위험등급") && typeof item.value === "string") {
+    return RISK_LABEL[item.value.toUpperCase()] ?? item.value;
+  }
+  return item.value;
+}
+
 export default function MetricGridSection({ section }) {
   return (
     <section className="border-t border-[var(--color-border)] py-6">
@@ -26,7 +61,7 @@ export default function MetricGridSection({ section }) {
                     : "mt-1 text-3xl font-extrabold text-[var(--color-header-text)]"
                 }
               >
-                {item.value}
+                {displayValue(item)}
                 {item.unit && (
                   <span className="ml-0.5 text-lg font-bold">{item.unit}</span>
                 )}
