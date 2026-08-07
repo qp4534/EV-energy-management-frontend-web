@@ -65,4 +65,60 @@ export const batteryService = {
     if (!passport) return null;
     return batteryService.getBatteryDiagnosis(passport.batteryId);
   },
+
+  // BatteryDiagnosis.jsx "배터리 매도 제안서" 탭(ProposalContent) 전용.
+  // 이전엔 차량 선택과 무관하게 proposalMock을 그대로 썼음 - 실제로는
+  // /api/battery-proposals, /api/battery-diagnosis-metrics 둘 다 이미 있어서
+  // carId -> batteryId로 찾아 매칭한다.
+  //
+  // TEMP: getBatteryByCarId와 동일한 패턴 - "batteryId로 조회" 엔드포인트가
+  // 없어서 목록을 받아 batteryId가 일치하는 걸 찾는다. 지금은 carId가 배터리와
+  // 무작위로 매칭돼 있어 거의 항상 못 찾고, 그 경우 첫 번째 항목을 임시로 보여준다
+  // (실제 FK 연결이 되면 자동으로 정확해진다).
+  getProposalByCarId: async (carId) => {
+    const passport = await batteryService.getBatteryByCarId(carId);
+    if (!passport) return null;
+    const batteryId = passport.batteryId;
+
+    const [proposalsRes, metricsRes] = await Promise.all([
+      api.get("/api/battery-proposals"),
+      api.get("/api/battery-diagnosis-metrics"),
+    ]);
+
+    const proposals = proposalsRes.data ?? [];
+    const proposal =
+      proposals.find((p) => p.batteryId === batteryId) ?? proposals[0] ?? null;
+    if (!proposal) return null;
+
+    const metrics = metricsRes.data ?? [];
+    const metricsForBattery = metrics
+      .filter((m) => m.batteryId === batteryId)
+      .sort((a, b) => new Date(b.diagnosedAt) - new Date(a.diagnosedAt)); // 최신 진단 우선
+    const metric = metricsForBattery[0] ?? metrics[0] ?? null;
+
+    return {
+      price: {
+        total: Math.round(Number(proposal.totalPrice) / 10000), // 원 -> 만원
+        unitPrice: Math.round(Number(proposal.pricePerKwh)).toLocaleString(),
+        negotiationRange: proposal.capacityRange,
+        grade: passport.gradeDetail,
+        // 특정 낙찰 사례·단가 범위는 배터리마다 다른 검증된 근거가 없어
+        // 일반적인 산정 방식만 설명한다(과거 mock처럼 특정 수치를 못박지 않음).
+        note: "본 제안가는 배터리 진단 결과에 공개 시장 벤치마크를 결합해 산정한 추정치입니다.",
+      },
+      healthMetrics: metric
+        ? [
+            { label: "수명 여유", score: `${metric.remainingLifeScore} / 100` },
+            { label: "방전 지속력", score: `${metric.dischargePowerScore} / 100` },
+            { label: "충전 건전성", score: `${metric.chargeHealthScore} / 100` },
+            { label: "전압 안정성", score: `${metric.voltageStabilityScore} / 100` },
+          ]
+        : [],
+      diagnosisNote:
+        "진단 방식 — 충·방전 센서값을 RandomForest 회귀·분류 모델로 분석. " +
+        "잔여수명 예측 평균오차 ±11 사이클, 등급 판별 정확도 98.4%.",
+      reasons: proposal.suitabilityReason ? [proposal.suitabilityReason] : [],
+      cautions: proposal.noticeText ? [proposal.noticeText] : [],
+    };
+  },
 };
