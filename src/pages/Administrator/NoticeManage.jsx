@@ -29,8 +29,15 @@ function NoticeManage() {
     n.title.includes(keyword) || n.content.includes(keyword)
   );
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // 상단 고정(isPinned)인 공지를 먼저, 그 다음은 등록일(createdAt) 최신순으로 정렬.
+  // 백엔드가 정렬해서 주지 않아서 프론트에서 처리.
+  const sorted = [...filtered].sort((a, b) => {
+    if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const pageData = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleSearch = () => setPage(1);
 
@@ -104,10 +111,10 @@ function NoticeManage() {
                     <td>
                       <span
                         className={
-                          n.isPinned ? "badge-important" : "badge-normal"
+                          n.isImportant ? "badge-important" : "badge-normal"
                         }
                       >
-                        {n.isPinned ? "중요" : "일반"}
+                        {n.isImportant ? "중요" : "일반"}
                       </span>
                     </td>
                     <td>{formatNoticeDate(n.createdAt)}</td>
