@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiCamera, FiUser } from "react-icons/fi";
 import { useProfile, useUpdateProfile } from "../hooks/queries/useUser";
+import { userService } from "../services/userService";
+import { clearAuth } from "../hooks/common/useAuth";
 import PasswordInput from "../components/auth/PasswordInput";
 import AuthButton from "../components/auth/AuthButton";
 import { formatPhoneNumber } from "../utils/phone";
 import "../styles/MyPage.css";
 
 export default function MyPage() {
+  const navigate = useNavigate();
   const { data: profile, isLoading } = useProfile();
   const updateProfile = useUpdateProfile();
 
@@ -18,6 +22,7 @@ export default function MyPage() {
   });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [withdrawPassword, setWithdrawPassword] = useState("");
 
   // 파일 업로드 저장소(S3 등)가 아직 정해지지 않아서, 고른 사진은 지금은 화면
   // 미리보기로만 보여준다. 실제 서버 저장은 저장소가 정해지면 연결한다.
@@ -85,6 +90,22 @@ export default function MyPage() {
       });
       setPasswordForm({ currentPassword: "", newPassword: "", newPasswordConfirm: "" });
       setMessage("비밀번호가 변경되었습니다.");
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    }
+  };
+
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    if (!window.confirm("정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+      return;
+    }
+    try {
+      await userService.deleteAccount(withdrawPassword);
+      clearAuth();
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     }
@@ -199,6 +220,24 @@ export default function MyPage() {
         </label>
         <AuthButton variant="primary" type="submit">
           비밀번호 변경
+        </AuthButton>
+      </form>
+
+      <form className="mypage-section mypage-section--danger" onSubmit={handleWithdraw}>
+        <h2>회원 탈퇴</h2>
+        <p className="mypage-danger-desc">
+          탈퇴 시 로그인이 더 이상 불가능합니다. 계속하려면 비밀번호를 입력해주세요.
+        </p>
+        <label>
+          <span>비밀번호</span>
+          <PasswordInput
+            value={withdrawPassword}
+            onChange={(e) => setWithdrawPassword(e.target.value)}
+            placeholder="현재 비밀번호"
+          />
+        </label>
+        <AuthButton variant="danger" type="submit">
+          회원 탈퇴
         </AuthButton>
       </form>
 

@@ -55,6 +55,22 @@ export const userService = {
     await api.post("/api/auth/logout");
   },
 
+  async sendVerificationCode(email) {
+    if (!email) {
+      return Promise.reject(new Error("이메일을 입력해주세요."));
+    }
+    // 메일 발송(SMTP 핸드셰이크 포함)은 일반 API 호출보다 오래 걸릴 수 있어서
+    // 기본 5초 타임아웃 대신 이 호출만 넉넉하게 준다.
+    await api.post("/api/auth/email/send-code", { email }, { timeout: 15000 });
+  },
+
+  async verifyEmailCode(email, code) {
+    if (!code) {
+      return Promise.reject(new Error("인증번호를 입력해주세요."));
+    }
+    await api.post("/api/auth/email/verify-code", { email, code });
+  },
+
   async getMe() {
     const response = await api.get("/api/auth/me");
     return response.data;
@@ -66,6 +82,13 @@ export const userService = {
     }
     const response = await api.patch("/api/auth/me", payload);
     return response.data;
+  },
+
+  async deleteAccount(currentPassword) {
+    if (!currentPassword) {
+      return Promise.reject(new Error("비밀번호를 입력해주세요."));
+    }
+    await api.delete("/api/auth/me", { data: { currentPassword } });
   },
 };
 

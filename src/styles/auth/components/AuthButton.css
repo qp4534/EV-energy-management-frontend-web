@@ -37,6 +37,15 @@
   background-color: var(--color-bg-main);
 }
 
+.auth-btn--danger {
+  background-color: #e0403f;
+  color: #fff;
+}
+
+.auth-btn--danger:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
 .auth-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;

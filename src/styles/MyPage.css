@@ -129,6 +129,16 @@
   color: var(--color-sub-text);
 }
 
+.mypage-section--danger {
+  border: 1px solid #e0403f;
+}
+
+.mypage-danger-desc {
+  font-size: 13px;
+  color: var(--color-sub-text);
+  margin: 0;
+}
+
 .mypage-message {
   color: var(--color-primary-btn);
   font-size: 14px;
