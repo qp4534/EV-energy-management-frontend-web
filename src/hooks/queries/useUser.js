@@ -1,21 +1,41 @@
-// userService 결과를 컴포넌트에 전달
+// userService 결과를 컴포넌트에 전달 (UserManage.jsx 전용)
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { userService } from "@/services/userService";
+import { userService } from "../../services/userService";
 
-// 로그인/회원가입/로그아웃은 캐싱할 게 없는 1회성 액션이라 훅으로 감싸지 않고
-// Login.jsx/SignupInfo.jsx/Header.jsx에서 userService를 직접 호출한다.
-
-export const useProfile = () => {
+// 회원 목록 조회
+export const useUsers = () => {
   return useQuery({
-    queryKey: ["me"],
-    queryFn: userService.getMe,
+    queryKey: ["users"],
+    queryFn: userService.getUsers,
   });
 };
 
-export const useUpdateProfile = () => {
+// 권한/역할 저장
+export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: userService.updateProfile,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["me"] }),
+    mutationFn: ({ userId, payload }) => userService.updateUser(userId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+};
+
+// 회원 탈퇴
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId) => userService.deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+};
+
+// 비밀번호 재설정 링크 전송
+// TODO: 백엔드에 POST /api/users/{userId}/password-reset 아직 없음 (userService.js 참고)
+export const useRequestPasswordReset = () => {
+  return useMutation({
+    mutationFn: (userId) => userService.requestPasswordReset(userId),
   });
 };
