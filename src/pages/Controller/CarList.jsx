@@ -3,6 +3,7 @@ import StatCardList from "@/components/controller/StatCardList";
 import SearchFilterBar from "@/components/common/SearchFilterBar";
 import CarFilterPanel from "@/components/controller/carList/CarFilterPanel";
 import CarVehicleList from "@/components/controller/carList/CarVehicleList";
+import CarDigitalTwinCard from "@/components/controller/carDetail/CarDigitalTwinCard";
 import Pagination from "@/components/common/Pagination";
 import { useCarTableList, useStopCharging } from "@/hooks/queries/useCar";
 import { DEFAULT_CAR_FILTERS, PAGE_SIZE } from "@/constants/carList.constants";
@@ -33,6 +34,7 @@ export default function CarList() {
   const stopCharging = (carId) => {
     stopChargingMutation.mutate(carId);
   };
+  const firstCarId = data?.items?.[0]?.carId;
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -72,6 +74,13 @@ export default function CarList() {
           onPageChange={setCurrentPage}
         />
       </div>
+
+      {firstCarId && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <CarDigitalTwinCard mode="live" vehicleId={firstCarId} />
+          <CarDigitalTwinCard mode="history" vehicleId={firstCarId} />
+        </div>
+      )}
     </div>
   );
 }
