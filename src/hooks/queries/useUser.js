@@ -1,12 +1,34 @@
-// userService 결과를 컴포넌트에 전달 (UserManage.jsx 전용)
+// userService 결과를 컴포넌트에 전달
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { userService } from "../../services/userService";
+import { userService } from "@/services/userService";
+import {
+  getUsers,
+  updateUser,
+  deleteUser,
+  requestPasswordReset,
+} from "@/services/userService";
 
+export const useProfile = () => {
+  return useQuery({
+    queryKey: ["me"],
+    queryFn: userService.getMe,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: userService.updateProfile,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["me"] }),
+  });
+};
+
+// 아래부터는 관리자 이용자 관리(UserManage.jsx)
 // 회원 목록 조회
 export const useUsers = () => {
   return useQuery({
     queryKey: ["users"],
-    queryFn: userService.getUsers,
+    queryFn: getUsers,
   });
 };
 
@@ -14,7 +36,7 @@ export const useUsers = () => {
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, payload }) => userService.updateUser(userId, payload),
+    mutationFn: ({ userId, payload }) => updateUser(userId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
@@ -25,7 +47,7 @@ export const useUpdateUser = () => {
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userId) => userService.deleteUser(userId),
+    mutationFn: (userId) => deleteUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
@@ -36,6 +58,6 @@ export const useDeleteUser = () => {
 // TODO: 백엔드에 POST /api/users/{userId}/password-reset 아직 없음 (userService.js 참고)
 export const useRequestPasswordReset = () => {
   return useMutation({
-    mutationFn: (userId) => userService.requestPasswordReset(userId),
+    mutationFn: (userId) => requestPasswordReset(userId),
   });
 };
