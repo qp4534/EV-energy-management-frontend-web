@@ -1,11 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import StatusDot from "../common/StatusDot";
 import InfoBlock from "./InfoBlock";
 import ProposalSection from "./ProposalSection";
 import BuyerTable from "./BuyerTable";
 import BulletList from "../common/BulletList";
 import PdfDownloadButton from "./PdfDownloadBtn";
-import { exportElementToPdf } from "../../../utils/exportPdf";
+import { batteryService } from "../../../services/batteryService";
 
 /**
  * diagnosisData: "배터리 진단" 탭과 같은 carId로 조회한 실제 진단 데이터
@@ -16,14 +16,21 @@ import { exportElementToPdf } from "../../../utils/exportPdf";
  */
 export default function ProposalContent({ diagnosisData, proposalData }) {
   const p = proposalData;
-  const printRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
 
   const handleDownload = async () => {
     if (isExporting) return;
     setIsExporting(true);
     try {
-      await exportElementToPdf(printRef.current, "배터리_매도_제안서");
+      const blob = await batteryService.downloadProposalPdf({ diagnosisData, proposalData });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "배터리_매도_제안서.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (e) {
       console.error("PDF 다운로드 실패", e);
       alert("PDF 다운로드에 실패했어요. 잠시 후 다시 시도해주세요.");
@@ -34,7 +41,6 @@ export default function ProposalContent({ diagnosisData, proposalData }) {
 
   return (
     <>
-      <div ref={printRef}>
       <ProposalSection title="1. 제안 가격">
         <div className="info-block-row">
           <InfoBlock label="제안 총액" value={p.price.total.toLocaleString()} unit="만원" />
@@ -89,7 +95,6 @@ export default function ProposalContent({ diagnosisData, proposalData }) {
       <ProposalSection title="4. 유의사항">
         <BulletList items={p.cautions} />
       </ProposalSection>
-      </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <PdfDownloadButton onClick={handleDownload} disabled={isExporting} />

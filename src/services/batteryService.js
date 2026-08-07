@@ -122,6 +122,39 @@ export const batteryService = {
     };
   },
 
+  // "배터리 매도 제안서" 탭의 PDF Download 버튼 전용.
+  // 화면에 이미 표시된 diagnosisData/proposalData를 그대로 백엔드(/api/battery-proposals/pdf)에
+  // 넘긴다 - 백엔드도 rul-diagnosis도 재계산하지 않고 그대로 문서화만 하므로 화면 숫자와
+  // PDF 숫자가 항상 같다. (이전엔 html2canvas로 화면을 스크린샷 찍어 PDF에 붙였는데,
+  // 텍스트도 없는 이미지 한 장짜리라 정식 문서가 아니었다.)
+  downloadProposalPdf: async ({ diagnosisData, proposalData }) => {
+    const p = proposalData;
+    const unitPriceWon = Number(String(p.price.unitPrice).replace(/,/g, "")) || 0;
+    const response = await api.post(
+      "/api/battery-proposals/pdf",
+      {
+        buyerName: "매입 희망 기업",
+        buyerRole: "",
+        buyerLocation: "",
+        priceTotalManwon: p.price.total,
+        unitPriceWon,
+        negotiationRange: p.price.negotiationRange,
+        priceGradeLabel: p.price.grade,
+        priceNote: p.price.note,
+        grade: diagnosisData.grade,
+        remainingCycle: diagnosisData.remainingCycle,
+        newCycle: diagnosisData.newCycle,
+        healthScorePct: diagnosisData.healthScore,
+        healthMetrics: p.healthMetrics,
+        diagnosisNote: p.diagnosisNote,
+        reasons: p.reasons,
+        cautions: p.cautions,
+      },
+      { responseType: "blob", timeout: 20000 },
+    );
+    return response.data; // Blob
+  },
+
   // BatteryDiagnosis.jsx "배터리 잔존가치/판매처" 탭 전용.
   // 매도 제안서 탭과 같은 문제였음 - valueMock 고정값이라 차량을 바꿔도 안 바뀌었음.
   // /api/battery-offers(BATTERY_OFFERS, rank_order로 매입처 순위 있음)를 실제로 연결한다.
