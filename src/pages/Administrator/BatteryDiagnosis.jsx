@@ -14,11 +14,11 @@ import BatteryStatCard from "../../components/administrator/battery/BatteryStatC
 import BuyerCard from "../../components/administrator/battery/BuyerCard";
 import BuyerTable from "../../components/administrator/battery/BuyerTable";
 import ProposalContent from "../../components/administrator/battery/ProposalContent";
-import { valueMock } from "../../mocks/valueMock";
 import { useCarOptions } from "../../hooks/queries/useCar";
 import {
   useBatteryDiagnosisByCarId,
   useProposalByCarId,
+  useOffersByCarId,
 } from "../../hooks/queries/useBattery";
 import "../../styles/administrator/BatteryDiagnosis.css";
 
@@ -30,12 +30,10 @@ const DIAGNOSIS_TABS = [
 
 export default function BatteryDiagnosis() {
   const [activeTab, setActiveTab] = useState("diagnosis");
-  // "배터리 잔존가치/판매처" 탭은 아직 mock 유지 (별도 이슈 - 실제 API 연결 시 위와 동일 패턴 적용)
-  const value = valueMock;
 
   // "배터리 진단" 탭 - 차량을 선택하고 "진단 실행"을 눌러야 실제 조회가 실행된다.
-  // "배터리 매도 제안서" 탭도 같은 diagnosedCarId를 그대로 써서, 여기서 고른 차량이
-  // 바뀌면 매도 제안서도 같이 바뀐다(예전엔 제안서 탭이 proposalMock 고정값이라
+  // "배터리 매도 제안서"·"배터리 잔존가치/판매처" 탭도 같은 diagnosedCarId를 그대로 써서,
+  // 여기서 고른 차량이 바뀌면 두 탭 모두 같이 바뀐다(예전엔 둘 다 mock 고정값이라
   // 차량을 바꿔도 내용이 그대로였음 - 이제 실제 API로 연결).
   const [selectedCarId, setSelectedCarId] = useState("");
   const [diagnosedCarId, setDiagnosedCarId] = useState(null);
@@ -50,6 +48,11 @@ export default function BatteryDiagnosis() {
     isFetching: isProposalFetching,
     isError: isProposalError,
   } = useProposalByCarId(diagnosedCarId);
+  const {
+    data: offersData,
+    isFetching: isOffersFetching,
+    isError: isOffersError,
+  } = useOffersByCarId(diagnosedCarId);
 
   const handleDiagnose = () => {
     if (!selectedCarId) return;
@@ -139,39 +142,66 @@ export default function BatteryDiagnosis() {
  
       {activeTab === "value" && (
         <>
-          <div className="stat-card-row">
-            <BatteryStatCard
-              label="판별 등급"
-              value={value.summary.grade}
-              showDot
-              sub={value.summary.gradeSub}
-            />
-            <BatteryStatCard
-              label="예측 잔여수명"
-              value={value.summary.remainingCycle ?? 0}
-              unit="사이클"
-              sub={value.summary.remainingCycleSub}
-            />
-            <BatteryStatCard
-              label="최고 제안가"
-              value={value.summary.bestOffer}
-              unit="만원"
-              sub={value.summary.bestOfferSub}
-            />
-          </div>
- 
-          <div className="buyer-section-title">
-            매입처별 예상 제안가 (
-            {(value.topBuyers?.length || 0) + (value.otherBuyers?.length || 0)}곳)
-          </div>
-          <div className="buyer-section-subtitle">상위 3곳은 상세 표시</div>
- 
-          {value.topBuyers.map((buyer) => (
-            <BuyerCard key={buyer.name} {...buyer} />
-          ))}
- 
-          <div className="buyer-others-label">그 외</div>
-          <BuyerTable rows={value.otherBuyers} />
+          {!diagnosedCarId && (
+            <div className="placeholder-card">
+              "배터리 진단" 탭에서 차량을 선택하고 "진단 실행"을 누르면
+              그 차량의 잔존가치·판매처가 표시됩니다.
+            </div>
+          )}
+
+          {diagnosedCarId && isOffersFetching && (
+            <div className="placeholder-card">불러오는 중...</div>
+          )}
+
+          {diagnosedCarId && !isOffersFetching && (isOffersError || !offersData) && (
+            <div className="placeholder-card">
+              잔존가치·판매처 정보를 불러오지 못했습니다. 다시 시도해주세요.
+            </div>
+          )}
+
+          {diagnosedCarId && !isOffersFetching && offersData && (
+            <>
+              <div className="stat-card-row">
+                <BatteryStatCard
+                  label="판별 등급"
+                  value={offersData.summary.grade}
+                  showDot
+                  sub={offersData.summary.gradeSub}
+                />
+                <BatteryStatCard
+                  label="예측 잔여수명"
+                  value={offersData.summary.remainingCycle ?? 0}
+                  unit="사이클"
+                  sub={offersData.summary.remainingCycleSub}
+                />
+                <BatteryStatCard
+                  label="최고 제안가"
+                  value={offersData.summary.bestOffer}
+                  unit="만원"
+                  sub={offersData.summary.bestOfferSub}
+                />
+              </div>
+
+              <div className="buyer-section-title">
+                매입처별 예상 제안가 (
+                {(offersData.topBuyers?.length || 0) +
+                  (offersData.otherBuyers?.length || 0)}
+                곳)
+              </div>
+              <div className="buyer-section-subtitle">상위 3곳은 상세 표시</div>
+
+              {offersData.topBuyers.map((buyer) => (
+                <BuyerCard key={buyer.name} {...buyer} />
+              ))}
+
+              {offersData.otherBuyers.length > 0 && (
+                <>
+                  <div className="buyer-others-label">그 외</div>
+                  <BuyerTable rows={offersData.otherBuyers} />
+                </>
+              )}
+            </>
+          )}
         </>
       )}
  

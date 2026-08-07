@@ -121,4 +121,60 @@ export const batteryService = {
       cautions: proposal.noticeText ? [proposal.noticeText] : [],
     };
   },
+
+  // BatteryDiagnosis.jsx "배터리 잔존가치/판매처" 탭 전용.
+  // 매도 제안서 탭과 같은 문제였음 - valueMock 고정값이라 차량을 바꿔도 안 바뀌었음.
+  // /api/battery-offers(BATTERY_OFFERS, rank_order로 매입처 순위 있음)를 실제로 연결한다.
+  //
+  // TEMP: getProposalByCarId와 동일한 패턴 - batteryId로 조회하는 엔드포인트가 없어
+  // 목록에서 필터링한다. 매칭되는 offer가 없으면 상위 3곳으로 대체.
+  getOffersByCarId: async (carId) => {
+    const passport = await batteryService.getBatteryByCarId(carId);
+    if (!passport) return null;
+    const batteryId = passport.batteryId;
+
+    const offersRes = await api.get("/api/battery-offers");
+    const allOffers = offersRes.data ?? [];
+
+    let offers = allOffers
+      .filter((o) => o.batteryId === batteryId)
+      .sort((a, b) => (a.rankOrder ?? 999) - (b.rankOrder ?? 999));
+    if (offers.length === 0) {
+      // 이 배터리엔 매칭되는 offer가 없음(더미데이터 희소) - 대표값으로 상위 3곳만 대체 표시
+      offers = [...allOffers]
+        .sort((a, b) => Number(b.offeredPrice) - Number(a.offeredPrice))
+        .slice(0, 3);
+    }
+    if (offers.length === 0) return null;
+
+    const toManwon = (won) => Math.round(Number(won) / 10000);
+    const top = offers[0];
+
+    return {
+      summary: {
+        grade: passport.gradeDetail,
+        gradeSub: `SOH ${passport.sohScore}% · ${passport.batteryType}`,
+        remainingCycle: passport.remainingCycles,
+        remainingCycleSub: passport.totalCycles
+          ? `(신품 ${Number(passport.totalCycles).toLocaleString()})`
+          : null,
+        bestOffer: toManwon(top.offeredPrice),
+        bestOfferSub: `${top.buyerName} · ${Math.round(Number(top.pricePerKwh)).toLocaleString()} 원/kWh`,
+      },
+      topBuyers: offers.slice(0, 3).map((o, i) => ({
+        rank: o.rankOrder ?? i + 1,
+        name: o.buyerName,
+        category: o.businessType,
+        price: toManwon(o.offeredPrice),
+        priceSubtext: `${Math.round(Number(o.pricePerKwh)).toLocaleString()} 원/kWh`,
+        gradeLabel: passport.gradeDetail, // offer 단위 등급 필드가 없어 배터리 등급을 재사용
+        description: o.description,
+      })),
+      otherBuyers: offers.slice(3).map((o) => ({
+        name: o.buyerName,
+        category: o.businessType,
+        price: `${toManwon(o.offeredPrice)} 만원`,
+      })),
+    };
+  },
 };
