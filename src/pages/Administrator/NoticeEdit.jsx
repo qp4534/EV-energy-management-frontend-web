@@ -1,42 +1,47 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getNoticeDetail, updateNotice } from "../../services/noticeService";
+import { useNoticeDetail, useUpdateNotice } from "../../hooks/queries/useNotice";
 import NoticeForm from "../../components/administrator/notice/NoticeForm";
 import "../../styles/administrator/NoticeForm.css";
 
 function NoticeEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [initialData, setInitialData] = useState(null);
+  const { data: initialData, isLoading } = useNoticeDetail(id);
+  const updateNoticeMutation = useUpdateNotice();
 
-  useEffect(() => {
-    const fetchDetail = async () => {
-      try {
-        const data = await getNoticeDetail(id);
-        setInitialData(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchDetail();
-  }, [id]);
+  const handleSubmit = async (formData) => {
+    // NoticeForm은 "target"으로 넘기지만 백엔드 NoticeDto는 "targetRole"이라 이름을 맞춰줌.
+    // userId는 화면에서 안 바꾸는 값이라, 원본 조회 데이터(initialData.userId)를 그대로 유지 —
+    // 안 넣으면 NOT NULL 위반으로 500 남 (NoticeWrite.jsx와 같은 이유).
+    const { target, ...rest } = formData;
 
-  const handleSubmit = async (data) => {
-    await updateNotice(id, data);
-    alert("공지사항이 수정되었습니다!");
-    navigate(`/admin/notices/${id}`);
+    try {
+      await updateNoticeMutation.mutateAsync({
+        id,
+        noticeData: {
+          ...rest,
+          targetRole: target,
+          userId: initialData?.userId,
+        },
+      });
+      alert("공지사항이 수정되었습니다!");
+      navigate(`/admin/notices/${id}`);
+    } catch (err) {
+      console.error("공지사항 수정 실패:", err);
+      alert("공지사항 수정에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
 
-  if (!initialData) return <div className="notice-detail-loading">불러오는 중...</div>;
+  if (isLoading || !initialData) return <div className="notice-detail-loading">불러오는 중...</div>;
 
   return (
     <div className="notice-form">
       <h2>공지사항 수정</h2>
       <NoticeForm
-        initialData={initialData}
+        initialData={{ ...initialData, target: initialData.targetRole }}
         onSubmit={handleSubmit}
         onCancel={() => navigate(`/admin/notices/${id}`)}
-        submitLabel="수정"
+        submitLabel={updateNoticeMutation.isPending ? "수정 중..." : "수정"}
       />
     </div>
   );
