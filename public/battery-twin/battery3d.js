@@ -888,12 +888,22 @@ export class BatteryPackViewer {
     if (!state || !Array.isArray(state.temperature_decic)) return;
     this.state = state;
     this.frame = frame;
+    const temperatures = state.temperature_decic.map((value) => Number(value) / 10);
+    const minimum = Math.min(...temperatures);
+    const maximum = Math.max(...temperatures);
+    // A real battery hotspot exists only when cells differ meaningfully;
+    // otherwise the "hottest cell" is just noise and must not be auto-selected.
+    const hasBatteryHotspot = maximum - minimum >= 2.0;
     const changedScenario = this.lastScenario !== frame.scenario_id;
-    const riskRaised = frame.risk_level > this.lastRiskLevel && frame.primary_risk_source === "battery";
+    const riskRaised = frame.risk_level > this.lastRiskLevel && hasBatteryHotspot;
     this.lastScenario = frame.scenario_id;
     this.lastRiskLevel = frame.risk_level;
     this._updateConnectorTwin(frame.connector_twin_state);
-    if (changedScenario || this.selectedIndex === null || (riskRaised && frame.risk_level >= 2)) {
+    if (changedScenario || this.selectedIndex === null) {
+      this.selectedIndex = hasBatteryHotspot
+        ? Number(state.hotspot_cell_index)
+        : null;
+    } else if (riskRaised && frame.risk_level >= 2) {
       this.selectedIndex = Number(state.hotspot_cell_index);
     }
 
@@ -903,9 +913,6 @@ export class BatteryPackViewer {
       return;
     }
 
-    const temperatures = state.temperature_decic.map((value) => Number(value) / 10);
-    const minimum = Math.min(...temperatures);
-    const maximum = Math.max(...temperatures);
     for (let index = 0; index < temperatures.length; index += 1) {
       const level = Number(state.state_level[index]);
       this.cells.setColorAt(index, cellColor(level, temperatures[index], minimum, maximum));
@@ -917,7 +924,15 @@ export class BatteryPackViewer {
   }
 
   _updateSelection(notify) {
-    if (!this.state || this.selectedIndex === null) return;
+    if (!this.state) return;
+    if (this.selectedIndex === null) {
+      if (this.mode === "webgl" && this.selectionBox) {
+        this.selectionBox.visible = false;
+      }
+      if (this.mode === "fallback") this._updateFallback();
+      this.render?.();
+      return;
+    }
     const index = clamp(this.selectedIndex, 0, Number(this.definition.visualized_cell_count) - 1);
     this.selectedIndex = index;
     if (this.mode === "webgl" && this.selectionBox) {
