@@ -1,4 +1,3 @@
-import React from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -12,6 +11,8 @@ import { useDailyDangerCarCount } from "@/hooks/queries/useCar";
 
 export default function ChartCard() {
   const { data: chartData, isLoading, isError } = useDailyDangerCarCount();
+  const maxCount = Math.max(1, ...(chartData ?? []).map((item) => item.count));
+  const yAxisMax = Math.ceil(maxCount / 5) * 5;
 
   if (isLoading) {
     return (
@@ -52,8 +53,8 @@ export default function ChartCard() {
 
             {/* Y축 */}
             <YAxis
-              domain={[0, 4]}
-              ticks={[0, 1, 2, 3, 4]}
+              domain={[0, yAxisMax]}
+              allowDecimals={false}
               tickLine={false}
               axisLine={{ stroke: "#B0B0B0" }}
               tick={{ fill: "#555555", fontSize: 13 }}
