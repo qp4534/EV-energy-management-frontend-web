@@ -227,7 +227,7 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
       <div className="digital-twin-heading">
         <div>
           <h2>{isHistory ? "사고 전후 3시간 디지털 트윈" : "실시간 디지털 트윈"}</h2>
-          <p>{isHistory ? "사고 1시간 전부터 사고 2시간 후까지" : `${vehicleId} · 차량·배터리 상태 1Hz 모니터링`}</p>
+          <p>{isHistory ? "사고 1시간 전부터 사고 2시간 후까지" : "차량·배터리 상태 1Hz 모니터링"}</p>
         </div>
         <span className={`digital-twin-live ${isHistory ? "digital-twin-live--history" : ""}`}>
           {isHistory ? "INCIDENT" : "LIVE"}
