@@ -42,9 +42,7 @@ jobs:
 
       - name: Update image tag in gitops repo
         run: |
-          # Both Argo Applications currently manage the same frontend Deployment.
-          # Keep their desired image tags identical until the legacy application is retired.
-          sed -i "s#image: ${{ env.IMAGE }}:.*#image: ${{ env.IMAGE }}:${{ github.sha }}#" gitops/apps/frontend/deployment.yaml
+          # k3s (apps/frontend) instance is stopped - EKS is the only deploy target now.
           sed -i "s#image: ${{ env.IMAGE }}:.*#image: ${{ env.IMAGE }}:${{ github.sha }}#" gitops/apps/frontend-eks/deployment.yaml
           cd gitops
           git config user.name "frontend-deploy-bot"
