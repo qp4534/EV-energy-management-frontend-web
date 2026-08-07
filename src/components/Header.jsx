@@ -1,13 +1,19 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiZap, FiUser, FiLogOut } from "react-icons/fi";
 import { clearAuth } from "../hooks/common/useAuth";
+import { userService } from "../services/userService";
 import "../styles/Header.css";
 
 function Header({ role = "controller" }) {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await userService.logout();
+    } catch (e) {
+      // 네트워크/서버 오류가 나도 로컬 로그아웃은 진행한다
+    }
     clearAuth();
     navigate("/");
   };
@@ -24,14 +30,14 @@ function Header({ role = "controller" }) {
 
       {/* 우측: 사용자 프로필 정보 영역 */}
       <div className="header-right">
-        <div className="user-info">
+        <Link to="/mypage" className="user-info">
           <div className="user-icon-bg">
             <FiUser />
           </div>
           <span className="user-name">
             {role === "admin" ? "최고 관리자" : "관제 운용자"}
           </span>
-        </div>
+        </Link>
         <button type="button" className="logout-btn" onClick={handleLogout}>
           <FiLogOut />
           로그아웃

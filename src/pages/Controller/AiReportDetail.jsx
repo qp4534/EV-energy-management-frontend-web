@@ -6,11 +6,14 @@ import {
   useMarkReportAsRead,
 } from "@/hooks/queries/useReport"; // 실제 프로젝트에서는 "@/hooks/queries/useReport"
 import ReportSectionRenderer from "@/components/controller/reportDetail/ReportSectionRenderer";
-import { REPORT_RISK_BADGE_LABEL } from "@/constants/report.constants";
-import { RISK_LEVEL_COLOR } from "@/constants/carList.constants";
+import {
+  REPORT_RISK_BADGE_LABEL,
+  REPORT_RISK_COLOR,
+} from "@/constants/report.constants";
 
 // "YYYY-MM-DDTHH:mm:ss" -> "YYYY-MM-DD HH:mm"
 function formatDateTime(dateStr) {
+  if (!dateStr) return "-";
   const [date, time = ""] = dateStr.split("T");
   return `${date} ${time.slice(0, 5)}`.trim();
 }
@@ -55,7 +58,7 @@ export default function AiReportDetail() {
       <div>
         <div className="mb-2 flex items-center gap-2">
           <span
-            className={`rounded-full px-3 py-1 text-xs font-bold text-white ${RISK_LEVEL_COLOR[report.riskLevel]}`}
+            className={`rounded-full px-3 py-1 text-xs font-bold text-white ${REPORT_RISK_COLOR[report.riskLevel] ?? REPORT_RISK_COLOR.UNKNOWN}`}
           >
             {REPORT_RISK_BADGE_LABEL[report.riskLevel] ?? report.riskLevel}
           </span>
@@ -80,9 +83,46 @@ export default function AiReportDetail() {
         </div>
       ) : (
         <>
-          {reportData.sections.map((section, i) => (
+          {(reportData.sections ?? []).map((section, i) => (
             <ReportSectionRenderer key={i} section={section} />
           ))}
+
+          {reportData.sources?.length > 0 && (
+            <section className="card">
+              <h3 className="mb-2 text-base font-bold text-[var(--color-header-text)]">
+                참고 자료
+              </h3>
+              <ul className="flex flex-col gap-1.5 text-sm text-[var(--color-sub-text)]">
+                {reportData.sources.map((source) => {
+                  const location = [
+                    source.page ? `${source.page}쪽` : null,
+                    source.clause,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ");
+                  const label = location
+                    ? `${source.title} (${location})`
+                    : source.title;
+                  return (
+                    <li key={source.chunkId ?? label}>
+                      {source.url ? (
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline hover:opacity-70"
+                        >
+                          {label}
+                        </a>
+                      ) : (
+                        label
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
 
           {reportData.actions?.length > 0 && (
             <div className="flex items-center gap-3">

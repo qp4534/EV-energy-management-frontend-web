@@ -8,7 +8,31 @@ function niceBounds(values) {
 }
 
 export default function LineChartSection({ section }) {
-  const { series, heading, unit = "" } = section;
+  const heading = section.title ?? section.heading;
+  const unit = section.unit ?? "";
+  const dataset = section.datasets?.[0];
+  const datasetValues = dataset?.data ?? dataset?.values ?? [];
+  const series = Array.isArray(section.series)
+    ? section.series
+    : (section.labels ?? [])
+        .map((label, index) => ({
+          label,
+          value: Number(datasetValues[index]),
+        }))
+        .filter((point) => Number.isFinite(point.value));
+
+  if (series.length === 0) {
+    return (
+      <section className="card">
+        <h3 className="mb-2 text-base font-bold text-[var(--color-header-text)]">
+          {heading}
+        </h3>
+        <p className="text-sm text-[var(--color-btn-desc)]">
+          데이터가 없습니다.
+        </p>
+      </section>
+    );
+  }
   const width = 700;
   const height = 260;
   const padding = { top: 10, right: 16, bottom: 30, left: 40 };

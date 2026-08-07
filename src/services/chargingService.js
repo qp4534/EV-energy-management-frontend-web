@@ -26,25 +26,24 @@ export const chargingService = {
     return response.data;
   },
 
-  // CarDetail.jsx "상세 위치" 카드용. 원래는 CHARGING_SESSION에서 carId로 세션을 찾아
-  // 그 세션의 chargeId로 충전소를 찾는 조인이 필요하다.
-  //
-  // TEMP: USE_MOCK과 무관하게 항상 실제 API 호출. 다만 백엔드 /api/charging-sessions는
-  // 아직 진짜 DB가 아니라 요청마다 carId/chargeId를 랜덤 UUID로 새로 생성해서 내려주기
-  // 때문에, 실제 차량의 carId와 절대 일치하지 않는다 - 그래서 일치하는 세션을 못 찾으면
-  // 첫 번째 충전소를 임시로 보여준다. ChargingSessionService가 실제 DB와 연결되어
-  // carId가 진짜로 유지되면 이 폴백 없이 정확한 매칭이 될 것이다.
+  // CarDetail.jsx "상세 위치" 카드용. CAR 테이블엔 위치가 없어서 CAR -> (활성) CHARGING_SESSION
+  // -> chargerId로 CHARGER -> chargeId로 CHARGING_STATION, 이렇게 2단 조인해야 위치가 나온다.
+  // 이 차가 지금 충전 세션이 없으면(주차만 하고 있으면) 애초에 위치를 알 방법이 없어서
+  // 그 경우엔 첫 번째 충전소로 폴백한다.
   getStationByCarId: async (carId) => {
-    const [sessionsRes, stationsRes] = await Promise.all([
+    const [sessionsRes, chargersRes, stationsRes] = await Promise.all([
       api.get("/api/charging-sessions"),
+      api.get("/api/chargers"),
       api.get("/api/charging-stations"),
     ]);
     const sessions = sessionsRes.data;
+    const chargers = chargersRes.data;
     const stations = stationsRes.data;
 
     const session = sessions.find((s) => s.carId === carId);
+    const charger = chargers.find((c) => c.chargerId === session?.chargerId);
     const station =
-      stations.find((st) => st.chargeId === session?.chargeId) ??
+      stations.find((st) => st.chargeId === charger?.chargeId) ??
       stations[0] ??
       null;
     return station;

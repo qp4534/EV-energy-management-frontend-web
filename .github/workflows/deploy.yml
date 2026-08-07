@@ -2,8 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    # dev_nh added temporarily to test this workflow before merging; remove once verified
-    branches: [main, dev_nh]
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -29,6 +28,7 @@ jobs:
           push: true
           build-args: |
             VITE_API_URL=/
+            VITE_KAKAO_MAP_KEY=${{ secrets.VITE_KAKAO_MAP_KEY }}
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
             ${{ env.IMAGE }}:latest
@@ -37,8 +37,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: qp4534/EV-energy-management-gitops
-          # dev_nh pinned temporarily for testing; switch to main once merged
-          ref: dev_nh
           token: ${{ secrets.GITOPS_PUSH_TOKEN }}
           path: gitops
 
