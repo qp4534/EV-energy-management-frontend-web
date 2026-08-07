@@ -5,7 +5,7 @@ import '../../../styles/administrator/components/UserPermissionModal.css';
 // 실제 정책에 맞게 ROLE_DEFAULTS.차주 값만 조정하세요.
 const ROLES = [
   { key: '관리자', label: '관리자', icon: '🛡️' },
-  { key: '관제사', label: '관제사', icon: '📡' },
+  { key: '관제자', label: '관제자', icon: '📡' },
   { key: '차주', label: '회원(차주)', icon: '🚚' },
 ];
 
@@ -47,7 +47,7 @@ const ROLE_DEFAULTS = {
     user_manage: true,
     system_setting: true,
   },
-  관제사: {
+  관제자: {
     dashboard_view: true,
     fire_alert: true,
     battery_diag_view: true,
@@ -67,19 +67,62 @@ const ROLE_DEFAULTS = {
   },
 };
 
-export default function UserPermissionModal({ user, onClose, onSave }) {
-  const [role, setRole] = useState(user?.role ?? '관제사');
-  const [permissions, setPermissions] = useState(
-    ROLE_DEFAULTS[user?.role ?? '관제사']
-  );
+// ROLE_DEFAULTS에 없는 role(예: 백엔드 mock의 '이용자')이 들어와도
+// 죽지 않도록 하는 안전망. 전 권한 false로 시작한다.
+const FALLBACK_PERMISSIONS = PERMISSION_GROUPS.reduce((acc, group) => {
+  group.items.forEach((item) => {
+    acc[item.key] = false;
+  });
+  return acc;
+}, {});
+
+export default function UserPermissionModal({ user, onClose, onSave, onResetPassword, onDeleteUser }) {
+  // ROLES에 없는 role(예: '이용자')이 들어오면 role 버튼 중 아무것도
+  // 선택되지 않은 상태로 시작한다 (크래시는 안 나고, UI상 미선택으로만 보임).
+  const [role, setRole] = useState(user?.role ?? '관제자');
+
+  // 저장된 권한이 있으면(빈 객체가 아니면) 그대로 사용,
+  // 없으면 role 기본값, 그마저도 없으면(알 수 없는 role) 안전한 fallback 사용
+  const initialPermissions =
+    user?.permissions && Object.keys(user.permissions).length > 0
+      ? user.permissions
+      : ROLE_DEFAULTS[user?.role] ?? FALLBACK_PERMISSIONS;
+
+  const [permissions, setPermissions] = useState(initialPermissions);
+  const [isResetting, setIsResetting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleRoleChange = (nextRole) => {
     setRole(nextRole);
-    setPermissions(ROLE_DEFAULTS[nextRole]);
+    setPermissions(ROLE_DEFAULTS[nextRole] ?? FALLBACK_PERMISSIONS); // role을 직접 바꾸면 기본값으로 리셋 (의도된 동작)
   };
 
   const togglePermission = (key) => {
-    setPermissions((prev) => ({ ...prev, [key]: !prev[key] }));
+    setPermissions((prev) => ({ ...(prev ?? FALLBACK_PERMISSIONS), [key]: !prev?.[key] }));
+  };
+
+  const handleResetPassword = async () => {
+    if (!onResetPassword || isResetting) return;
+    try {
+      setIsResetting(true);
+      await onResetPassword(user);
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!onDeleteUser || isDeleting) return;
+    const confirmed = window.confirm(
+      `${user.name} 님을 정말 탈퇴 처리하시겠습니까? 이 작업은 되돌릴 수 없습니다.`
+    );
+    if (!confirmed) return;
+    try {
+      setIsDeleting(true);
+      await onDeleteUser(user);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (!user) return null;
@@ -150,7 +193,13 @@ export default function UserPermissionModal({ user, onClose, onSave }) {
                 <p className="account-title">비밀번호 변경</p>
                 <p className="sub">가입 이메일로 비밀번호 재설정 링크를 전송합니다.</p>
               </div>
-              <button className="account-btn primary">재설정 링크 전송</button>
+              <button
+                className="account-btn primary"
+                onClick={handleResetPassword}
+                disabled={isResetting}
+              >
+                {isResetting ? '전송 중...' : '재설정 링크 전송'}
+              </button>
             </div>
 
             <div className="account-row danger">
@@ -158,7 +207,13 @@ export default function UserPermissionModal({ user, onClose, onSave }) {
                 <p className="account-title">회원 탈퇴</p>
                 <p className="sub">계정과 권한 정보가 즉시 삭제되며 되돌릴 수 없습니다.</p>
               </div>
-              <button className="account-btn danger">회원 탈퇴</button>
+              <button
+                className="account-btn danger"
+                onClick={handleDeleteUser}
+                disabled={isDeleting}
+              >
+                {isDeleting ? '처리 중...' : '회원 탈퇴'}
+              </button>
             </div>
           </div>
         )}

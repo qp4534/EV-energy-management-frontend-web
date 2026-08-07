@@ -91,3 +91,12 @@ export const useThermalStreamByCarId = (carId) => {
     enabled: !!carId, // carId가 전달되었을 때만 쿼리 실행
   });
 };
+
+// BatteryDiagnosis.jsx(/admin/battery) 상단 차량 선택 드롭다운 전용 - 전체 차량 목록(간략 정보).
+export const useCarOptions = () => {
+  return useQuery({
+    queryKey: ["carOptions"],
+    queryFn: carService.getCarOptions,
+    staleTime: 1000 * 60 * 5, // 차량 목록은 자주 안 바뀌므로 5분 캐싱
+  });
+};

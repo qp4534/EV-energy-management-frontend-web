@@ -1,13 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MOCK_NOTICES } from "../../mocks/noticeMock";
+import { getNoticeDetail, updateNotice } from "../../services/noticeService";
 import NoticeForm from "../../components/administrator/notice/NoticeForm";
 import "../../styles/administrator/NoticeForm.css";
-
-const updateNoticeMock = async (noticeId, data) => {
-  console.log("수정 데이터:", noticeId, data);
-  return new Promise((resolve) => setTimeout(resolve, 300));
-};
 
 function NoticeEdit() {
   const { id } = useParams();
@@ -15,13 +10,20 @@ function NoticeEdit() {
   const [initialData, setInitialData] = useState(null);
 
   useEffect(() => {
-    const found = MOCK_NOTICES.find((n) => n.noticeId === id);
-    setInitialData(found || null);
+    const fetchDetail = async () => {
+      try {
+        const data = await getNoticeDetail(id);
+        setInitialData(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchDetail();
   }, [id]);
 
   const handleSubmit = async (data) => {
-    await updateNoticeMock(id, data);
-    alert("공지사항이 수정되었습니다! (임시)");
+    await updateNotice(id, data);
+    alert("공지사항이 수정되었습니다!");
     navigate(`/admin/notices/${id}`);
   };
 

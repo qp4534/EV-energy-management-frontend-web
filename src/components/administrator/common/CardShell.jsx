@@ -1,5 +1,4 @@
 import React from "react";
-import { Maximize2 } from "lucide-react";
 import ExpandButton from "../../ExpandButton";
 
 export default function CardShell({ title, children, expandTo, onExpand }) {
@@ -11,11 +10,7 @@ export default function CardShell({ title, children, expandTo, onExpand }) {
         <h3 className="m-0 text-[15px] font-bold text-[var(--color-header-text)]">
           {title}
         </h3>
-        {hasExpandAction ? (
-          <ExpandButton to={expandTo} onClick={onExpand} />
-        ) : (
-          <Maximize2 size={15} className="text-[var(--color-sub-text)]" />
-        )}
+        {hasExpandAction && <ExpandButton to={expandTo} onClick={onExpand} />}
       </div>
       {children}
     </div>
