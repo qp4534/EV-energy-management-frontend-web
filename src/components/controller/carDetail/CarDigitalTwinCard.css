@@ -291,15 +291,21 @@
   left: 0;
 }
 
-.digital-twin-time-axis span:last-child {
+.digital-twin-time-axis span:nth-child(2) {
   position: absolute;
-  right: 0;
+  left: 33.333%;
+  transform: translateX(-50%);
+}
+
+.digital-twin-time-axis span:nth-child(3) {
+  position: absolute;
+  left: 66.667%;
+  transform: translateX(-50%);
 }
 
 .digital-twin-time-axis strong {
   position: absolute;
-  left: 33.333%;
-  transform: translateX(-50%);
+  right: 0;
   color: #c55225;
   font-weight: 800;
 }

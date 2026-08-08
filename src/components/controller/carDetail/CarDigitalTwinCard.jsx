@@ -226,7 +226,7 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
     <div className={`card digital-twin-card digital-twin-card--${mode} flex h-full flex-col gap-3`}>
       <div className="digital-twin-heading">
         <div>
-          <h2>{isHistory ? "사고 전후 3시간 디지털 트윈" : "실시간 디지털 트윈"}</h2>
+          <h2>{isHistory ? "사고 전 3시간 디지털 트윈" : "실시간 디지털 트윈"}</h2>
           <p>{isHistory ? "사고 1시간 전부터 사고 2시간 후까지" : "차량·배터리 상태 1Hz 모니터링"}</p>
         </div>
         <span className={`digital-twin-live ${isHistory ? "digital-twin-live--history" : ""}`}>
@@ -315,7 +315,7 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
               <input type="range" min="0" max={progressMax} value={Math.min(frameIndex, progressMax)} onChange={(event) => { setPlaying(false); setFrameIndex(Number(event.target.value)); }} disabled={status !== "ready"} aria-label="사고 전후 3시간 재생 위치" />
               <span>{formatIncidentTime(frameIndex, frames.length)}</span>
             </div>
-            <div className="digital-twin-time-axis"><span>-1시간</span><strong>사고 발생</strong><span>+2시간</span></div>
+                <div className="digital-twin-time-axis"><span>-3시간</span><span>-2시간</span><span>-1시간</span><strong>사고 발생</strong></div>
           </div>
         ) : (
           <div className="digital-twin-live-summary"><span className="digital-twin-pulse" />1초마다 최신 프레임 반영 <strong>{currentFrame?.timestamp ? new Date(currentFrame.timestamp).toLocaleTimeString("ko-KR") : "--:--:--"}</strong></div>
