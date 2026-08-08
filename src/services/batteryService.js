@@ -208,11 +208,15 @@ export const batteryService = {
   // 있는 벤치마크 - 그대로) 목록을 만든다. 서버 시크릿으로 자동 동작하고, 검색이 안
   // 되면 자체적으로 고정 매입처 목록에 폴백한다(live:false).
   fetchLiveOffers: async ({ grade, capacityKwh, condition }) => {
-    const response = await api.post("/api/battery-offers/live-offers", {
-      grade,
-      capacityKwh,
-      condition,
-    });
+    // 이 호출 체인(백엔드 -> rul-diagnosis -> Serper 검색(최대 8s) + DeepSeek 요약(최대 20s))은
+    // 실제로 20초 가까이 걸릴 수 있다(백엔드 RestClient의 read-timeout도 20000ms로 맞춰져
+    // 있음). axios 기본 인스턴스 timeout(5000ms)을 그대로 쓰면 백엔드가 응답하기도 전에
+    // 프론트가 먼저 타임아웃 나버려서 "매입처 조회에 실패했어요"가 항상 뜨는 문제가 있었다.
+    const response = await api.post(
+      "/api/battery-offers/live-offers",
+      { grade, capacityKwh, condition },
+      { timeout: 30000 },
+    );
     const { live, offers = [] } = response.data;
     const toManwon = (won) => Math.round(Number(won) / 10000);
     const mapped = offers.map((o, i) => ({
