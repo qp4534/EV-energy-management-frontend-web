@@ -40,12 +40,28 @@ export const batteryService = {
       console.error("reuseProbabilities 파싱 실패:", e);
     }
 
+    // battery_level 컬럼은 '1'/'2'/'3'뿐 아니라 DEFAULT '미등록'도 들어있을 수 있다
+    // (schema.sql 코멘트 참고). '미등록'이면 gradeLevel을 못 쓰므로, 화면에 이미 나오는
+    // gradeDetail(재사용/2차사용/재활용급)로부터 등급을 유추하는 걸로 대신한다.
+    const validLevel = ["1", "2", "3"].includes(String(d.batteryLevel)) ? d.batteryLevel : null;
+    const levelFromGradeDetail = d.gradeDetail?.includes("재사용")
+      ? "1"
+      : d.gradeDetail?.includes("2차사용")
+        ? "2"
+        : d.gradeDetail?.includes("재활용") || d.gradeDetail?.includes("수거")
+          ? "3"
+          : null;
+    const gradeLevel = validLevel || levelFromGradeDetail;
+
     return {
       grade: d.gradeDetail,
       // PDF(/report/pdf/full)는 "1등급"/"2등급"/"3등급" 형식을 요구한다 - 화면 표시용
       // grade(gradeDetail, 예: "재사용(EV 재제조)급")와는 다른 값이라 따로 둔다.
-      gradeLevel: d.batteryLevel ? `${d.batteryLevel}등급` : null,
-      capacityKwh: Number(d.ratedCapacity) || null,
+      gradeLevel: gradeLevel ? `${gradeLevel}등급` : null,
+      // rated_capacity는 DB에 "77.4kWh"처럼 단위가 붙은 문자열로 저장돼 있어서
+      // Number()로는 항상 NaN이 나왔다(Number는 문자열 전체가 숫자여야 함) - parseFloat는
+      // 앞쪽 숫자만 읽으므로 정상 파싱된다.
+      capacityKwh: parseFloat(d.ratedCapacity) || null,
       remainingCycle: d.remainingCycles,
       newCycle: d.totalCycles,
       healthScore: Number(d.sohScore),
