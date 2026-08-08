@@ -220,6 +220,18 @@ export const batteryService = {
     };
   },
 
+  // "잔존가치/판매처" 탭 매입처 카드의 "실시간 검색" 버튼 전용. 이 매입처가 사용후 배터리를
+  // 매입하겠다고 공개적으로 밝힌 근거자료를 찾아온다. 키는 이 요청 한 번만 쓰이고 어디에도
+  // 저장·로그되지 않는다. 결과 disclosure가 null이면 호출부가 기존 DB 문구를 그대로 쓰면 됨.
+  fetchBuyerDisclosure: async ({ buyerName, serperApiKeyNh, deepseekApiKeyNh }) => {
+    const response = await api.post("/api/battery-offers/buyer-disclosure", {
+      buyerName,
+      ...(serperApiKeyNh ? { serperApiKeyNh } : {}),
+      ...(deepseekApiKeyNh ? { deepseekApiKeyNh } : {}),
+    });
+    return response.data.disclosure; // string | null
+  },
+
   // "잔존가치/판매처" 탭의 "실시간 검색으로 매입처 확인" 버튼 전용. DB 고정 목록이 아니라
   // 매입처 회사 자체를 실시간 검색으로 찾아서(가격은 기존 계산식 그대로) 목록을 다시 만든다.
   // live:false면 검색 실패/키 없음으로 rul-diagnosis가 자체적으로 고정 목록에 폴백한 것.

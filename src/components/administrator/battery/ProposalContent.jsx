@@ -75,6 +75,40 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
 
   return (
     <>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, marginBottom: 16 }}>
+        <button
+          type="button"
+          onClick={() => setShowApiKeyField((v) => !v)}
+          style={{ background: "none", border: "none", padding: 0, fontSize: 12, color: "#888", cursor: "pointer" }}
+        >
+          {showApiKeyField ? "개인 키 입력 닫기" : "매입처 실시간 검색용 개인 키 입력 (선택)"}
+        </button>
+
+        {showApiKeyField && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+            <input
+              type="password"
+              autoComplete="off"
+              value={serperApiKeyNh}
+              onChange={(e) => setSerperApiKeyNh(e.target.value)}
+              placeholder="Serper API 키 (검색용)"
+              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
+            />
+            <input
+              type="password"
+              autoComplete="off"
+              value={deepseekApiKeyNh}
+              onChange={(e) => setDeepseekApiKeyNh(e.target.value)}
+              placeholder="DeepSeek API 키 (요약용)"
+              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
+            />
+            <span style={{ fontSize: 11, color: "#999" }}>
+              둘 다 입력 안 하면 서버 기본값 사용. 이 PDF 한 번만 쓰이고 저장·기록되지 않아요.
+            </span>
+          </div>
+        )}
+      </div>
+
       <ProposalSection title="1. 제안 가격">
         <div className="info-block-row">
           <InfoBlock label="제안 총액" value={p.price.total.toLocaleString()} unit="만원" />
@@ -130,39 +164,7 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
         <BulletList items={cautions} />
       </ProposalSection>
 
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-        <button
-          type="button"
-          onClick={() => setShowApiKeyField((v) => !v)}
-          style={{ background: "none", border: "none", padding: 0, fontSize: 12, color: "#888", cursor: "pointer" }}
-        >
-          {showApiKeyField ? "개인 키 입력 닫기" : "매입처 실시간 검색용 개인 키 입력 (선택)"}
-        </button>
-
-        {showApiKeyField && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-            <input
-              type="password"
-              autoComplete="off"
-              value={serperApiKeyNh}
-              onChange={(e) => setSerperApiKeyNh(e.target.value)}
-              placeholder="Serper API 키 (검색용)"
-              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
-            />
-            <input
-              type="password"
-              autoComplete="off"
-              value={deepseekApiKeyNh}
-              onChange={(e) => setDeepseekApiKeyNh(e.target.value)}
-              placeholder="DeepSeek API 키 (요약용)"
-              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
-            />
-            <span style={{ fontSize: 11, color: "#999" }}>
-              둘 다 입력 안 하면 서버 기본값 사용. 이 PDF 한 번만 쓰이고 저장·기록되지 않아요.
-            </span>
-          </div>
-        )}
-
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <PdfDownloadButton onClick={handleDownload} disabled={isExporting} />
       </div>
     </>
