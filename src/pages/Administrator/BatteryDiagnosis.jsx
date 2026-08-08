@@ -20,6 +20,7 @@ import {
   useProposalByCarId,
   useOffersByCarId,
 } from "../../hooks/queries/useBattery";
+import { batteryService } from "../../services/batteryService";
 import "../../styles/administrator/BatteryDiagnosis.css";
 
 const DIAGNOSIS_TABS = [
@@ -54,9 +55,43 @@ export default function BatteryDiagnosis() {
     isError: isOffersError,
   } = useOffersByCarId(diagnosedCarId);
 
+  // "잔존가치/판매처" 탭 - 매입처 카드들을 만들 때(=상위 매입처 목록을 화면에 그릴 때) 한
+  // 번에 키를 넣고 실시간 검색을 돌린다. DB 고정 목록(offersData) 대신, 회사 자체를
+  // 검색으로 찾아서(가격은 기존 계산식 그대로) liveOffers로 목록을 통째로 교체한다.
+  // 키는 이 요청에만 쓰이고 저장·로그되지 않는다.
+  const [showKeyFields, setShowKeyFields] = useState(false);
+  const [serperApiKeyNh, setSerperApiKeyNh] = useState("");
+  const [deepseekApiKeyNh, setDeepseekApiKeyNh] = useState("");
+  const [isSearchingLiveOffers, setIsSearchingLiveOffers] = useState(false);
+  const [liveOffers, setLiveOffers] = useState(null); // null = 아직 검색 안 함(기존 DB 목록 표시)
+  const [liveOffersError, setLiveOffersError] = useState(false);
+
   const handleDiagnose = () => {
     if (!selectedCarId) return;
     setDiagnosedCarId(selectedCarId);
+  };
+
+  const handleSearchLiveOffers = async () => {
+    if (isSearchingLiveOffers || !diagnosisData?.gradeLevel || !diagnosisData?.capacityKwh) return;
+    setIsSearchingLiveOffers(true);
+    setLiveOffersError(false);
+    try {
+      const result = await batteryService.fetchLiveOffers({
+        grade: diagnosisData.gradeLevel,
+        capacityKwh: diagnosisData.capacityKwh,
+        condition: diagnosisData.healthScore / 100,
+        serperApiKeyNh: serperApiKeyNh || undefined,
+        deepseekApiKeyNh: deepseekApiKeyNh || undefined,
+      });
+      setLiveOffers(result);
+    } catch (e) {
+      console.error("매입처 실시간 검색 실패", e); // e에 키가 담기지 않음
+      setLiveOffersError(true);
+    } finally {
+      setIsSearchingLiveOffers(false);
+      setSerperApiKeyNh("");
+      setDeepseekApiKeyNh("");
+    }
   };
 
   return (
@@ -142,6 +177,54 @@ export default function BatteryDiagnosis() {
  
       {activeTab === "value" && (
         <>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, marginBottom: 16 }}>
+            <button
+              type="button"
+              onClick={() => setShowKeyFields((v) => !v)}
+              style={{ background: "none", border: "none", padding: 0, fontSize: 12, color: "#888", cursor: "pointer" }}
+            >
+              {showKeyFields ? "실시간 검색 닫기" : "매입처를 실시간 검색으로 다시 찾기 (선택)"}
+            </button>
+
+            {showKeyFields && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                <input
+                  type="password"
+                  autoComplete="off"
+                  value={serperApiKeyNh}
+                  onChange={(e) => setSerperApiKeyNh(e.target.value)}
+                  placeholder="Serper API 키 (검색용)"
+                  style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
+                />
+                <input
+                  type="password"
+                  autoComplete="off"
+                  value={deepseekApiKeyNh}
+                  onChange={(e) => setDeepseekApiKeyNh(e.target.value)}
+                  placeholder="DeepSeek API 키 (요약용)"
+                  style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
+                />
+                <span style={{ fontSize: 11, color: "#999" }}>
+                  둘 다 입력 안 하면 서버 기본값 사용. 회사 자체를 실시간 검색으로 다시 찾고, 가격은 기존
+                  계산식 그대로 적용해요. 키는 저장·기록되지 않아요.
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSearchLiveOffers}
+                  disabled={isSearchingLiveOffers || !diagnosedCarId}
+                  className="battery-diagnosis-run-btn"
+                >
+                  {isSearchingLiveOffers ? "검색 중..." : "실시간 검색으로 매입처 다시 찾기"}
+                </button>
+                {liveOffersError && (
+                  <span style={{ fontSize: 11, color: "#c0392b" }}>
+                    검색에 실패했어요. 잠시 후 다시 시도해주세요.
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
           {!diagnosedCarId && (
             <div className="placeholder-card">
               "배터리 진단" 탭에서 차량을 선택하고 "진단 실행"을 누르면
@@ -182,24 +265,40 @@ export default function BatteryDiagnosis() {
                 />
               </div>
 
-              <div className="buyer-section-title">
-                매입처별 예상 제안가 (
-                {(offersData.topBuyers?.length || 0) +
-                  (offersData.otherBuyers?.length || 0)}
-                곳)
-              </div>
-              <div className="buyer-section-subtitle">상위 3곳은 상세 표시</div>
+              {(() => {
+                const topBuyers = liveOffers ? liveOffers.topBuyers : offersData.topBuyers;
+                const otherBuyers = liveOffers ? liveOffers.otherBuyers : offersData.otherBuyers;
+                return (
+                  <>
+                    <div className="buyer-section-title">
+                      매입처별 예상 제안가 (
+                      {(topBuyers?.length || 0) + (otherBuyers?.length || 0)}
+                      곳)
+                    </div>
+                    <div className="buyer-section-subtitle">
+                      상위 3곳은 상세 표시
+                      {liveOffers && (
+                        <span style={{ marginLeft: 8 }}>
+                          {liveOffers.live
+                            ? "· 🔎 실시간 검색으로 찾은 매입처"
+                            : "· 검색 결과가 없어 기존 매입처 목록으로 표시 중"}
+                        </span>
+                      )}
+                    </div>
 
-              {offersData.topBuyers.map((buyer) => (
-                <BuyerCard key={buyer.name} {...buyer} />
-              ))}
+                    {topBuyers.map((buyer) => (
+                      <BuyerCard key={buyer.name} {...buyer} />
+                    ))}
 
-              {offersData.otherBuyers.length > 0 && (
-                <>
-                  <div className="buyer-others-label">그 외</div>
-                  <BuyerTable rows={offersData.otherBuyers} />
-                </>
-              )}
+                    {otherBuyers.length > 0 && (
+                      <>
+                        <div className="buyer-others-label">그 외</div>
+                        <BuyerTable rows={otherBuyers} />
+                      </>
+                    )}
+                  </>
+                );
+              })()}
             </>
           )}
         </>

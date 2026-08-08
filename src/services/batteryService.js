@@ -180,32 +180,29 @@ export const batteryService = {
   },
 
   // BatteryDiagnosis.jsx "배터리 잔존가치/판매처" 탭 전용.
-  // 매도 제안서 탭과 같은 문제였음 - valueMock 고정값이라 차량을 바꿔도 안 바뀌었음.
-  // /api/battery-offers(BATTERY_OFFERS, rank_order로 매입처 순위 있음)를 실제로 연결한다.
   //
-  // TEMP: getProposalByCarId와 동일한 패턴 - batteryId로 조회하는 엔드포인트가 없어
-  // 목록에서 필터링한다. 매칭되는 offer가 없으면 상위 3곳으로 대체.
+  // 예전엔 BATTERY_OFFERS DB 테이블(더미 데이터)을 그대로 읽었는데, 거기 buyer_name이
+  // "테라사이클코리아" 같은 완전히 지어낸 이름이고 description도 "{회사명} 매입 제안"
+  // 한 줄짜리 placeholder였다(data-generation/domain_nahyun/generate_data.py 확인 -
+  // 실제 조사된 회사가 아니라 테스트용 더미). 이제는 검색 버튼을 안 눌러도 기본값부터
+  // rul-diagnosis의 실제 조사된 매입처 목록(valuation.BUYERS - 현대글로비스·피엠그로우
+  // 등, 사업 근거까지 정리된 실제 회사)과 그 계산식(BNEF/국내 낙찰가 등 출처 있는
+  // 벤치마크)으로 산정한 값을 그대로 쓴다. 키 없이 fetchLiveOffers를 호출하면
+  // discover_buyers()가 키 없어서 자동으로 이 고정 목록으로 폴백하므로 비용도 0원.
   getOffersByCarId: async (carId) => {
     const passport = await batteryService.getBatteryByCarId(carId);
     if (!passport) return null;
-    const batteryId = passport.batteryId;
+    const gradeLevel = passport.batteryLevel ? `${passport.batteryLevel}등급` : null;
+    const capacityKwh = Number(passport.ratedCapacity) || null;
+    if (!gradeLevel || !capacityKwh) return null;
 
-    const offersRes = await api.get("/api/battery-offers");
-    const allOffers = offersRes.data ?? [];
-
-    let offers = allOffers
-      .filter((o) => o.batteryId === batteryId)
-      .sort((a, b) => (a.rankOrder ?? 999) - (b.rankOrder ?? 999));
-    if (offers.length === 0) {
-      // 이 배터리엔 매칭되는 offer가 없음(더미데이터 희소) - 대표값으로 상위 3곳만 대체 표시
-      offers = [...allOffers]
-        .sort((a, b) => Number(b.offeredPrice) - Number(a.offeredPrice))
-        .slice(0, 3);
-    }
-    if (offers.length === 0) return null;
-
-    const toManwon = (won) => Math.round(Number(won) / 10000);
-    const top = offers[0];
+    const { topBuyers, otherBuyers } = await batteryService.fetchLiveOffers({
+      grade: gradeLevel,
+      capacityKwh,
+      condition: (Number(passport.sohScore) || 0) / 100,
+    });
+    if (topBuyers.length === 0) return null;
+    const top = topBuyers[0];
 
     return {
       summary: {
@@ -215,22 +212,44 @@ export const batteryService = {
         remainingCycleSub: passport.totalCycles
           ? `(신품 ${Number(passport.totalCycles).toLocaleString()})`
           : null,
-        bestOffer: toManwon(top.offeredPrice),
-        bestOfferSub: `${top.buyerName} · ${Math.round(Number(top.pricePerKwh)).toLocaleString()} 원/kWh`,
+        bestOffer: top.price,
+        bestOfferSub: `${top.name} · ${top.priceSubtext}`,
       },
-      topBuyers: offers.slice(0, 3).map((o, i) => ({
-        rank: o.rankOrder ?? i + 1,
-        name: o.buyerName,
-        category: o.businessType,
-        price: toManwon(o.offeredPrice),
-        priceSubtext: `${Math.round(Number(o.pricePerKwh)).toLocaleString()} 원/kWh`,
-        gradeLabel: passport.gradeDetail, // offer 단위 등급 필드가 없어 배터리 등급을 재사용
-        description: o.description,
-      })),
-      otherBuyers: offers.slice(3).map((o) => ({
-        name: o.buyerName,
-        category: o.businessType,
-        price: `${toManwon(o.offeredPrice)} 만원`,
+      topBuyers,
+      otherBuyers,
+    };
+  },
+
+  // "잔존가치/판매처" 탭의 "실시간 검색으로 매입처 확인" 버튼 전용. DB 고정 목록이 아니라
+  // 매입처 회사 자체를 실시간 검색으로 찾아서(가격은 기존 계산식 그대로) 목록을 다시 만든다.
+  // live:false면 검색 실패/키 없음으로 rul-diagnosis가 자체적으로 고정 목록에 폴백한 것.
+  fetchLiveOffers: async ({ grade, capacityKwh, condition, serperApiKeyNh, deepseekApiKeyNh }) => {
+    const response = await api.post("/api/battery-offers/live-offers", {
+      grade,
+      capacityKwh,
+      condition,
+      ...(serperApiKeyNh ? { serperApiKeyNh } : {}),
+      ...(deepseekApiKeyNh ? { deepseekApiKeyNh } : {}),
+    });
+    const { live, offers = [] } = response.data;
+    const toManwon = (won) => Math.round(Number(won) / 10000);
+    const mapped = offers.map((o, i) => ({
+      rank: i + 1,
+      name: o["매입처"],
+      category: o["역할"],
+      price: toManwon(o["제안가_원"]),
+      priceSubtext: `${Math.round(Number(o["단가_원per_kWh"])).toLocaleString()} 원/kWh`,
+      gradeLabel: o["단가대"],
+      description: o["왜"],
+      tag: o["확인된_사실"],
+    }));
+    return {
+      live,
+      topBuyers: mapped.slice(0, 3),
+      otherBuyers: mapped.slice(3).map((b) => ({
+        name: b.name,
+        category: b.category,
+        price: `${b.price} 만원`,
       })),
     };
   },
