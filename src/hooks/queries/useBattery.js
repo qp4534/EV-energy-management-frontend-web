@@ -30,13 +30,3 @@ export const useProposalByCarId = (carId) => {
     enabled: !!carId,
   });
 };
-
-// BatteryDiagnosis.jsx "배터리 잔존가치/판매처" 탭 전용. 마찬가지로 진단 탭과
-// 같은 carId(diagnosedCarId)를 공유한다.
-export const useOffersByCarId = (carId) => {
-  return useQuery({
-    queryKey: ["batteryOffers", carId],
-    queryFn: () => batteryService.getOffersByCarId(carId),
-    enabled: !!carId,
-  });
-};

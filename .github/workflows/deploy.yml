@@ -29,6 +29,7 @@ jobs:
           build-args: |
             VITE_API_URL=/
             VITE_KAKAO_MAP_KEY=${{ secrets.VITE_KAKAO_MAP_KEY }}
+            VITE_TWIN_API_URL=https://mijungev.kro.kr
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
             ${{ env.IMAGE }}:latest
@@ -42,9 +43,7 @@ jobs:
 
       - name: Update image tag in gitops repo
         run: |
-          # Both Argo Applications currently manage the same frontend Deployment.
-          # Keep their desired image tags identical until the legacy application is retired.
-          sed -i "s#image: ${{ env.IMAGE }}:.*#image: ${{ env.IMAGE }}:${{ github.sha }}#" gitops/apps/frontend/deployment.yaml
+          # k3s (apps/frontend) instance is stopped - EKS is the only deploy target now.
           sed -i "s#image: ${{ env.IMAGE }}:.*#image: ${{ env.IMAGE }}:${{ github.sha }}#" gitops/apps/frontend-eks/deployment.yaml
           cd gitops
           git config user.name "frontend-deploy-bot"

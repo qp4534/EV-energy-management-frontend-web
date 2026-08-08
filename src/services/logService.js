@@ -29,7 +29,7 @@ export const logService = {
     const res = await api.get("/api/login-logs");
     return res.data.map((log) => ({
       id: log.logId,
-      user: log.userId, // TEMP: User 조인 안 됨
+      user: log.userName || log.userId, // 백엔드에서 User 조인 완료. 탈퇴 등으로 못 찾으면 UUID로 폴백
       datetime: log.createdAt ? new Date(log.createdAt).toLocaleString("ko-KR") : "-",
       ip: log.ipAddress,
       device: log.userAgent,
@@ -70,7 +70,7 @@ export const logService = {
         const detail = parseDetail(log.detail);
         return {
           id: log.actionId,
-          user: log.userId, // TEMP: User 조인 안 됨
+          user: log.userName || log.userId, // 백엔드에서 User 조인 완료. 탈퇴 등으로 못 찾으면 UUID로 폴백
           action: log.actionType,
           target: detail.target ?? log.targetType,
           datetime: log.createdAt ? new Date(log.createdAt).toLocaleString("ko-KR") : "-",
@@ -91,7 +91,7 @@ export const logService = {
         const detail = parseDetail(log.detail);
         return {
           id: log.actionId,
-          admin: log.userId, // TEMP: User 조인 안 됨
+          admin: log.userName || log.userId, // 백엔드에서 User 조인 완료. 탈퇴 등으로 못 찾으면 UUID로 폴백
           action: log.actionType,
           target: detail.title ?? detail.target ?? log.targetType,
           datetime: log.createdAt ? new Date(log.createdAt).toLocaleString("ko-KR") : "-",

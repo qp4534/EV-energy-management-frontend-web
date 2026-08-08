@@ -90,12 +90,17 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
   const [status, setStatus] = useState("loading");
   const [dataSource, setDataSource] = useState("로컬 시뮬레이션");
   const [errorMessage, setErrorMessage] = useState("");
+  const [remoteHistoryFailed, setRemoteHistoryFailed] = useState(false);
   const [selectedCell, setSelectedCell] = useState(null);
   const [toggles, setToggles] = useState({ vehicle: true, cover: true, exploded: false });
 
   const localFrames = useMemo(() => replayFrames(replay), [replay]);
   const phases = useMemo(() => replayPhases(replay), [replay]);
-  const frames = remoteFrames.length ? remoteFrames : localFrames;
+  const frames = remoteFrames.length
+    ? remoteFrames
+    : isHistory && !remoteHistoryFailed
+      ? []
+      : localFrames;
   const currentFrame = frames[frameIndex] ?? null;
   const activePhase = !remoteFrames.length
     ? phases.find((phase) => frameIndex >= phase.startIndex && frameIndex <= phase.endIndex)
@@ -153,6 +158,8 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
     let socket;
 
     if (isHistory) {
+      setRemoteHistoryFailed(false);
+      setDataSource("사고 이력 불러오는 중...");
       fetch(`${TWIN_API_URL}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/incidents/latest/history?resolution_seconds=30`)
         .then((response) => {
           if (!response.ok) throw new Error(String(response.status));
@@ -164,7 +171,10 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
           setFrameIndex(0);
           setDataSource("사고 이력 API · 30초 간격");
         })
-        .catch(() => setDataSource("사고 이력 없음 · 로컬 시뮬레이션"));
+        .catch(() => {
+          setRemoteHistoryFailed(true);
+          setDataSource("사고 이력 없음 · 로컬 시뮬레이션");
+        });
     } else {
       const wsBase = TWIN_API_URL.replace(/^http/, "ws");
       socket = new WebSocket(`${wsBase}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/live`);
@@ -217,7 +227,7 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
       <div className="digital-twin-heading">
         <div>
           <h2>{isHistory ? "사고 전후 3시간 디지털 트윈" : "실시간 디지털 트윈"}</h2>
-          <p>{isHistory ? "사고 1시간 전부터 사고 2시간 후까지" : `${vehicleId} · 차량·배터리 상태 1Hz 모니터링`}</p>
+          <p>{isHistory ? "사고 1시간 전부터 사고 2시간 후까지" : "차량·배터리 상태 1Hz 모니터링"}</p>
         </div>
         <span className={`digital-twin-live ${isHistory ? "digital-twin-live--history" : ""}`}>
           {isHistory ? "INCIDENT" : "LIVE"}
@@ -234,11 +244,17 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
 
         {status === "ready" && (
           <>
-            <div className="digital-twin-status">
-              <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : currentFrame?.scenario_name ?? "실시간 상태"}</span>
-              <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
-              <small>최대 셀 {Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</small>
-            </div>
+            {isHistory && !remoteFrames.length && !remoteHistoryFailed ? (
+              <div className="digital-twin-status">
+                <span>사고 이력 불러오는 중...</span>
+              </div>
+            ) : (
+              <div className="digital-twin-status">
+                <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : currentFrame?.scenario_name ?? "실시간 상태"}</span>
+                <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
+                <small>최대 셀 {Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</small>
+              </div>
+            )}
             {selectedCell && (
               <div className="digital-twin-selection">
                 <span>선택 셀</span><strong>{selectedCell.cellId}</strong>
@@ -265,7 +281,7 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
 
         {isHistory ? (
           <div className="digital-twin-history-control">
-            {!remoteFrames.length && phases.length > 0 && (
+            {!remoteFrames.length && remoteHistoryFailed && phases.length > 0 && (
               <div className="digital-twin-phase-list" aria-label="위험 유형별 시연 구간">
                 {phases.map((phase) => (
                   <button
