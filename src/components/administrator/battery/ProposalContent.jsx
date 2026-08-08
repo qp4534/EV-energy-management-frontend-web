@@ -49,18 +49,25 @@ export default function ProposalContent({
   // 이미 있는 값을 문장으로 조립한 것뿐이다.
   const reasons = [
     ...p.reasons,
+    // AI 로직 설명 — 등급·가치가 어떻게 계산됐는지(3단계 파이프라인 + 모델 종류 + 정확도)를
+    // 먼저 설명해야 뒤에 나오는 수치들이 "AI가 계산한 값"이라는 게 근거로 읽힌다.
+    // p.diagnosisNote(RandomForest·오차율)는 팀 자체 모델 평가 결과이므로 외부 출처 링크가
+    // 필요 없다(자사 실측치) - 대신 회사 밖 자료를 인용할 때는(매입처/가격 근거) 아래처럼
+    // 공식 자료(회사 뉴스룸·언론 보도·BloombergNEF 리포트)만 links로 붙인다.
+    `AI 진단 로직 — 화재/안전 위험 게이트(Agent1) → SOH 등급 분류(Agent2) → 잔여수명·가치 평가(Agent3) ` +
+      `3단계 파이프라인을 통과했습니다. ${p.diagnosisNote}`,
     `본 배터리는 판별 등급 ${diagnosisData.grade}(${diagnosisData.gradeLevel ?? "등급 미판정"})로 ` +
-      `분류되어${topBuyer ? `, ${topBuyer.name}(${topBuyer.gradeLabel}) 매입 조건을 충족합니다.` : "입니다."}`,
-    `배터리 건강도(SOH) ${diagnosisData.healthScore}%, 예측 잔여수명 ${diagnosisData.remainingCycle?.toLocaleString?.() ?? diagnosisData.remainingCycle} ` +
+      `AI가 분류하여${topBuyer ? `, ${topBuyer.name}(${topBuyer.gradeLabel}) 매입 조건을 충족합니다.` : "입니다."}`,
+    `AI 모델이 산출한 배터리 건강도(SOH) ${diagnosisData.healthScore}%, 예측 잔여수명 ${diagnosisData.remainingCycle?.toLocaleString?.() ?? diagnosisData.remainingCycle} ` +
       `사이클(신품 기준 ${diagnosisData.newCycle?.toLocaleString?.() ?? diagnosisData.newCycle} 사이클 대비 ` +
       `${diagnosisData.newCycle ? Math.round((diagnosisData.remainingCycle / diagnosisData.newCycle) * 100) : "—"}%)로, ` +
-      `AI 진단 결과 안정적인 성능을 유지하고 있는 것으로 확인됩니다.`,
+      `안정적인 성능을 유지하고 있는 것으로 확인됩니다.`,
     `공칭 용량 ${diagnosisData.capacityKwh ?? "—"}kWh 규모로${topBuyer ? `, ${topBuyer.name}의 취급 규모에 부합합니다.` : "입니다."}`,
     ...(diagnosisData.judgement?.confidence
-      ? [`AI 판정 신뢰도 ${diagnosisData.judgement.confidence}%로, 등급 판정 결과의 신뢰성이 높습니다.`]
+      ? [`AI 판정 신뢰도(분류 모델 출력값) ${diagnosisData.judgement.confidence}%로, 등급 판정 결과의 신뢰성이 높습니다.`]
       : []),
     ...(p.healthMetrics ?? []).map(
-      (m) => `건전성 세부 지표 중 '${m.label}' ${m.score}로 측정되어, 이를 근거로 매입 후 활용 가치를 산정했습니다.`,
+      (m) => `AI가 계산한 건전성 세부 지표 중 '${m.label}' ${m.score}로 측정되어, 이를 근거로 매입 후 활용 가치를 산정했습니다.`,
     ),
     ...(topBuyer?.description
       ? [`확인된 사업 영역 — ${topBuyer.name}(${topBuyer.category}) · ${topBuyer.description}`]
