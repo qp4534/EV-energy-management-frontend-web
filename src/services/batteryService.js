@@ -159,7 +159,12 @@ export const batteryService = {
   // from-view 버전이었는데, 등급판정기준·경제성/환경효과 같은 실제 제출용 내용이 빠져있었다.)
   // 매입처 실시간 검색(Serper+DeepSeek)은 서버 쪽 시크릿(rul-diagnosis-secret)으로
   // 자동 처리된다 - 개인 키를 화면에서 입력받지 않는다.
-  downloadProposalPdf: async ({ diagnosisData, proposalData }) => {
+  // chosenBuyer: BuyerCard/ProposalContent에서 사용자가 top3 중 고른 매입처의 원본(raw,
+  // 한글 키) 오퍼 객체 - fetchLiveOffers()가 각 buyer에 붙여둔 `raw` 필드 그대로 넘기면
+  // 된다. 안 넘기면(아직 매입처를 못 찾았을 때) 백엔드가 기존처럼 1순위 매입처로 계산한다.
+  // reasons: 화면 "귀사에 적합한 이유"에 이미 표시된 문구 - PDF에도 그대로 반영해서
+  // 화면·PDF 내용이 어긋나지 않게 한다.
+  downloadProposalPdf: async ({ diagnosisData, proposalData, chosenBuyer }) => {
     const p = proposalData;
     if (!diagnosisData.capacityKwh) {
       throw new Error("이 차량은 배터리 공칭 용량 정보가 없어 PDF를 만들 수 없습니다.");
@@ -185,6 +190,8 @@ export const batteryService = {
         fullLife: diagnosisData.newCycle,
         healthPct: diagnosisData.healthScore,
         indicators,
+        chosenBuyer: chosenBuyer?.raw ?? null,
+        reasons: p.reasons ?? [],
       },
       { responseType: "blob", timeout: 20000 },
     );
@@ -217,6 +224,14 @@ export const batteryService = {
       gradeLabel: o["단가대"],
       description: o["왜"],
       tag: o["확인된_사실"],
+      // 근거 하이퍼링크 - 매입처는 valuation.BUYERS(정적)/실시간 검색 결과의 출처 링크,
+      // 단가는 항상 같은 가격 산정 출처(BNEF 등)를 가리킨다.
+      sourceUrl: o["출처_링크"] || "",
+      priceSourceUrl: o["단가출처_링크"] || "",
+      priceSourceLabel: o["단가출처_라벨"] || "",
+      // raw: PDF 생성 시(downloadProposalPdf) 그대로 되돌려 보낼 원본(한글 키) 오퍼 객체 -
+      // 화면에서 고른 매입처와 PDF에 적힌 매입처가 어긋나지 않게 하기 위함.
+      raw: o,
     }));
     return {
       live,
@@ -226,6 +241,8 @@ export const batteryService = {
         category: b.category,
         price: `${b.price} 만원`,
       })),
+      priceSourceUrl: mapped[0]?.priceSourceUrl || "",
+      priceSourceLabel: mapped[0]?.priceSourceLabel || "",
     };
   },
 };

@@ -57,6 +57,9 @@ export default function BatteryDiagnosis() {
   const [isSearchingBuyers, setIsSearchingBuyers] = useState(false);
   const [buyerSearchError, setBuyerSearchError] = useState(false);
   const [buyerSearchMissingData, setBuyerSearchMissingData] = useState(false);
+  // "매도 제안서" 탭에서 top3 매입처 중 어느 곳을 기준으로 제안서를 쓸지 - buyerResult가
+  // 새로 갱신될 때마다(재검색·재진단) 0번(최고 제안가)으로 되돌린다.
+  const [selectedBuyerIdx, setSelectedBuyerIdx] = useState(0);
 
   const handleDiagnose = () => {
     if (!selectedCarId) return;
@@ -64,6 +67,7 @@ export default function BatteryDiagnosis() {
     setBuyerResult(null);
     setBuyerSearchError(false);
     setBuyerSearchMissingData(false);
+    setSelectedBuyerIdx(0);
   };
 
   const handleFindBuyers = async () => {
@@ -85,6 +89,7 @@ export default function BatteryDiagnosis() {
         condition: diagnosisData.healthScore / 100,
       });
       setBuyerResult(result);
+      setSelectedBuyerIdx(0);
     } catch (e) {
       console.error("매입처 조회 실패", e);
       setBuyerSearchError(true);
@@ -218,6 +223,16 @@ export default function BatteryDiagnosis() {
               </div>
 
               <div className="buyer-section-title">매입처별 예상 제안가</div>
+              {buyerResult?.priceSourceUrl && (
+                <a
+                  href={buyerResult.priceSourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="buyer-price-source-link"
+                >
+                  가격 산정 출처 — {buyerResult.priceSourceLabel || "출처 보기"} ↗
+                </a>
+              )}
 
               {!buyerResult && (
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
@@ -297,7 +312,11 @@ export default function BatteryDiagnosis() {
               <ProposalContent
                 diagnosisData={diagnosisData}
                 proposalData={proposalData}
-                topBuyer={buyerResult?.topBuyers?.[0]}
+                buyers={buyerResult?.topBuyers}
+                selectedBuyerIdx={selectedBuyerIdx}
+                onSelectBuyer={setSelectedBuyerIdx}
+                priceSourceUrl={buyerResult?.priceSourceUrl}
+                priceSourceLabel={buyerResult?.priceSourceLabel}
               />
             )}
         </>

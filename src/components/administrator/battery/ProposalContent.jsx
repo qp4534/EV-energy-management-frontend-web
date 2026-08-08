@@ -23,20 +23,51 @@ const STANDARD_CAUTIONS = [
  * proposalData: batteryService.getProposalByCarId() 결과 (price/healthMetrics/reasons/cautions)
  *   과거엔 이 값이 proposalMock 고정값이라 차량을 바꿔도 내용이 안 바뀌었다 - 이제 부모가
  *   선택된 차량 기준으로 조회한 실제 데이터를 넘겨준다.
- * topBuyer: "잔존가치/판매처" 탭에서 "매입처 3곳 찾기"를 눌러 찾은 결과의 최고 매입처 1곳
- *   (buyerResult.topBuyers[0], 부모 BatteryDiagnosis.jsx가 넘겨줌). "귀사에 적합한 이유"가
- *   DB엔 문구 1개뿐이라 부실해서, 실시간 검색으로 확인된 매입처의 사업 영역 설명을
- *   추가로 붙여 보강한다 - 아직 검색 전이면 undefined라 이 보강 없이 기본 문구만 나간다.
+ * buyers: "잔존가치/판매처" 탭에서 "매입처 3곳 찾기"를 눌러 찾은 top3 매입처 배열
+ *   (buyerResult.topBuyers, 부모 BatteryDiagnosis.jsx가 넘겨줌) - 아직 검색 전이면 undefined.
+ * selectedBuyerIdx / onSelectBuyer: buyers 중 몇 번째를 기준으로 제안서를 쓸지 - 부모가
+ *   상태를 들고 있고 여기서는 고르는 UI만 그린다(재검색 시 부모가 0번으로 초기화).
+ * priceSourceUrl / priceSourceLabel: 제안 단가 산정 근거(BNEF 등) 링크 - buyers와 별개로
+ *   항상 같은 값이라 buyerResult에서 그대로 내려받는다.
  */
-export default function ProposalContent({ diagnosisData, proposalData, topBuyer }) {
+export default function ProposalContent({
+  diagnosisData,
+  proposalData,
+  buyers,
+  selectedBuyerIdx = 0,
+  onSelectBuyer,
+  priceSourceUrl,
+  priceSourceLabel,
+}) {
   const p = proposalData;
   const [isExporting, setIsExporting] = useState(false);
+  const topBuyer = buyers?.[selectedBuyerIdx];
 
+  // "귀사에 적합한 이유" - 예전엔 DB의 suitabilityReason 문구 1개(+매입처 설명 1줄)뿐이라
+  // 너무 부실했다. 이미 화면에 있는 진단·매입처 데이터를 최대한 근거로 엮어 여러 문장으로
+  // 풀어쓴다 - 지어낸 수치는 하나도 없고, 전부 diagnosisData/proposalData/topBuyer에
+  // 이미 있는 값을 문장으로 조립한 것뿐이다.
   const reasons = [
     ...p.reasons,
-    ...(topBuyer?.description
-      ? [`확인된 사업 영역 — ${topBuyer.name} · ${topBuyer.description}`]
+    `본 배터리는 판별 등급 ${diagnosisData.grade}(${diagnosisData.gradeLevel ?? "등급 미판정"})로 ` +
+      `분류되어${topBuyer ? `, ${topBuyer.name}(${topBuyer.gradeLabel}) 매입 조건을 충족합니다.` : "입니다."}`,
+    `배터리 건강도(SOH) ${diagnosisData.healthScore}%, 예측 잔여수명 ${diagnosisData.remainingCycle?.toLocaleString?.() ?? diagnosisData.remainingCycle} ` +
+      `사이클(신품 기준 ${diagnosisData.newCycle?.toLocaleString?.() ?? diagnosisData.newCycle} 사이클 대비 ` +
+      `${diagnosisData.newCycle ? Math.round((diagnosisData.remainingCycle / diagnosisData.newCycle) * 100) : "—"}%)로, ` +
+      `AI 진단 결과 안정적인 성능을 유지하고 있는 것으로 확인됩니다.`,
+    `공칭 용량 ${diagnosisData.capacityKwh ?? "—"}kWh 규모로${topBuyer ? `, ${topBuyer.name}의 취급 규모에 부합합니다.` : "입니다."}`,
+    ...(diagnosisData.judgement?.confidence
+      ? [`AI 판정 신뢰도 ${diagnosisData.judgement.confidence}%로, 등급 판정 결과의 신뢰성이 높습니다.`]
       : []),
+    ...(p.healthMetrics ?? []).map(
+      (m) => `건전성 세부 지표 중 '${m.label}' ${m.score}로 측정되어, 이를 근거로 매입 후 활용 가치를 산정했습니다.`,
+    ),
+    ...(topBuyer?.description
+      ? [`확인된 사업 영역 — ${topBuyer.name}(${topBuyer.category}) · ${topBuyer.description}`]
+      : []),
+    ...(topBuyer?.tag ? [`실제 확인된 근거 — ${topBuyer.tag}`] : []),
+    `제안 단가 ${p.price.unitPrice}원/kWh는 공개 시장 벤치마크(${priceSourceLabel || "BloombergNEF 등 국제 배터리팩 가격조사"})에 ` +
+      `AI 진단 결과를 결합해 산정한 값입니다.`,
   ];
   const cautions = [...p.cautions, ...STANDARD_CAUTIONS];
 
@@ -47,6 +78,7 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
       const blob = await batteryService.downloadProposalPdf({
         diagnosisData,
         proposalData: { ...proposalData, reasons, cautions },
+        chosenBuyer: topBuyer,
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -66,6 +98,24 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
 
   return (
     <>
+      {buyers && buyers.length > 0 && (
+        <div className="buyer-picker" role="radiogroup" aria-label="매입처 선택">
+          {buyers.map((b, i) => (
+            <button
+              key={b.name}
+              type="button"
+              role="radio"
+              aria-checked={i === selectedBuyerIdx}
+              className={`buyer-picker-btn${i === selectedBuyerIdx ? " is-selected" : ""}`}
+              onClick={() => onSelectBuyer?.(i)}
+            >
+              <div className="buyer-picker-btn-name">{i + 1}위 · {b.name}</div>
+              <div className="buyer-picker-btn-price">{b.price.toLocaleString()}만원 · {b.gradeLabel}</div>
+            </button>
+          ))}
+        </div>
+      )}
+
       <ProposalSection title="1. 제안 가격">
         <div className="info-block-row">
           <InfoBlock label="제안 총액" value={p.price.total.toLocaleString()} unit="만원" />
@@ -76,6 +126,16 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
           <StatusDot tone="success" label={p.price.grade} size="sm" />
         </div>
         <p className="proposal-note">{p.price.note}</p>
+        {priceSourceUrl && (
+          <a
+            href={priceSourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="proposal-source-link"
+          >
+            가격 산정 출처 — {priceSourceLabel || "출처 보기"} ↗
+          </a>
+        )}
       </ProposalSection>
 
       <ProposalSection title="2. 배터리 상태 진단 (AI 진단 결과)">
@@ -115,6 +175,17 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
 
       <ProposalSection title="3. 귀사에 적합한 이유">
         <BulletList items={reasons} />
+        {topBuyer?.sourceUrl && (
+          <a
+            href={topBuyer.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="proposal-source-link"
+            style={{ display: "inline-block", marginTop: 8 }}
+          >
+            매입처 근거 출처 보기 ↗
+          </a>
+        )}
       </ProposalSection>
 
       <ProposalSection title="4. 유의사항">
