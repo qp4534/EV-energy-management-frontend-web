@@ -29,8 +29,6 @@ export const noticeService = {
   },
 
   // 공지사항 열람 처리 (NoticeDetail.jsx 진입 시 자동 호출)
-  // 전체 필드를 덮어쓰는 PUT이라, isRead만 보내면 title/content 등이 지워진다.
-  // (markReportAsRead 때와 같은 이유) 원본을 먼저 가져와 합친 뒤 보낸다.
   markNoticeAsRead: async (id) => {
     const { data: original } = await api.get(`/api/notices/${id}`);
     const res = await api.put(`/api/notices/${id}`, {
@@ -38,5 +36,11 @@ export const noticeService = {
       isRead: true,
     });
     return res.data;
+  },
+
+  // 공지 상세 페이지 첨부파일 목록
+  getAttachmentsByNoticeId: async (noticeId) => {
+    const res = await api.get('/api/notice-attachments');
+    return res.data.filter((a) => a.noticeId === noticeId);
   },
 };

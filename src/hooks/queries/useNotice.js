@@ -64,3 +64,12 @@ export const useMarkNoticeAsRead = () => {
     },
   });
 };
+
+// 공지 상세 첨부파일 목록 (NoticeDetail.jsx)
+export const useNoticeAttachments = (noticeId) => {
+  return useQuery({
+    queryKey: ["noticeAttachments", noticeId],
+    queryFn: () => noticeService.getAttachmentsByNoticeId(noticeId),
+    enabled: !!noticeId,
+  });
+};

@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useNotices, useNoticeDetail, useDeleteNotice, useMarkNoticeAsRead } from "../../hooks/queries/useNotice";
+import { useNotices, useNoticeDetail, useDeleteNotice, useMarkNoticeAsRead, useNoticeAttachments } from "../../hooks/queries/useNotice";
+import { useUserById } from "../../hooks/queries/useUser";
 import "../../styles/administrator/NoticeDetail.css";
+
+const TARGET_ROLE_LABEL = { ADMIN: "관리자", CONTROLLER: "관제자" };
 
 function NoticeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: notice, isLoading } = useNoticeDetail(id);
   const { data: allNotices } = useNotices();
+  const { data: attachments } = useNoticeAttachments(id);
+  const { data: author } = useUserById(notice?.userId);
   const deleteNoticeMutation = useDeleteNotice();
   const markAsReadMutation = useMarkNoticeAsRead();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -72,23 +77,37 @@ function NoticeDetail() {
           <span className={notice.isImportant ? "badge-important" : "badge-normal"}>
             {notice.isImportant ? "중요" : "일반"}
           </span>
+          <span className="badge-normal">
+            {TARGET_ROLE_LABEL[notice.targetRole] ?? "전체"}
+          </span>
         </div>
 
         <h3 className="detail-title">{notice.title}</h3>
 
         <div className="detail-meta">
-          <span>작성일: {formattedDate}</span>
+          <span>작성자: {author?.name ?? "-"}</span>
+          <span>&nbsp;|&nbsp;작성일: {formattedDate}</span>
+          <span>&nbsp;|&nbsp;조회수: {notice.viewCount ?? 0} 회</span>
         </div>
 
-        {notice.attachments?.length > 0 && (
+        {attachments?.length > 0 && (
           <div className="detail-attachments">
-            {notice.attachments.map((file) => (
+            {attachments.map((file) => (
               <div className="detail-attachment" key={file.attachmentId}>
                 <i className="ti ti-paperclip" aria-hidden="true"></i>
                 <span className="file-name">
-                  {file.fileName} ({(file.fileSize / 1024 / 1024).toFixed(1)}MB)
+                  {file.fileName}
+                  {file.fileSize ? ` (${(file.fileSize / 1024 / 1024).toFixed(1)}MB)` : ""}
                 </span>
-                <button className="download-btn">다운로드</button>
+                <a
+                  className="download-btn"
+                  href={file.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  download
+                >
+                  다운로드
+                </a>
               </div>
             ))}
           </div>

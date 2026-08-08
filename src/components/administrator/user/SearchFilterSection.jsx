@@ -4,8 +4,8 @@ import TabBar from '../common/TabBar';
 const FILTER_TABS = [
   { key: '전체', label: '전체' },
   { key: '관리자', label: '관리자' },
-  { key: '관제사', label: '관제사' },
-  { key: '차주', label: '차주' },
+  { key: '관제자', label: '관제자' },
+  { key: '이용자', label: '이용자' },
 ];
 
 export default function SearchFilterSection({

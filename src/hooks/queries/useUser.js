@@ -50,10 +50,16 @@ export const useDeleteUser = () => {
   });
 };
 
+// 특정 회원 1명 조회 (NoticeDetail.jsx 작성자 이름 표시용 등)
+export const useUserById = (userId) => {
+  return useQuery({
+    queryKey: ["users", userId],
+    queryFn: () => userService.getUser(userId),
+    enabled: !!userId,
+  });
+};
+
 // 비밀번호 재설정 링크 전송 (관리자가 다른 유저 대상으로 보내는 것)
-// userService.requestPasswordReset(email)은 본인이 직접 요청하는 별개 함수라
-// 여기서는 반드시 adminRequestPasswordReset을 써야 함 (userService.js 주석 참고).
-// TODO: 백엔드에 POST /api/users/{userId}/password-reset 아직 없음
 export const useRequestPasswordReset = () => {
   return useMutation({
     mutationFn: (userId) => userService.adminRequestPasswordReset(userId),
