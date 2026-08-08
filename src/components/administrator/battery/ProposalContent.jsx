@@ -30,6 +30,10 @@ const STANDARD_CAUTIONS = [
 export default function ProposalContent({ diagnosisData, proposalData, topBuyer }) {
   const p = proposalData;
   const [isExporting, setIsExporting] = useState(false);
+  // 매입처 실시간 검색을 개인 앤트로픽 키로 한 번만 돌려보고 싶을 때만 입력 - 화면에만
+  // 잠깐 머무르고(state), 어디에도 저장(localStorage 등)·로그 안 함. 다운로드 직후 비움.
+  const [apiKey, setApiKey] = useState("");
+  const [showApiKeyField, setShowApiKeyField] = useState(false);
 
   const reasons = [
     ...p.reasons,
@@ -46,6 +50,7 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
       const blob = await batteryService.downloadProposalPdf({
         diagnosisData,
         proposalData: { ...proposalData, reasons, cautions },
+        apiKey: apiKey || undefined,
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -56,10 +61,11 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
       a.remove();
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error("PDF 다운로드 실패", e);
+      console.error("PDF 다운로드 실패", e); // e에 키가 담기지 않음 - axios 에러엔 요청 바디가 없음
       alert("PDF 다운로드에 실패했어요. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsExporting(false);
+      setApiKey(""); // 성공/실패 관계없이 입력창 비움 - 메모리에 남는 시간 최소화
     }
   };
 
@@ -120,7 +126,31 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
         <BulletList items={cautions} />
       </ProposalSection>
 
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+        <button
+          type="button"
+          onClick={() => setShowApiKeyField((v) => !v)}
+          style={{ background: "none", border: "none", padding: 0, fontSize: 12, color: "#888", cursor: "pointer" }}
+        >
+          {showApiKeyField ? "개인 키 입력 닫기" : "매입처 실시간 검색용 개인 키 입력 (선택)"}
+        </button>
+
+        {showApiKeyField && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+            <input
+              type="password"
+              autoComplete="off"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="sk-ant-... (입력 안 하면 서버 기본값 사용)"
+              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
+            />
+            <span style={{ fontSize: 11, color: "#999" }}>
+              이 PDF 한 번만 사용되고 저장·기록되지 않아요.
+            </span>
+          </div>
+        )}
+
         <PdfDownloadButton onClick={handleDownload} disabled={isExporting} />
       </div>
     </>
