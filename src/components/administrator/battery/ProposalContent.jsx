@@ -30,9 +30,11 @@ const STANDARD_CAUTIONS = [
 export default function ProposalContent({ diagnosisData, proposalData, topBuyer }) {
   const p = proposalData;
   const [isExporting, setIsExporting] = useState(false);
-  // 매입처 실시간 검색을 개인 앤트로픽 키로 한 번만 돌려보고 싶을 때만 입력 - 화면에만
-  // 잠깐 머무르고(state), 어디에도 저장(localStorage 등)·로그 안 함. 다운로드 직후 비움.
-  const [apiKey, setApiKey] = useState("");
+  // 매입처 실시간 검색(Serper 검색 + DeepSeek 요약)을 개인 키로 한 번만 돌려보고 싶을 때만
+  // 입력 - 화면에만 잠깐 머무르고(state), 어디에도 저장(localStorage 등)·로그 안 함.
+  // 다운로드 직후 비움.
+  const [serperApiKeyNh, setSerperApiKeyNh] = useState("");
+  const [deepseekApiKeyNh, setDeepseekApiKeyNh] = useState("");
   const [showApiKeyField, setShowApiKeyField] = useState(false);
 
   const reasons = [
@@ -50,7 +52,8 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
       const blob = await batteryService.downloadProposalPdf({
         diagnosisData,
         proposalData: { ...proposalData, reasons, cautions },
-        apiKey: apiKey || undefined,
+        serperApiKeyNh: serperApiKeyNh || undefined,
+        deepseekApiKeyNh: deepseekApiKeyNh || undefined,
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -65,7 +68,8 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
       alert("PDF 다운로드에 실패했어요. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsExporting(false);
-      setApiKey(""); // 성공/실패 관계없이 입력창 비움 - 메모리에 남는 시간 최소화
+      setSerperApiKeyNh(""); // 성공/실패 관계없이 입력창 비움 - 메모리에 남는 시간 최소화
+      setDeepseekApiKeyNh("");
     }
   };
 
@@ -140,13 +144,21 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
             <input
               type="password"
               autoComplete="off"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-ant-... (입력 안 하면 서버 기본값 사용)"
+              value={serperApiKeyNh}
+              onChange={(e) => setSerperApiKeyNh(e.target.value)}
+              placeholder="Serper API 키 (검색용)"
+              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
+            />
+            <input
+              type="password"
+              autoComplete="off"
+              value={deepseekApiKeyNh}
+              onChange={(e) => setDeepseekApiKeyNh(e.target.value)}
+              placeholder="DeepSeek API 키 (요약용)"
               style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
             />
             <span style={{ fontSize: 11, color: "#999" }}>
-              이 PDF 한 번만 사용되고 저장·기록되지 않아요.
+              둘 다 입력 안 하면 서버 기본값 사용. 이 PDF 한 번만 쓰이고 저장·기록되지 않아요.
             </span>
           </div>
         )}

@@ -141,10 +141,11 @@ export const batteryService = {
   // 않지만, 매입처 매칭(estimate_offers)·경제성 계산(economics.compute)까지 포함된 정식
   // 문서를 그대로 받는다. (이전엔 html2canvas 스크린샷 → 그다음엔 화면 텍스트만 옮겨적는
   // from-view 버전이었는데, 등급판정기준·경제성/환경효과 같은 실제 제출용 내용이 빠져있었다.)
-  // apiKey: 매입처 실시간 검색을 본인 개인 키로 한 번만 돌려보고 싶을 때만 선택 전달.
-  // 입력 안 하면 서버 키(없으면 정적 문구 폴백)로 동작 - 기존과 동일. 이 함수는 절대
-  // apiKey를 콘솔에 찍거나 어디에도 저장하지 않는다 - 요청 바디에 실어 보내고 끝.
-  downloadProposalPdf: async ({ diagnosisData, proposalData, apiKey }) => {
+  // serperApiKeyNh/deepseekApiKeyNh: 매입처 실시간 검색(Serper 검색 + DeepSeek 요약)을 본인
+  // 개인 키로 한 번만 돌려보고 싶을 때만 선택 전달. 입력 안 하면 서버 키(없으면 정적 문구
+  // 폴백)로 동작 - 기존과 동일. 이 함수는 절대 키를 콘솔에 찍거나 어디에도 저장하지
+  // 않는다 - 요청 바디에 실어 보내고 끝.
+  downloadProposalPdf: async ({ diagnosisData, proposalData, serperApiKeyNh, deepseekApiKeyNh }) => {
     const p = proposalData;
     if (!diagnosisData.capacityKwh) {
       throw new Error("이 차량은 배터리 공칭 용량 정보가 없어 PDF를 만들 수 없습니다.");
@@ -170,7 +171,8 @@ export const batteryService = {
         fullLife: diagnosisData.newCycle,
         healthPct: diagnosisData.healthScore,
         indicators,
-        ...(apiKey ? { anthropicApiKey: apiKey } : {}),
+        ...(serperApiKeyNh ? { serperApiKeyNh } : {}),
+        ...(deepseekApiKeyNh ? { deepseekApiKeyNh } : {}),
       },
       { responseType: "blob", timeout: 20000 },
     );
