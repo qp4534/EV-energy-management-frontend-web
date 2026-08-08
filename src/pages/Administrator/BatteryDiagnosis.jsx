@@ -56,18 +56,28 @@ export default function BatteryDiagnosis() {
   const [buyerResult, setBuyerResult] = useState(null);
   const [isSearchingBuyers, setIsSearchingBuyers] = useState(false);
   const [buyerSearchError, setBuyerSearchError] = useState(false);
+  const [buyerSearchMissingData, setBuyerSearchMissingData] = useState(false);
 
   const handleDiagnose = () => {
     if (!selectedCarId) return;
     setDiagnosedCarId(selectedCarId);
     setBuyerResult(null);
     setBuyerSearchError(false);
+    setBuyerSearchMissingData(false);
   };
 
   const handleFindBuyers = async () => {
-    if (isSearchingBuyers || !diagnosisData?.gradeLevel || !diagnosisData?.capacityKwh) return;
+    if (isSearchingBuyers) return;
+    // 예전엔 여기서 gradeLevel/capacityKwh가 없으면 아무 반응 없이 조용히 return해서,
+    // 데이터가 부실한 차량에서는 버튼을 눌러도 눌리는 게 안 보였다(실제로는 눌렸지만
+    // 아무 일도 안 일어난 것) - 이제는 왜 안 되는지 화면에 이유를 보여준다.
+    if (!diagnosisData?.gradeLevel || !diagnosisData?.capacityKwh) {
+      setBuyerSearchMissingData(true);
+      return;
+    }
     setIsSearchingBuyers(true);
     setBuyerSearchError(false);
+    setBuyerSearchMissingData(false);
     try {
       const result = await batteryService.fetchLiveOffers({
         grade: diagnosisData.gradeLevel,
@@ -222,6 +232,11 @@ export default function BatteryDiagnosis() {
                   {buyerSearchError && (
                     <span style={{ fontSize: 12, color: "#c0392b" }}>
                       매입처 조회에 실패했어요. 다시 시도해주세요.
+                    </span>
+                  )}
+                  {buyerSearchMissingData && (
+                    <span style={{ fontSize: 12, color: "#c0392b" }}>
+                      이 차량은 등급(1/2/3등급) 또는 배터리 용량 정보가 없어 매입처를 찾을 수 없어요.
                     </span>
                   )}
                 </div>
