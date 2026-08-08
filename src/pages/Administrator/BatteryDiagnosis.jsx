@@ -232,7 +232,11 @@ export default function BatteryDiagnosis() {
             !isProposalFetching &&
             diagnosisData &&
             proposalData && (
-              <ProposalContent diagnosisData={diagnosisData} proposalData={proposalData} />
+              <ProposalContent
+                diagnosisData={diagnosisData}
+                proposalData={proposalData}
+                topBuyer={offersData?.topBuyers?.[0]}
+              />
             )}
         </>
       )}

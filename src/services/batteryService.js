@@ -42,6 +42,10 @@ export const batteryService = {
 
     return {
       grade: d.gradeDetail,
+      // PDF(/report/pdf/full)는 "1등급"/"2등급"/"3등급" 형식을 요구한다 - 화면 표시용
+      // grade(gradeDetail, 예: "재사용(EV 재제조)급")와는 다른 값이라 따로 둔다.
+      gradeLevel: d.batteryLevel ? `${d.batteryLevel}등급` : null,
+      capacityKwh: Number(d.ratedCapacity) || null,
       remainingCycle: d.remainingCycles,
       newCycle: d.totalCycles,
       healthScore: Number(d.sohScore),
@@ -122,33 +126,47 @@ export const batteryService = {
     };
   },
 
+  // healthMetrics(0~100, "83 / 100" 형태 문자열)를 rul-diagnosis가 기대하는 0~1 지표로
+  // 변환한다. 라벨은 batteryService.getProposalByCarId가 항상 이 4개 이름으로 내려준다.
+  _INDICATOR_KEY_BY_LABEL: {
+    "수명 여유": "life",
+    "방전 지속력": "capacity",
+    "충전 건전성": "charge",
+    "전압 안정성": "stability",
+  },
+
   // "배터리 매도 제안서" 탭의 PDF Download 버튼 전용.
-  // 화면에 이미 표시된 diagnosisData/proposalData를 그대로 백엔드(/api/battery-proposals/pdf)에
-  // 넘긴다 - 백엔드도 rul-diagnosis도 재계산하지 않고 그대로 문서화만 하므로 화면 숫자와
-  // PDF 숫자가 항상 같다. (이전엔 html2canvas로 화면을 스크린샷 찍어 PDF에 붙였는데,
-  // 텍스트도 없는 이미지 한 장짜리라 정식 문서가 아니었다.)
+  // 화면에 이미 표시된(=이미 계산되어 저장된) 진단 결과를 백엔드(/api/battery-proposals/pdf)에
+  // 넘기면, 백엔드가 rul-diagnosis의 /report/pdf/full을 호출한다 - 원본 센서값을 다시 돌리진
+  // 않지만, 매입처 매칭(estimate_offers)·경제성 계산(economics.compute)까지 포함된 정식
+  // 문서를 그대로 받는다. (이전엔 html2canvas 스크린샷 → 그다음엔 화면 텍스트만 옮겨적는
+  // from-view 버전이었는데, 등급판정기준·경제성/환경효과 같은 실제 제출용 내용이 빠져있었다.)
   downloadProposalPdf: async ({ diagnosisData, proposalData }) => {
     const p = proposalData;
-    const unitPriceWon = Number(String(p.price.unitPrice).replace(/,/g, "")) || 0;
+    if (!diagnosisData.capacityKwh) {
+      throw new Error("이 차량은 배터리 공칭 용량 정보가 없어 PDF를 만들 수 없습니다.");
+    }
+    if (!diagnosisData.gradeLevel) {
+      throw new Error("이 차량은 등급(1/2/3등급) 정보가 없어 PDF를 만들 수 없습니다.");
+    }
+
+    const indicators = { life: 0.5, capacity: 0.5, charge: 0.5, stability: 0.5 };
+    for (const m of p.healthMetrics ?? []) {
+      const key = batteryService._INDICATOR_KEY_BY_LABEL[m.label];
+      if (!key) continue;
+      const n = parseFloat(String(m.score));
+      if (!Number.isNaN(n)) indicators[key] = n / 100;
+    }
+
     const response = await api.post(
       "/api/battery-proposals/pdf",
       {
-        buyerName: "매입 희망 기업",
-        buyerRole: "",
-        buyerLocation: "",
-        priceTotalManwon: p.price.total,
-        unitPriceWon,
-        negotiationRange: p.price.negotiationRange,
-        priceGradeLabel: p.price.grade,
-        priceNote: p.price.note,
-        grade: diagnosisData.grade,
-        remainingCycle: diagnosisData.remainingCycle,
-        newCycle: diagnosisData.newCycle,
-        healthScorePct: diagnosisData.healthScore,
-        healthMetrics: p.healthMetrics,
-        diagnosisNote: p.diagnosisNote,
-        reasons: p.reasons,
-        cautions: p.cautions,
+        capacityKwh: diagnosisData.capacityKwh,
+        grade: diagnosisData.gradeLevel,
+        rulCycles: diagnosisData.remainingCycle,
+        fullLife: diagnosisData.newCycle,
+        healthPct: diagnosisData.healthScore,
+        indicators,
       },
       { responseType: "blob", timeout: 20000 },
     );
