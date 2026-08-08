@@ -18,7 +18,6 @@ import { useCarOptions } from "../../hooks/queries/useCar";
 import {
   useBatteryDiagnosisByCarId,
   useProposalByCarId,
-  useOffersByCarId,
 } from "../../hooks/queries/useBattery";
 import { batteryService } from "../../services/batteryService";
 import "../../styles/administrator/BatteryDiagnosis.css";
@@ -49,48 +48,38 @@ export default function BatteryDiagnosis() {
     isFetching: isProposalFetching,
     isError: isProposalError,
   } = useProposalByCarId(diagnosedCarId);
-  const {
-    data: offersData,
-    isFetching: isOffersFetching,
-    isError: isOffersError,
-  } = useOffersByCarId(diagnosedCarId);
 
-  // "잔존가치/판매처" 탭 - 매입처 카드들을 만들 때(=상위 매입처 목록을 화면에 그릴 때) 한
-  // 번에 키를 넣고 실시간 검색을 돌린다. DB 고정 목록(offersData) 대신, 회사 자체를
-  // 검색으로 찾아서(가격은 기존 계산식 그대로) liveOffers로 목록을 통째로 교체한다.
-  // 키는 이 요청에만 쓰이고 저장·로그되지 않는다.
-  const [showKeyFields, setShowKeyFields] = useState(false);
-  const [serperApiKeyNh, setSerperApiKeyNh] = useState("");
-  const [deepseekApiKeyNh, setDeepseekApiKeyNh] = useState("");
-  const [isSearchingLiveOffers, setIsSearchingLiveOffers] = useState(false);
-  const [liveOffers, setLiveOffers] = useState(null); // null = 아직 검색 안 함(기존 DB 목록 표시)
-  const [liveOffersError, setLiveOffersError] = useState(false);
+  // "잔존가치/판매처" 탭 - 잔존가치(등급/사이클/건강도)는 diagnosisData만 있으면 바로
+  // 뜨고, 매입처 매칭(rul-diagnosis 왕복이 필요해 상대적으로 느림)은 버튼을 눌러야
+  // 돌아간다. 이때 찾은 결과는 "매도 제안서" 탭에도 그대로 넘어가서(topBuyer) 그
+  // 탭의 "귀사에 적합한 이유"도 같이 근거 있는 내용으로 채워진다.
+  const [buyerResult, setBuyerResult] = useState(null);
+  const [isSearchingBuyers, setIsSearchingBuyers] = useState(false);
+  const [buyerSearchError, setBuyerSearchError] = useState(false);
 
   const handleDiagnose = () => {
     if (!selectedCarId) return;
     setDiagnosedCarId(selectedCarId);
+    setBuyerResult(null);
+    setBuyerSearchError(false);
   };
 
-  const handleSearchLiveOffers = async () => {
-    if (isSearchingLiveOffers || !diagnosisData?.gradeLevel || !diagnosisData?.capacityKwh) return;
-    setIsSearchingLiveOffers(true);
-    setLiveOffersError(false);
+  const handleFindBuyers = async () => {
+    if (isSearchingBuyers || !diagnosisData?.gradeLevel || !diagnosisData?.capacityKwh) return;
+    setIsSearchingBuyers(true);
+    setBuyerSearchError(false);
     try {
       const result = await batteryService.fetchLiveOffers({
         grade: diagnosisData.gradeLevel,
         capacityKwh: diagnosisData.capacityKwh,
         condition: diagnosisData.healthScore / 100,
-        serperApiKeyNh: serperApiKeyNh || undefined,
-        deepseekApiKeyNh: deepseekApiKeyNh || undefined,
       });
-      setLiveOffers(result);
+      setBuyerResult(result);
     } catch (e) {
-      console.error("매입처 실시간 검색 실패", e); // e에 키가 담기지 않음
-      setLiveOffersError(true);
+      console.error("매입처 조회 실패", e);
+      setBuyerSearchError(true);
     } finally {
-      setIsSearchingLiveOffers(false);
-      setSerperApiKeyNh("");
-      setDeepseekApiKeyNh("");
+      setIsSearchingBuyers(false);
     }
   };
 
@@ -177,54 +166,6 @@ export default function BatteryDiagnosis() {
  
       {activeTab === "value" && (
         <>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, marginBottom: 16 }}>
-            <button
-              type="button"
-              onClick={() => setShowKeyFields((v) => !v)}
-              style={{ background: "none", border: "none", padding: 0, fontSize: 12, color: "#888", cursor: "pointer" }}
-            >
-              {showKeyFields ? "실시간 검색 닫기" : "매입처를 실시간 검색으로 다시 찾기 (선택)"}
-            </button>
-
-            {showKeyFields && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                <input
-                  type="password"
-                  autoComplete="off"
-                  value={serperApiKeyNh}
-                  onChange={(e) => setSerperApiKeyNh(e.target.value)}
-                  placeholder="Serper API 키 (검색용)"
-                  style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
-                />
-                <input
-                  type="password"
-                  autoComplete="off"
-                  value={deepseekApiKeyNh}
-                  onChange={(e) => setDeepseekApiKeyNh(e.target.value)}
-                  placeholder="DeepSeek API 키 (요약용)"
-                  style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
-                />
-                <span style={{ fontSize: 11, color: "#999" }}>
-                  둘 다 입력 안 하면 서버 기본값 사용. 회사 자체를 실시간 검색으로 다시 찾고, 가격은 기존
-                  계산식 그대로 적용해요. 키는 저장·기록되지 않아요.
-                </span>
-                <button
-                  type="button"
-                  onClick={handleSearchLiveOffers}
-                  disabled={isSearchingLiveOffers || !diagnosedCarId}
-                  className="battery-diagnosis-run-btn"
-                >
-                  {isSearchingLiveOffers ? "검색 중..." : "실시간 검색으로 매입처 다시 찾기"}
-                </button>
-                {liveOffersError && (
-                  <span style={{ fontSize: 11, color: "#c0392b" }}>
-                    검색에 실패했어요. 잠시 후 다시 시도해주세요.
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
           {!diagnosedCarId && (
             <div className="placeholder-card">
               "배터리 진단" 탭에서 차량을 선택하고 "진단 실행"을 누르면
@@ -232,73 +173,80 @@ export default function BatteryDiagnosis() {
             </div>
           )}
 
-          {diagnosedCarId && isOffersFetching && (
+          {diagnosedCarId && isDiagnosing && (
             <div className="placeholder-card">불러오는 중...</div>
           )}
 
-          {diagnosedCarId && !isOffersFetching && (isOffersError || !offersData) && (
+          {diagnosedCarId && !isDiagnosing && (isDiagnosisError || !diagnosisData) && (
             <div className="placeholder-card">
-              잔존가치·판매처 정보를 불러오지 못했습니다. 다시 시도해주세요.
+              잔존가치 정보를 불러오지 못했습니다. 다시 시도해주세요.
             </div>
           )}
 
-          {diagnosedCarId && !isOffersFetching && offersData && (
+          {/* 잔존가치(등급/사이클/건강도)는 진단 데이터만 있으면 바로 뜬다 - 매입처
+              검색(rul-diagnosis 왕복)을 기다릴 필요가 없다. */}
+          {diagnosedCarId && !isDiagnosing && diagnosisData && (
             <>
               <div className="stat-card-row">
-                <BatteryStatCard
-                  label="판별 등급"
-                  value={offersData.summary.grade}
-                  showDot
-                  sub={offersData.summary.gradeSub}
-                />
+                <BatteryStatCard label="판별 등급" value={diagnosisData.grade} showDot />
                 <BatteryStatCard
                   label="예측 잔여수명"
-                  value={offersData.summary.remainingCycle ?? 0}
+                  value={diagnosisData.remainingCycle ?? 0}
                   unit="사이클"
-                  sub={offersData.summary.remainingCycleSub}
+                  sub={
+                    diagnosisData.newCycle
+                      ? `(신품 ${diagnosisData.newCycle.toLocaleString()})`
+                      : null
+                  }
                 />
                 <BatteryStatCard
-                  label="최고 제안가"
-                  value={offersData.summary.bestOffer}
-                  unit="만원"
-                  sub={offersData.summary.bestOfferSub}
+                  label="배터리 건강도"
+                  value={diagnosisData.healthScore}
+                  suffix="%"
+                  sub="(추정)"
                 />
               </div>
 
-              {(() => {
-                const topBuyers = liveOffers ? liveOffers.topBuyers : offersData.topBuyers;
-                const otherBuyers = liveOffers ? liveOffers.otherBuyers : offersData.otherBuyers;
-                return (
-                  <>
-                    <div className="buyer-section-title">
-                      매입처별 예상 제안가 (
-                      {(topBuyers?.length || 0) + (otherBuyers?.length || 0)}
-                      곳)
-                    </div>
-                    <div className="buyer-section-subtitle">
-                      상위 3곳은 상세 표시
-                      {liveOffers && (
-                        <span style={{ marginLeft: 8 }}>
-                          {liveOffers.live
-                            ? "· 🔎 실시간 검색으로 찾은 매입처"
-                            : "· 검색 결과가 없어 기존 매입처 목록으로 표시 중"}
-                        </span>
-                      )}
-                    </div>
+              <div className="buyer-section-title">매입처별 예상 제안가</div>
 
-                    {topBuyers.map((buyer) => (
-                      <BuyerCard key={buyer.name} {...buyer} />
-                    ))}
+              {!buyerResult && (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+                  <button
+                    type="button"
+                    onClick={handleFindBuyers}
+                    disabled={isSearchingBuyers}
+                    className="battery-diagnosis-run-btn"
+                  >
+                    {isSearchingBuyers ? "매입처 찾는 중..." : "매입처 3곳 찾기"}
+                  </button>
+                  {buyerSearchError && (
+                    <span style={{ fontSize: 12, color: "#c0392b" }}>
+                      매입처 조회에 실패했어요. 다시 시도해주세요.
+                    </span>
+                  )}
+                </div>
+              )}
 
-                    {otherBuyers.length > 0 && (
-                      <>
-                        <div className="buyer-others-label">그 외</div>
-                        <BuyerTable rows={otherBuyers} />
-                      </>
-                    )}
-                  </>
-                );
-              })()}
+              {buyerResult && (
+                <>
+                  <div className="buyer-section-subtitle">
+                    {(buyerResult.topBuyers?.length || 0) + (buyerResult.otherBuyers?.length || 0)}
+                    곳 · 상위 3곳은 상세 표시
+                    {buyerResult.live ? " · 🔎 실시간 검색으로 찾은 매입처" : ""}
+                  </div>
+
+                  {buyerResult.topBuyers.map((buyer) => (
+                    <BuyerCard key={buyer.name} {...buyer} />
+                  ))}
+
+                  {buyerResult.otherBuyers.length > 0 && (
+                    <>
+                      <div className="buyer-others-label">그 외</div>
+                      <BuyerTable rows={buyerResult.otherBuyers} />
+                    </>
+                  )}
+                </>
+              )}
             </>
           )}
         </>
@@ -334,7 +282,7 @@ export default function BatteryDiagnosis() {
               <ProposalContent
                 diagnosisData={diagnosisData}
                 proposalData={proposalData}
-                topBuyer={offersData?.topBuyers?.[0]}
+                topBuyer={buyerResult?.topBuyers?.[0]}
               />
             )}
         </>

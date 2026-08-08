@@ -23,19 +23,14 @@ const STANDARD_CAUTIONS = [
  * proposalData: batteryService.getProposalByCarId() 결과 (price/healthMetrics/reasons/cautions)
  *   과거엔 이 값이 proposalMock 고정값이라 차량을 바꿔도 내용이 안 바뀌었다 - 이제 부모가
  *   선택된 차량 기준으로 조회한 실제 데이터를 넘겨준다.
- * topBuyer: "잔존가치/판매처" 탭과 같은 carId로 조회한 최고 매입처 1곳(useOffersByCarId 결과의
- *   topBuyers[0]). "귀사에 적합한 이유"가 DB엔 문구 1개뿐이라 부실해서, 이미 다른 탭에서
- *   불러온 매입처의 확인된 사업 영역 설명을 추가로 붙여 보강한다.
+ * topBuyer: "잔존가치/판매처" 탭에서 "매입처 3곳 찾기"를 눌러 찾은 결과의 최고 매입처 1곳
+ *   (buyerResult.topBuyers[0], 부모 BatteryDiagnosis.jsx가 넘겨줌). "귀사에 적합한 이유"가
+ *   DB엔 문구 1개뿐이라 부실해서, 실시간 검색으로 확인된 매입처의 사업 영역 설명을
+ *   추가로 붙여 보강한다 - 아직 검색 전이면 undefined라 이 보강 없이 기본 문구만 나간다.
  */
 export default function ProposalContent({ diagnosisData, proposalData, topBuyer }) {
   const p = proposalData;
   const [isExporting, setIsExporting] = useState(false);
-  // 매입처 실시간 검색(Serper 검색 + DeepSeek 요약)을 개인 키로 한 번만 돌려보고 싶을 때만
-  // 입력 - 화면에만 잠깐 머무르고(state), 어디에도 저장(localStorage 등)·로그 안 함.
-  // 다운로드 직후 비움.
-  const [serperApiKeyNh, setSerperApiKeyNh] = useState("");
-  const [deepseekApiKeyNh, setDeepseekApiKeyNh] = useState("");
-  const [showApiKeyField, setShowApiKeyField] = useState(false);
 
   const reasons = [
     ...p.reasons,
@@ -52,8 +47,6 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
       const blob = await batteryService.downloadProposalPdf({
         diagnosisData,
         proposalData: { ...proposalData, reasons, cautions },
-        serperApiKeyNh: serperApiKeyNh || undefined,
-        deepseekApiKeyNh: deepseekApiKeyNh || undefined,
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -64,51 +57,15 @@ export default function ProposalContent({ diagnosisData, proposalData, topBuyer 
       a.remove();
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error("PDF 다운로드 실패", e); // e에 키가 담기지 않음 - axios 에러엔 요청 바디가 없음
+      console.error("PDF 다운로드 실패", e);
       alert("PDF 다운로드에 실패했어요. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsExporting(false);
-      setSerperApiKeyNh(""); // 성공/실패 관계없이 입력창 비움 - 메모리에 남는 시간 최소화
-      setDeepseekApiKeyNh("");
     }
   };
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8, marginBottom: 16 }}>
-        <button
-          type="button"
-          onClick={() => setShowApiKeyField((v) => !v)}
-          style={{ background: "none", border: "none", padding: 0, fontSize: 12, color: "#888", cursor: "pointer" }}
-        >
-          {showApiKeyField ? "개인 키 입력 닫기" : "매입처 실시간 검색용 개인 키 입력 (선택)"}
-        </button>
-
-        {showApiKeyField && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-            <input
-              type="password"
-              autoComplete="off"
-              value={serperApiKeyNh}
-              onChange={(e) => setSerperApiKeyNh(e.target.value)}
-              placeholder="Serper API 키 (검색용)"
-              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
-            />
-            <input
-              type="password"
-              autoComplete="off"
-              value={deepseekApiKeyNh}
-              onChange={(e) => setDeepseekApiKeyNh(e.target.value)}
-              placeholder="DeepSeek API 키 (요약용)"
-              style={{ width: 260, padding: "6px 8px", fontSize: 13, border: "1px solid #ddd", borderRadius: 4 }}
-            />
-            <span style={{ fontSize: 11, color: "#999" }}>
-              둘 다 입력 안 하면 서버 기본값 사용. 이 PDF 한 번만 쓰이고 저장·기록되지 않아요.
-            </span>
-          </div>
-        )}
-      </div>
-
       <ProposalSection title="1. 제안 가격">
         <div className="info-block-row">
           <InfoBlock label="제안 총액" value={p.price.total.toLocaleString()} unit="만원" />

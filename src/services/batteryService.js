@@ -141,11 +141,9 @@ export const batteryService = {
   // 않지만, 매입처 매칭(estimate_offers)·경제성 계산(economics.compute)까지 포함된 정식
   // 문서를 그대로 받는다. (이전엔 html2canvas 스크린샷 → 그다음엔 화면 텍스트만 옮겨적는
   // from-view 버전이었는데, 등급판정기준·경제성/환경효과 같은 실제 제출용 내용이 빠져있었다.)
-  // serperApiKeyNh/deepseekApiKeyNh: 매입처 실시간 검색(Serper 검색 + DeepSeek 요약)을 본인
-  // 개인 키로 한 번만 돌려보고 싶을 때만 선택 전달. 입력 안 하면 서버 키(없으면 정적 문구
-  // 폴백)로 동작 - 기존과 동일. 이 함수는 절대 키를 콘솔에 찍거나 어디에도 저장하지
-  // 않는다 - 요청 바디에 실어 보내고 끝.
-  downloadProposalPdf: async ({ diagnosisData, proposalData, serperApiKeyNh, deepseekApiKeyNh }) => {
+  // 매입처 실시간 검색(Serper+DeepSeek)은 서버 쪽 시크릿(rul-diagnosis-secret)으로
+  // 자동 처리된다 - 개인 키를 화면에서 입력받지 않는다.
+  downloadProposalPdf: async ({ diagnosisData, proposalData }) => {
     const p = proposalData;
     if (!diagnosisData.capacityKwh) {
       throw new Error("이 차량은 배터리 공칭 용량 정보가 없어 PDF를 만들 수 없습니다.");
@@ -171,77 +169,26 @@ export const batteryService = {
         fullLife: diagnosisData.newCycle,
         healthPct: diagnosisData.healthScore,
         indicators,
-        ...(serperApiKeyNh ? { serperApiKeyNh } : {}),
-        ...(deepseekApiKeyNh ? { deepseekApiKeyNh } : {}),
       },
       { responseType: "blob", timeout: 20000 },
     );
     return response.data; // Blob
   },
 
-  // BatteryDiagnosis.jsx "배터리 잔존가치/판매처" 탭 전용.
+  // BatteryDiagnosis.jsx "잔존가치/판매처" 탭의 "매입처 3곳 찾기" 버튼 전용.
   //
   // 예전엔 BATTERY_OFFERS DB 테이블(더미 데이터)을 그대로 읽었는데, 거기 buyer_name이
   // "테라사이클코리아" 같은 완전히 지어낸 이름이고 description도 "{회사명} 매입 제안"
   // 한 줄짜리 placeholder였다(data-generation/domain_nahyun/generate_data.py 확인 -
-  // 실제 조사된 회사가 아니라 테스트용 더미). 이제는 검색 버튼을 안 눌러도 기본값부터
-  // rul-diagnosis의 실제 조사된 매입처 목록(valuation.BUYERS - 현대글로비스·피엠그로우
-  // 등, 사업 근거까지 정리된 실제 회사)과 그 계산식(BNEF/국내 낙찰가 등 출처 있는
-  // 벤치마크)으로 산정한 값을 그대로 쓴다. 키 없이 fetchLiveOffers를 호출하면
-  // discover_buyers()가 키 없어서 자동으로 이 고정 목록으로 폴백하므로 비용도 0원.
-  getOffersByCarId: async (carId) => {
-    const passport = await batteryService.getBatteryByCarId(carId);
-    if (!passport) return null;
-    const gradeLevel = passport.batteryLevel ? `${passport.batteryLevel}등급` : null;
-    const capacityKwh = Number(passport.ratedCapacity) || null;
-    if (!gradeLevel || !capacityKwh) return null;
-
-    const { topBuyers, otherBuyers } = await batteryService.fetchLiveOffers({
-      grade: gradeLevel,
-      capacityKwh,
-      condition: (Number(passport.sohScore) || 0) / 100,
-    });
-    if (topBuyers.length === 0) return null;
-    const top = topBuyers[0];
-
-    return {
-      summary: {
-        grade: passport.gradeDetail,
-        gradeSub: `SOH ${passport.sohScore}% · ${passport.batteryType}`,
-        remainingCycle: passport.remainingCycles,
-        remainingCycleSub: passport.totalCycles
-          ? `(신품 ${Number(passport.totalCycles).toLocaleString()})`
-          : null,
-        bestOffer: top.price,
-        bestOfferSub: `${top.name} · ${top.priceSubtext}`,
-      },
-      topBuyers,
-      otherBuyers,
-    };
-  },
-
-  // "잔존가치/판매처" 탭 매입처 카드의 "실시간 검색" 버튼 전용. 이 매입처가 사용후 배터리를
-  // 매입하겠다고 공개적으로 밝힌 근거자료를 찾아온다. 키는 이 요청 한 번만 쓰이고 어디에도
-  // 저장·로그되지 않는다. 결과 disclosure가 null이면 호출부가 기존 DB 문구를 그대로 쓰면 됨.
-  fetchBuyerDisclosure: async ({ buyerName, serperApiKeyNh, deepseekApiKeyNh }) => {
-    const response = await api.post("/api/battery-offers/buyer-disclosure", {
-      buyerName,
-      ...(serperApiKeyNh ? { serperApiKeyNh } : {}),
-      ...(deepseekApiKeyNh ? { deepseekApiKeyNh } : {}),
-    });
-    return response.data.disclosure; // string | null
-  },
-
-  // "잔존가치/판매처" 탭의 "실시간 검색으로 매입처 확인" 버튼 전용. DB 고정 목록이 아니라
-  // 매입처 회사 자체를 실시간 검색으로 찾아서(가격은 기존 계산식 그대로) 목록을 다시 만든다.
-  // live:false면 검색 실패/키 없음으로 rul-diagnosis가 자체적으로 고정 목록에 폴백한 것.
-  fetchLiveOffers: async ({ grade, capacityKwh, condition, serperApiKeyNh, deepseekApiKeyNh }) => {
+  // 실제 조사된 회사가 아니라 테스트용 더미). 이제는 매입처 회사 자체를 rul-diagnosis가
+  // 실시간 검색으로 찾아서(가격은 valuation.BUYERS 계산식 - BNEF/국내 낙찰가 등 출처
+  // 있는 벤치마크 - 그대로) 목록을 만든다. 서버 시크릿으로 자동 동작하고, 검색이 안
+  // 되면 자체적으로 고정 매입처 목록에 폴백한다(live:false).
+  fetchLiveOffers: async ({ grade, capacityKwh, condition }) => {
     const response = await api.post("/api/battery-offers/live-offers", {
       grade,
       capacityKwh,
       condition,
-      ...(serperApiKeyNh ? { serperApiKeyNh } : {}),
-      ...(deepseekApiKeyNh ? { deepseekApiKeyNh } : {}),
     });
     const { live, offers = [] } = response.data;
     const toManwon = (won) => Math.round(Number(won) / 10000);
