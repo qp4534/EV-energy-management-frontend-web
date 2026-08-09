@@ -230,7 +230,7 @@ export default function BatteryDiagnosis() {
                   rel="noopener noreferrer"
                   className="buyer-price-source-link"
                 >
-                  가격 산정 출처 — {buyerResult.priceSourceLabel || "출처 보기"} ↗
+                  가격 산정 참고자료: {buyerResult.priceSourceLabel || "관련 자료"} ↗
                 </a>
               )}
 
