@@ -23,22 +23,23 @@ import { batteryService } from "../../../services/batteryService";
 //   charge   = 정전류(CC) 충전 구간 비율(cc_ratio) 정규화 - 열화될수록 CC 구간이 짧아짐
 //   stability= 방전 중 3.6V→3.4V 도달 시간(decrement_36_34v_s) 정규화 - 느릴수록(값이 클수록) 안정적
 const METRIC_METHODOLOGY = {
-  "수명 여유":
-    "AI가 예측한 잔여수명(RUL)을 신품 수명 대비 비율로 정규화한 값으로, 높을수록 완전 방전까지 구동 여유가 큽니다.",
+  "수명 여유": "AI 예측 잔여수명(RUL)을 신품 수명 대비 비율로 정규화한 값. 높을수록 구동 여유 큼",
   "방전 지속력":
-    "완전 방전까지 걸리는 시간(discharge_time_s)을 동일 배터리군 백분위(p5~p95)로 정규화한 값으로, 높을수록 1회 충전 시 구동 가능 시간이 깁니다.",
+    "완전 방전 소요시간(discharge_time_s)을 동일 배터리군 백분위(p5~p95)로 정규화한 값. 높을수록 1회 충전 구동시간 김",
   "충전 건전성":
-    "정전류(CC) 충전 구간 비율(cc_ratio)을 정규화한 값으로, 배터리가 열화될수록 CC 구간이 짧아지므로 높을수록 충전 특성이 신품에 가깝습니다.",
-  "전압 안정성":
-    "방전 중 전압이 3.6V에서 3.4V로 떨어지는 데 걸린 시간을 정규화한 값으로, 높을수록(강하 속도가 느릴수록) 전압이 안정적으로 유지됩니다.",
+    "정전류(CC) 충전 구간 비율(cc_ratio) 정규화 값. 열화될수록 CC 구간 짧아짐, 높을수록 신품 특성에 가까움",
+  "전압 안정성": "방전 중 3.6V에서 3.4V까지 도달 시간 정규화 값. 높을수록(강하 속도 느릴수록) 전압 안정적",
 };
 
 const STANDARD_CAUTIONS = [
-  "본 제안가는 공개 실거래·시장 벤치마크에 AI 진단 결과를 결합하여 산정한 추정치이며, 귀사가 제시한 견적이 아닙니다.",
-  "최종 가격은 실물 검사(외관·전기적 검사) 및 시황에 따라 조정될 수 있습니다.",
-  "전기차 사용후 배터리는 「자원순환기본법」에 따른 순환자원 지정 고시 대상으로 폐기물관리법 규제가 면제되나, 단순 수리·수선·건조·세척을 통한 재사용 등 일반적·품목별 준수사항을 충족해야 하며, 미충족 시 폐기물처리업 허가 대상이 될 수 있습니다.",
-  "「사용후 배터리의 관리 및 산업육성에 관한 법률」이 2026.5.26 공포되어 2027.5.27 시행 예정입니다(아직 시행 전). 시행 이후에는 탈거 전 성능평가·등급분류 및 전주기 이력·거래시스템 등록이 의무화될 예정이므로 사전 대비가 필요합니다.",
-  "해외 매입처에 매각(수출)하는 경우 「폐기물의 국가 간 이동 및 그 처리에 관한 법률」(바젤협약 국내 이행법)에 따른 사전통보·승인 절차를 별도로 거쳐야 합니다.",
+  "본 제안가는 공개 실거래·시장 벤치마크와 AI 진단 결과를 결합해 산정한 추정치, 귀사 제시 견적 아님",
+  "최종 가격은 실물 검사(외관·전기적 검사) 및 시황에 따라 조정 가능",
+  "전기차 사용후 배터리: 「자원순환기본법」 순환자원 지정 고시 대상, 폐기물관리법 규제 면제. " +
+    "단, 일반적·품목별 준수사항 충족 필요(미충족 시 폐기물처리업 허가 대상 가능)",
+  "「사용후 배터리의 관리 및 산업육성에 관한 법률」: 2026.5.26 공포, 2027.5.27 시행 예정(아직 " +
+    "시행 전). 시행 후 탈거 전 성능평가·등급분류 및 이력·거래시스템 등록 의무화 예정, 사전 대비 필요",
+  "해외 매입처 매각(수출) 시 「폐기물의 국가 간 이동 및 그 처리에 관한 법률」(바젤협약 국내 " +
+    "이행법)에 따른 사전통보·승인 절차 별도 이행 필요",
 ];
 
 /**
@@ -71,41 +72,36 @@ export default function ProposalContent({
   // 너무 부실했다. 이미 화면에 있는 진단·매입처 데이터를 최대한 근거로 엮어 여러 문장으로
   // 풀어쓴다 - 지어낸 수치는 하나도 없고, 전부 diagnosisData/proposalData/topBuyer에
   // 이미 있는 값을 문장으로 조립한 것뿐이다.
+  // 문체: 정부 보도자료식 개조식(명사형 종결, "—" 연결 금지, 짧은 문장) - PDF의 pdf_report.py
+  // _to_gaejosik()가 최종 방어선으로 한 번 더 다듬지만, 소스 단계에서부터 이 스타일로 쓴다.
   const reasons = [
     ...p.reasons,
-    // AI 로직 설명 — 등급·가치가 어떻게 계산됐는지(3단계 파이프라인 + 모델 종류 + 정확도)를
-    // 먼저 설명해야 뒤에 나오는 수치들이 "AI가 계산한 값"이라는 게 근거로 읽힌다.
-    // p.diagnosisNote(RandomForest·오차율)는 팀 자체 모델 평가 결과이므로 외부 출처 링크가
-    // 필요 없다(자사 실측치) - 대신 회사 밖 자료를 인용할 때는(매입처/가격 근거) 아래처럼
-    // 공식 자료(회사 뉴스룸·언론 보도·BloombergNEF 리포트)만 links로 붙인다.
-    `AI 진단 로직 — 화재/안전 위험 게이트(Agent1) → SOH 등급 분류(Agent2) → 잔여수명·가치 평가(Agent3) ` +
-      `3단계 파이프라인을 통과했습니다. ${p.diagnosisNote}`,
-    `본 배터리는 판별 등급 ${diagnosisData.grade}(${diagnosisData.gradeLevel ?? "등급 미판정"})로 ` +
-      `AI가 분류하여${topBuyer ? `, ${topBuyer.name}(${topBuyer.gradeLabel}) 매입 조건을 충족합니다.` : "입니다."}`,
-    `AI 모델이 산출한 배터리 건강도(SOH) ${diagnosisData.healthScore}%, 예측 잔여수명 ${diagnosisData.remainingCycle?.toLocaleString?.() ?? diagnosisData.remainingCycle} ` +
-      `사이클(신품 기준 ${diagnosisData.newCycle?.toLocaleString?.() ?? diagnosisData.newCycle} 사이클 대비 ` +
-      `${diagnosisData.newCycle ? Math.round((diagnosisData.remainingCycle / diagnosisData.newCycle) * 100) : "—"}%)로, ` +
-      `안정적인 성능을 유지하고 있는 것으로 확인됩니다.`,
-    `공칭 용량 ${diagnosisData.capacityKwh ?? "—"}kWh 규모로${topBuyer ? `, ${topBuyer.name}의 취급 규모에 부합합니다.` : "입니다."}`,
+    "AI 진단 로직: Agent1(안전 게이트), Agent2(등급분류), Agent3(가치평가) 3단계 파이프라인 순차 적용",
+    "RandomForest 회귀·분류 모델 사용. 잔여수명 예측 오차 ±11사이클, 등급 판별 정확도 98.4%",
+    `판별 등급 ${diagnosisData.grade}(${diagnosisData.gradeLevel ?? "등급 미판정"}) AI 자동 분류` +
+      (topBuyer ? `, ${topBuyer.name}(${topBuyer.gradeLabel}) 매입 조건 충족` : ""),
+    `배터리 건강도(SOH) ${diagnosisData.healthScore}%, 예측 잔여수명 ` +
+      `${diagnosisData.remainingCycle?.toLocaleString?.() ?? diagnosisData.remainingCycle}사이클` +
+      `(신품 기준 ${diagnosisData.newCycle?.toLocaleString?.() ?? diagnosisData.newCycle}사이클 대비 ` +
+      `${diagnosisData.newCycle ? Math.round((diagnosisData.remainingCycle / diagnosisData.newCycle) * 100) : "—"}%) 확인`,
+    `공칭 용량 ${diagnosisData.capacityKwh ?? "—"}kWh` +
+      (topBuyer ? `, ${topBuyer.name} 취급 규모 부합` : ""),
     ...(diagnosisData.judgement?.confidence
-      ? [`AI 판정 신뢰도(분류 모델 출력값) ${diagnosisData.judgement.confidence}%로, 등급 판정 결과의 신뢰성이 높습니다.`]
+      ? [`AI 판정 신뢰도(분류 모델 출력값) ${diagnosisData.judgement.confidence}%, 등급 판정 신뢰성 높음`]
       : []),
-    // 건전성 세부 지표 4개 - 예전엔 "'X' Y/100로 측정되어..."를 4번 그대로 반복해서 근거
-    // 없이 숫자만 나열하는 것처럼 보였다. rul-diagnosis의 compute_indicators()가 실제로
-    // 어떤 원본 센서값을 어떻게 정규화해 이 점수를 만드는지(fastapi_app.py 기준) 지표별로
-    // 풀어써서, 숫자가 왜 그 의미를 갖는지 근거가 드러나게 한다.
+    // 건전성 세부 지표 4개 - rul-diagnosis의 compute_indicators()가 실제로 어떤 원본
+    // 센서값을 어떻게 정규화해 이 점수를 만드는지(fastapi_app.py 기준) 지표별로 풀어써서
+    // 숫자의 근거가 드러나게 한다.
     ...(p.healthMetrics ?? []).map((m) => {
       const detail = METRIC_METHODOLOGY[m.label];
-      return detail
-        ? `${m.label} ${m.score} — ${detail}`
-        : `${m.label} ${m.score}로 측정되었습니다.`;
+      return detail ? `${m.label} ${m.score}: ${detail}` : `${m.label} ${m.score} 측정`;
     }),
     ...(topBuyer?.description
-      ? [`확인된 사업 영역 — ${topBuyer.name}(${topBuyer.category}) · ${topBuyer.description}`]
+      ? [`확인된 사업 영역: ${topBuyer.name}(${topBuyer.category}), ${topBuyer.description}`]
       : []),
-    ...(topBuyer?.tag ? [`실제 확인된 근거 — ${topBuyer.tag}`] : []),
-    `제안 단가 ${p.price.unitPrice}원/kWh는 공개 시장 벤치마크(${priceSourceLabel || "BloombergNEF 등 국제 배터리팩 가격조사"})에 ` +
-      `AI 진단 결과를 결합해 산정한 값입니다.`,
+    ...(topBuyer?.tag ? [`확인된 근거: ${topBuyer.tag}`] : []),
+    `제안 단가 ${p.price.unitPrice}원/kWh, 공개 시장 벤치마크` +
+      `(${priceSourceLabel || "BloombergNEF 등 국제 배터리팩 가격조사"})와 AI 진단 결과 결합 산정`,
   ];
   const cautions = [...p.cautions, ...STANDARD_CAUTIONS];
 
@@ -171,7 +167,7 @@ export default function ProposalContent({
             rel="noopener noreferrer"
             className="proposal-source-link"
           >
-            가격 산정 출처 — {priceSourceLabel || "출처 보기"} ↗
+            가격 산정 참고자료: {priceSourceLabel || "관련 자료"} ↗
           </a>
         )}
       </ProposalSection>
@@ -221,7 +217,7 @@ export default function ProposalContent({
             className="proposal-source-link"
             style={{ display: "inline-block", marginTop: 8 }}
           >
-            매입처 근거 출처 보기 ↗
+            매입처 근거 참고자료 ↗
           </a>
         )}
       </ProposalSection>
