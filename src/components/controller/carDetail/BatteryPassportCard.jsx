@@ -1,4 +1,7 @@
-import { useBatteryByCarId } from "@/hooks/queries/useBattery";
+import {
+  useBatteryByCarId,
+  useLatestTwinMeasurementByCarId,
+} from "@/hooks/queries/useBattery";
 
 const formatMeasurementAge = (ageSeconds) => {
   const seconds = Math.max(0, Math.floor(Number(ageSeconds) || 0));
@@ -10,6 +13,7 @@ const formatMeasurementAge = (ageSeconds) => {
 
 export default function BatteryPassportCard({ carId }) {
   const { data: battery, isLoading, isError } = useBatteryByCarId(carId);
+  const { data: liveMeasurement } = useLatestTwinMeasurementByCarId(carId);
 
   if (isLoading) {
     return (
@@ -31,7 +35,6 @@ export default function BatteryPassportCard({ carId }) {
     );
   }
 
-  const liveMeasurement = battery.liveMeasurement;
   const liveTemperature = liveMeasurement?.maxCellTemperatureC;
   const hasLiveTemperature =
     liveTemperature !== null &&
@@ -42,7 +45,7 @@ export default function BatteryPassportCard({ carId }) {
     ? "데이터 지연"
     : hasLiveTemperature
       ? `${Number(liveTemperature).toFixed(1)}°C`
-      : "실시간 데이터 없음";
+      : "측정 데이터 없음";
   const temperatureCaption = liveMeasurement?.observedAt
     ? `마지막 Twin 측정 · ${new Date(liveMeasurement.observedAt).toLocaleString("ko-KR")} · ${formatMeasurementAge(liveMeasurement.ageSeconds)}`
     : "차량 Twin 연결 대기 중";

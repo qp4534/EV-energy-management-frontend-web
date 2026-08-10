@@ -19,26 +19,21 @@ const getPassportByCarId = async (carId) => {
 
 export const batteryService = {
   // CarDetail.jsx(/controller/cars/:id)의 "배터리 여권" 카드 전용.
-  // 정적 여권 정보와 차량별 최신 Twin 측정값을 별도 API로 조회해 결합한다.
+  // 제조사·SOH·충전 사이클 등의 정적 여권 정보만 조회한다.
+  getBatteryByCarId: getPassportByCarId,
+
+  // 차량별 최신 Twin 측정값만 조회한다. 이 요청만 1초 polling에 사용한다.
   // Twin이 없거나 지연돼도 다른 차량 또는 BATTERY_PASSPORT.currentTemp로 대체하지 않는다.
-  getBatteryByCarId: async (carId) => {
-    const passportPromise = getPassportByCarId(carId);
-    const measurementPromise = api.get(
-      `/api/twin-frames/cars/${carId}/latest-measurement`,
-      { params: { staleAfterSeconds: 10 } },
-    );
-    const [passportResult, measurementResult] = await Promise.allSettled([
-      passportPromise,
-      measurementPromise,
-    ]);
-    if (passportResult.status === "rejected") throw passportResult.reason;
-    return {
-      ...passportResult.value,
-      liveMeasurement:
-        measurementResult.status === "fulfilled"
-          ? measurementResult.value.data
-          : null,
-    };
+  getLatestTwinMeasurementByCarId: async (carId) => {
+    try {
+      const response = await api.get(
+        `/api/twin-frames/cars/${carId}/latest-measurement`,
+        { params: { staleAfterSeconds: 10 } },
+      );
+      return response.data;
+    } catch {
+      return null;
+    }
   },
 
   // BatteryDiagnosis.jsx(/admin/battery "배터리 진단" 탭)에서 쓰는 형태 그대로 반환한다.
