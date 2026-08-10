@@ -12,12 +12,17 @@ const GRADE_DETAIL_DESCRIPTIONS = {
   "수거·매입(중개)급": "수거 후 매입처를 통한 처리가 필요합니다.",
 };
 
+const getPassportByCarId = async (carId) => {
+  const response = await api.get(`/api/battery-passports/car/${carId}`);
+  return response.data;
+};
+
 export const batteryService = {
   // CarDetail.jsx(/controller/cars/:id)의 "배터리 여권" 카드 전용.
   // 정적 여권 정보와 차량별 최신 Twin 측정값을 별도 API로 조회해 결합한다.
   // Twin이 없거나 지연돼도 다른 차량 또는 BATTERY_PASSPORT.currentTemp로 대체하지 않는다.
   getBatteryByCarId: async (carId) => {
-    const passportPromise = api.get(`/api/battery-passports/car/${carId}`);
+    const passportPromise = getPassportByCarId(carId);
     const measurementPromise = api.get(
       `/api/twin-frames/cars/${carId}/latest-measurement`,
       { params: { staleAfterSeconds: 10 } },
@@ -28,7 +33,7 @@ export const batteryService = {
     ]);
     if (passportResult.status === "rejected") throw passportResult.reason;
     return {
-      ...passportResult.value.data,
+      ...passportResult.value,
       liveMeasurement:
         measurementResult.status === "fulfilled"
           ? measurementResult.value.data
@@ -89,7 +94,7 @@ export const batteryService = {
   // BatteryDiagnosis.jsx 상단 "차량 선택" 드롭다운 전용 - carId로 고르면 그 차량의
   // batteryId를 찾아 getBatteryDiagnosis에 위임한다(진단 API는 batteryId 기준이라 필요).
   getDiagnosisByCarId: async (carId) => {
-    const passport = await batteryService.getBatteryByCarId(carId);
+    const passport = await getPassportByCarId(carId);
     if (!passport) return null;
     return batteryService.getBatteryDiagnosis(passport.batteryId);
   },
@@ -99,12 +104,10 @@ export const batteryService = {
   // /api/battery-proposals, /api/battery-diagnosis-metrics 둘 다 이미 있어서
   // carId -> batteryId로 찾아 매칭한다.
   //
-  // TEMP: getBatteryByCarId와 동일한 패턴 - "batteryId로 조회" 엔드포인트가
-  // 없어서 목록을 받아 batteryId가 일치하는 걸 찾는다. 지금은 carId가 배터리와
-  // 무작위로 매칭돼 있어 거의 항상 못 찾고, 그 경우 첫 번째 항목을 임시로 보여준다
-  // (실제 FK 연결이 되면 자동으로 정확해진다).
+  // 여권은 차량별 엔드포인트로 정확히 찾고, 제안/진단 목록 안에서 해당 batteryId를 찾는다.
+  // 제안·진단 전용 carId API가 생기면 아래 목록 조회도 차량별 조회로 교체할 수 있다.
   getProposalByCarId: async (carId) => {
-    const passport = await batteryService.getBatteryByCarId(carId);
+    const passport = await getPassportByCarId(carId);
     if (!passport) return null;
     const batteryId = passport.batteryId;
 
