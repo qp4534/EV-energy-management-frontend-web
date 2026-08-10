@@ -1,5 +1,13 @@
 import { useBatteryByCarId } from "@/hooks/queries/useBattery";
 
+const formatMeasurementAge = (ageSeconds) => {
+  const seconds = Math.max(0, Math.floor(Number(ageSeconds) || 0));
+  if (seconds < 60) return `${seconds}초 전`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}분 전`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}시간 전`;
+  return `${Math.floor(seconds / 86400)}일 전`;
+};
+
 export default function BatteryPassportCard({ carId }) {
   const { data: battery, isLoading, isError } = useBatteryByCarId(carId);
 
@@ -30,11 +38,13 @@ export default function BatteryPassportCard({ carId }) {
     liveTemperature !== undefined &&
     Number.isFinite(Number(liveTemperature));
   const isStale = Boolean(liveMeasurement?.isStale);
-  const temperatureValue = hasLiveTemperature
-    ? `${Number(liveTemperature).toFixed(1)}°C${isStale ? " · 지연" : ""}`
-    : "실시간 데이터 없음";
+  const temperatureValue = isStale
+    ? "데이터 지연"
+    : hasLiveTemperature
+      ? `${Number(liveTemperature).toFixed(1)}°C`
+      : "실시간 데이터 없음";
   const temperatureCaption = liveMeasurement?.observedAt
-    ? `Twin 측정 · ${new Date(liveMeasurement.observedAt).toLocaleTimeString("ko-KR")}`
+    ? `마지막 Twin 측정 · ${new Date(liveMeasurement.observedAt).toLocaleString("ko-KR")} · ${formatMeasurementAge(liveMeasurement.ageSeconds)}`
     : "차량 Twin 연결 대기 중";
 
   const rows = [
