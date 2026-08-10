@@ -7,6 +7,16 @@ export const useBatteryByCarId = (carId) => {
     queryKey: ["battery", carId],
     queryFn: () => batteryService.getBatteryByCarId(carId),
     enabled: !!carId,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useLatestTwinMeasurementByCarId = (carId) => {
+  return useQuery({
+    queryKey: ["latestTwinMeasurement", carId],
+    queryFn: () => batteryService.getLatestTwinMeasurementByCarId(carId),
+    enabled: !!carId,
+    refetchInterval: 1000,
   });
 };
 
