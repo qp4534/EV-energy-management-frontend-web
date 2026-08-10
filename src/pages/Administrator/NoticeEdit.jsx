@@ -16,7 +16,7 @@ function NoticeEdit() {
     // viewCount/isRead가 ERD상 NOT NULL인데 NoticeForm은 이 값들을 안 다루기 때문에,
     // formData만 보내면 PUT이 전체를 덮어쓰면서 이 필드들이 null이 되어 제약 위반(500)이 남.
     // 그래서 initialData(원본 전체)를 베이스로 깔고, 폼에서 실제로 바뀌는 값만 덮어씀.
-    const { target, startDate, endDate, fileName, ...rest } = formData;
+    const { target, fileName, ...rest } = formData;
     const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER" };
 
     try {

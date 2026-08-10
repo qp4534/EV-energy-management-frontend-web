@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import TabBar from "../../components/administrator/common/TabBar";
 import LineChartCard from "../../components/administrator/statsreport/LineChartCard";
+import LineTrendChart from "../../components/administrator/common/LineTrendChart";
 import DonutCard from "../../components/administrator/statsreport/DonutCard";
 import StatCard from "../../components/administrator/main/StatCard";
 import CardShell from "../../components/administrator/common/CardShell";
@@ -21,9 +21,6 @@ import {
   useFireSummaryStats,
   useAlertTrend,
 } from "../../hooks/queries/useStatsReport";
-import {
-  dateRangeLabel,
-} from "../../mocks/statsReportMock";
 
 const TABS = [
   { key: "user", label: "이용자" },
@@ -52,7 +49,8 @@ export default function StatsReport() {
   const { data: recentDiagnosesRaw } = useRecentDiagnoses(6);
   const { data: vehicleRiskOverview } = useVehicleRiskOverview();
   const { data: fireSummaryStats } = useFireSummaryStats();
-  const { data: alertTrend } = useAlertTrend();
+  const [alertTrendMonths, setAlertTrendMonths] = useState(6);
+  const { data: alertTrend } = useAlertTrend(alertTrendMonths);
 
   const ROLE_COLORS = { 관리자: "#FFE88A", 관제자: "#FF8D72", 이용자: "#A8F56B" };
   const userTypeDistribution = (userTypeRaw ?? []).map((r) => ({
@@ -65,7 +63,7 @@ export default function StatsReport() {
   const batteryGradeDistribution = batteryGradeDistributionRaw ?? [];
   const batteryGradeTotal = batteryGradeDistribution.reduce((sum, g) => sum + g.count, 0);
 
-  // "배터리 처리" 카드 자리를 대체 - 진단 지표 평균 4종
+  // 진단 지표 평균 4종
   const METRIC_COLORS = {
     remainingLife: "var(--color-header-text)",
     dischargePower: "#1F8FCC",
@@ -79,7 +77,7 @@ export default function StatsReport() {
     { key: "voltageStability", label: "전압안정성 평균", value: metricAverage?.voltageStabilityAvg ?? 0 },
   ];
 
-  // "최근 처리 이력" 표 자리를 대체 - 최근 진단 이력
+  // 최근 진단 이력
   const recentDiagnoses = (recentDiagnosesRaw ?? []).map((d) => ({
     batteryId: d.batteryId,
     grade: d.grade ?? "-",
@@ -99,17 +97,9 @@ export default function StatsReport() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-main)] p-8">
-      {/* 헤더: 타이틀 + 기간 선택 */}
+      {/* 헤더 */}
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-[var(--color-header-text)]">통계 / 리포트 조회</h2>
-
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-login-frame)] px-4 py-2 text-sm text-[var(--color-header-text)] hover:bg-[var(--color-bg-main)]"
-        >
-          {dateRangeLabel}
-          <ChevronDown size={16} className="text-[var(--color-sub-text)]" />
-        </button>
+        <h2 className="text-2xl font-bold text-[var(--color-header-text)]">통계 / 리포트 조회</h2>
       </div>
 
       <TabBar tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
@@ -272,13 +262,29 @@ export default function StatsReport() {
           </div>
 
           <div className="mb-5">
-            <LineChartCard
-              title="월별 알림 발생 추이"
-              data={alertTrend ?? []}
-              dataKey="count"
-              color="var(--color-header-text)"
-              unit="건"
-            />
+            <CardShell
+              title={
+                <div className="flex w-full items-center justify-between">
+                  <span>월별 알림 발생 추이</span>
+                  <select
+                    value={alertTrendMonths}
+                    onChange={(e) => setAlertTrendMonths(Number(e.target.value))}
+                    className="ml-4 shrink-0 rounded-lg border border-[var(--color-border)] bg-[var(--color-login-frame)] px-3 py-1.5 text-xs font-medium text-[var(--color-header-text)] shadow-sm outline-none hover:bg-[var(--color-bg-main)]"
+                  >
+                    <option value={3}>최근 3개월</option>
+                    <option value={6}>최근 6개월</option>
+                    <option value={12}>최근 12개월</option>
+                  </select>
+                </div>
+              }
+            >
+              <LineTrendChart
+                data={alertTrend ?? []}
+                dataKey="count"
+                color="var(--color-header-text)"
+                unit="건"
+              />
+            </CardShell>
           </div>
 
           <CardShell title="현재 위험등급별 차량 수">

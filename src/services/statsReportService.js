@@ -48,7 +48,7 @@ export const statsReportService = {
     return data;
   },
 
-  // "화재 예방" 탭 - 위험등급별 차량 수는 이미 있는 대시보드용 엔드포인트를 그대로 재사용
+  // "화재 예방" 탭
   getVehicleRiskOverview: async () => {
     const { data } = await api.get("/api/dashboard/vehicle-risk-overview");
     return data;
@@ -59,8 +59,10 @@ export const statsReportService = {
     return data;
   },
 
-  getAlertTrend: async () => {
-    const { data } = await api.get("/api/stats-report/fire/alert-trend");
+  getAlertTrend: async (months = 6) => {
+    const { data } = await api.get("/api/stats-report/fire/alert-trend", {
+      params: { months },
+    });
     return data;
   },
 };

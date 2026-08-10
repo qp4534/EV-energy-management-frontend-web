@@ -75,9 +75,9 @@ export const useFireSummaryStats = () => {
   });
 };
 
-export const useAlertTrend = () => {
+export const useAlertTrend = (months = 6) => {
   return useQuery({
-    queryKey: ["statsReport", "alertTrend"],
-    queryFn: statsReportService.getAlertTrend,
+    queryKey: ["statsReport", "alertTrend", months],
+    queryFn: () => statsReportService.getAlertTrend(months),
   });
 };

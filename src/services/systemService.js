@@ -91,17 +91,16 @@ export const systemService = {
     }));
   },
 
-  // 현재 mock 사용 추후 실제 API 연결 필요
-  reissueIntegrationKey: async (id) => {
-    if (USE_MOCK) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const integration = MOCK_INTEGRATIONS.find((i) => i.id === id);
-      if (integration) integration.maskedKey = `iot_live_••••••••${randomHex(4)}`;
-      return integration;
-    }
-    const response = await api.post(`/api/v1/system/integrations/${id}/reissue`);
-    return response.data;
-  },
+  // 연동키 재발급
+reissueIntegrationKey: async (id) => {
+  const response = await api.post(`/api/external-integrations/${id}/reissue`);
+  return {
+    id: response.data.integrationId,
+    name: response.data.name,
+    desc: response.data.description,
+    maskedKey: response.data.apiKey, // 재발급 직후 응답이라 원본 키 (이번 1회만)
+  };
+},
 
   // SystemBatchJob.jsx - 백엔드 미구현, mock 유지
   getBatchJobs: async () => {
