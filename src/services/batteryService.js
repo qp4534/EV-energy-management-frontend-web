@@ -14,18 +14,26 @@ const GRADE_DETAIL_DESCRIPTIONS = {
 
 export const batteryService = {
   // CarDetail.jsx(/controller/cars/:id)의 "배터리 여권" 카드 전용.
-  // 차량 1대의 BATTERY_PASSPORT를 carId로 조회한다.
-  //
-  // TEMP: 항상 실제 API 호출. 백엔드 BatteryPassportDto 필드명(manufacturer/batteryType/
-  // ratedCapacity/sohScore/chargeCycles/currentTemp/lastInspectedAt/carId 등)이 mock과
-  // 완전히 같아서 매핑이 필요 없다. 다만 백엔드엔 "carId로 조회" 엔드포인트가 없어서
-  // 목록(/api/battery-passports)을 받아 carId가 일치하는 것을 찾는다 - 지금은 더미 데이터라
-  // carId가 매 요청 랜덤이라 거의 항상 못 찾고, 그 경우 첫 번째 항목을 임시로 보여준다.
-  // (chargingService.getStationByCarId와 동일한 패턴 - 실제 DB가 연결되면 자동으로 정확해진다)
+  // 정적 여권 정보와 차량별 최신 Twin 측정값을 별도 API로 조회해 결합한다.
+  // Twin이 없거나 지연돼도 다른 차량 또는 BATTERY_PASSPORT.currentTemp로 대체하지 않는다.
   getBatteryByCarId: async (carId) => {
-    const response = await api.get("/api/battery-passports");
-    const batteries = response.data;
-    return batteries.find((b) => b.carId === carId) ?? batteries[0] ?? null;
+    const passportPromise = api.get(`/api/battery-passports/car/${carId}`);
+    const measurementPromise = api.get(
+      `/api/twin-frames/cars/${carId}/latest-measurement`,
+      { params: { staleAfterSeconds: 10 } },
+    );
+    const [passportResult, measurementResult] = await Promise.allSettled([
+      passportPromise,
+      measurementPromise,
+    ]);
+    if (passportResult.status === "rejected") throw passportResult.reason;
+    return {
+      ...passportResult.value.data,
+      liveMeasurement:
+        measurementResult.status === "fulfilled"
+          ? measurementResult.value.data
+          : null,
+    };
   },
 
   // BatteryDiagnosis.jsx(/admin/battery "배터리 진단" 탭)에서 쓰는 형태 그대로 반환한다.

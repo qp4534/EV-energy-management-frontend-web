@@ -7,6 +7,7 @@ export const useBatteryByCarId = (carId) => {
     queryKey: ["battery", carId],
     queryFn: () => batteryService.getBatteryByCarId(carId),
     enabled: !!carId,
+    refetchInterval: 1000,
   });
 };
 
