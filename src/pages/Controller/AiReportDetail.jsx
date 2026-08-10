@@ -27,6 +27,11 @@ const ACTION_ICON = {
   dispatchEmergency: HiOutlineTruck,
 };
 
+const DEFAULT_ANOMALY_ACTIONS = [
+  { key: "notifyCustomer", label: "고객 알림 발송" },
+  { key: "dispatchEmergency", label: "긴급출동 배차" },
+];
+
 export default function AiReportDetail() {
   const { id: reportId } = useParams();
   const navigate = useNavigate();
@@ -54,6 +59,11 @@ export default function AiReportDetail() {
   }
 
   const reportData = report.reportData;
+  const configuredActions = reportData?.actions ?? [];
+  const actions =
+    report.reportType === "이상" && configuredActions.length === 0
+      ? DEFAULT_ANOMALY_ACTIONS
+      : configuredActions;
 
   return (
     <div className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-8">
@@ -161,9 +171,9 @@ export default function AiReportDetail() {
               </section>
             )}
 
-            {reportData.actions?.length > 0 && (
+            {actions.length > 0 && (
               <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-6">
-                {reportData.actions.map((action) => {
+                {actions.map((action) => {
                   const Icon = ACTION_ICON[action.key];
                   return (
                     <button

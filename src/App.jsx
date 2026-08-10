@@ -30,6 +30,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import useAuth from "./hooks/common/useAuth";
 import CarReportList from "./pages/Controller/CarReportList";
+import ChatbotWidget from "./components/ChatbotWidget";
 
 const AUTH_ROUTE_PATTERN = /^\/(login|find-id|reset-password|signup|terms)/;
 
@@ -37,7 +38,7 @@ function DashboardLayout() {
   // 사용자 역할 상태를 관리하는 state
   // 'controller' | 'administrator'
   // 개발하실때 useState('controller')로 설정하시면 관리자 화면이 보여요!(백엔드랑 권한 설정 넣기 전까진 이렇게 해용!)
-  const [userRole, setUserRole] = useState("controller");
+  const [userRole] = useState("controller");
   const location = useLocation();
   const { isLoggedIn, role: authRole } = useAuth();
   const isAuthRoute = AUTH_ROUTE_PATTERN.test(location.pathname);
@@ -119,6 +120,7 @@ function DashboardLayout() {
           </Routes>
         </main>
       </div>
+      <ChatbotWidget />
     </div>
   );
 }
