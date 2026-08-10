@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const BORDER = "#e0e0e0";
 
-export default function DonutStat({ title, data = [] }) {
+export default function DonutStat({ title, data = [], unit = "명" }) {
   const isEmpty =
     data.length === 0 ||
     data.every((item) => item.value === 0);
@@ -76,7 +76,7 @@ export default function DonutStat({ title, data = [] }) {
             </span>
 
             <span className="font-semibold text-[var(--color-header-text)]">
-              {item.value}명
+              {item.value}{unit}
             </span>
           </div>
         ))}

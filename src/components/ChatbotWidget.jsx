@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  FiHeadphones,
+  FiMessageSquare,
   FiRefreshCw,
   FiSend,
   FiX,
@@ -252,7 +252,7 @@ export default function ChatbotWidget() {
         aria-controls="mijunge-chatbot-panel"
         aria-expanded={isOpen}
       >
-        <FiHeadphones aria-hidden="true" />
+        <FiMessageSquare aria-hidden="true" />
       </button>
     </div>
   );

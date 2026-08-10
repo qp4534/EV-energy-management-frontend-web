@@ -6,7 +6,7 @@ import '../../../styles/administrator/components/UserPermissionModal.css';
 const ROLES = [
   { key: '관리자', label: '관리자', icon: '🛡️' },
   { key: '관제자', label: '관제자', icon: '📡' },
-  { key: '차주', label: '회원(차주)', icon: '🚚' },
+  { key: '이용자', label: '이용자', icon: '🚚' },
 ];
 
 const PERMISSION_GROUPS = [

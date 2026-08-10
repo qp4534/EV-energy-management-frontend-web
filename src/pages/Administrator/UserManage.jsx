@@ -14,11 +14,9 @@ import '../../styles/administrator/UserManage.css';
 
 const PAGE_SIZE = 10; // 페이지당 표시할 회원 수
 
-// TODO: 백엔드 UserDto에 name 필드가 없어서 임시로 이메일 앞부분을 표시 이름으로 사용
 const mapUserForDisplay = (user) => ({
   ...user,
   id: user.userId,
-  name: user.email?.split('@')[0] ?? '이름없음',
 });
 
 export default function UserManage() {
@@ -42,9 +40,8 @@ export default function UserManage() {
     return [
       { icon: '👤', label: '전체 이용자', value: users.length },
       { icon: '🛡️', label: '관리자', value: countByRole('관리자') },
-      // TODO: role 값 체계(관제자/차주 등) 확정되면 아래 라벨/카운트 기준 재확인
       { icon: '📡', label: '관제자', value: countByRole('관제자') },
-      { icon: '🚚', label: '회원 (차주)', value: countByRole('차주') },
+      { icon: '🚚', label: '이용자', value: countByRole('이용자') },
     ];
   }, [users]);
 

@@ -21,8 +21,8 @@ export default function UserTable({ users, onManageRole }) {
               <td className="border-t border-[var(--color-border)] px-5 py-3.5 text-sm text-[var(--color-header-text)]">
                 <span className="inline-flex items-center justify-center rounded-full bg-[var(--color-primary-btn)] px-3 py-1 text-[0.8125rem] font-semibold text-[var(--color-header-text)]">
                   {user.role === '관리자' && '🛡️ '}
-                  {user.role === '관제사' && '📡 '}
-                  {user.role === '차주' && '🚚 '}
+                  {user.role === '관제자' && '📡 '}
+                  {user.role === '이용자' && '🚚 '}
                   {user.role}
                 </span>
               </td>
