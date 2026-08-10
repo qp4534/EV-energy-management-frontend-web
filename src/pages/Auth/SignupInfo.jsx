@@ -121,7 +121,12 @@ export default function SignupInfo() {
       setSuccess(true);
       setError("");
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      // VALIDATION_ERROR 응답은 실제 이유가 최상위 message("입력값을 확인해주세요.")가
+      // 아니라 fieldErrors 안에 있다 - 예전엔 이 구체적인 이유를 화면에 못 보여줘서
+      // 무엇이 문제인지 사용자가 알 방법이 없었다. 있으면 그걸 우선 보여준다.
+      const fieldErrors = err.response?.data?.fieldErrors;
+      const firstFieldError = fieldErrors && Object.values(fieldErrors)[0];
+      setError(firstFieldError || err.response?.data?.message || err.message);
     }
   };
 
