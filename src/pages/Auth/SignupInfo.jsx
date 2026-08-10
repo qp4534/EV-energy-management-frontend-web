@@ -94,13 +94,17 @@ export default function SignupInfo() {
       setError("이메일 인증을 먼저 완료해주세요.");
       return;
     }
+    // 년/월/일 중 하나라도 안 고르면 예전엔 그냥 빈 값으로 서버에 보내서, 서버 쪽 not-null
+    // 제약에 걸려 "서버 오류가 발생했습니다"라는 알아보기 힘든 에러만 뜨고 왜 실패했는지
+    // 알 수 없었다 - 여기서 먼저 걸러서 무엇이 비어있는지 바로 알려준다.
+    if (!form.birthYear || !form.birthMonth || !form.birthDay) {
+      setError("생년월일(년/월/일)을 모두 선택해주세요.");
+      return;
+    }
     try {
-      const birth =
-        form.birthYear && form.birthMonth && form.birthDay
-          ? `${form.birthYear}-${String(form.birthMonth).padStart(2, "0")}-${String(
-              form.birthDay
-            ).padStart(2, "0")}`
-          : "";
+      const birth = `${form.birthYear}-${String(form.birthMonth).padStart(2, "0")}-${String(
+        form.birthDay
+      ).padStart(2, "0")}`;
       const consentedTerms = Object.entries(agreements ?? {})
         .filter(([, agreed]) => agreed)
         .map(([key]) => key);
