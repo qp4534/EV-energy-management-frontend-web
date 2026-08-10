@@ -1,3 +1,14 @@
+.notice-detail {
+  padding: 32px;
+}
+
+.notice-detail h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin-bottom: 20px;
+}
+
 .notice-detail-loading {
   padding: 60px;
   text-align: center;

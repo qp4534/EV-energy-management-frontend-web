@@ -1,5 +1,13 @@
 .notice-manage {
   min-height: 100%;
+  padding: 32px;
+}
+
+.notice-manage h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin-bottom: 20px;
 }
 
 .notice-manage-header {
