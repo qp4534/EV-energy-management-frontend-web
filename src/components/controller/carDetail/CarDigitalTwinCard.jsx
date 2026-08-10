@@ -255,18 +255,29 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
           <>
             {isHistory && !remoteFrames.length && !remoteHistoryFailed ? (
               <div className="digital-twin-status">
-                <span>사고 이력 불러오는 중...</span>
+                <div className="digital-twin-status-section">
+                  <span>상태</span>
+                  <strong>사고 이력 불러오는 중...</strong>
+                </div>
               </div>
             ) : (
-              <div className="digital-twin-status">
-                <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : currentFrame?.scenario_name ?? "실시간 상태"}</span>
-                <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
-                <small>최대 셀 {Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</small>
-                <small>
-                  최대 커넥터 {maxConnectorTemperatureC === null
+              <div className="digital-twin-status" aria-label="디지털 트윈 현재 상태">
+                <div className="digital-twin-status-section digital-twin-status-section--risk">
+                  <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : "현재 상태"}</span>
+                  <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
+                </div>
+                <div className="digital-twin-status-section">
+                  <span>배터리 셀</span>
+                  <strong>{Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</strong>
+                </div>
+                <div className="digital-twin-status-section">
+                  <span>커넥터</span>
+                  <strong>
+                    {maxConnectorTemperatureC === null
                     ? "측정 데이터 없음"
                     : `${maxConnectorTemperatureC.toFixed(1)}°C`}
-                </small>
+                  </strong>
+                </div>
               </div>
             )}
             {selectedCell && (
