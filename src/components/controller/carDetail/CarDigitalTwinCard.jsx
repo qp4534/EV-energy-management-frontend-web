@@ -37,6 +37,12 @@ function replayPhases(replay) {
   });
 }
 
+function maxDecicTemperatureC(values) {
+  if (!Array.isArray(values) || !values.length) return null;
+  const temperatures = values.map(Number).filter(Number.isFinite);
+  return temperatures.length ? Math.max(...temperatures) / 10 : null;
+}
+
 function toRenderFrame(frame) {
   const riskLevel = Number(frame.final_risk_level) || 0;
   const temperatures = frame.temperature_decic ?? [];
@@ -102,6 +108,9 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
       ? []
       : localFrames;
   const currentFrame = frames[frameIndex] ?? null;
+  const maxConnectorTemperatureC = maxDecicTemperatureC(
+    currentFrame?.connector_twin_state?.temperature_decic,
+  );
   const activePhase = !remoteFrames.length
     ? phases.find((phase) => frameIndex >= phase.startIndex && frameIndex <= phase.endIndex)
     : null;
@@ -253,6 +262,11 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
                 <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : currentFrame?.scenario_name ?? "실시간 상태"}</span>
                 <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
                 <small>최대 셀 {Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</small>
+                <small>
+                  최대 커넥터 {maxConnectorTemperatureC === null
+                    ? "측정 데이터 없음"
+                    : `${maxConnectorTemperatureC.toFixed(1)}°C`}
+                </small>
               </div>
             )}
             {selectedCell && (
