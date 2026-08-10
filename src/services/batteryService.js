@@ -12,20 +12,28 @@ const GRADE_DETAIL_DESCRIPTIONS = {
   "수거·매입(중개)급": "수거 후 매입처를 통한 처리가 필요합니다.",
 };
 
+const getPassportByCarId = async (carId) => {
+  const response = await api.get(`/api/battery-passports/car/${carId}`);
+  return response.data;
+};
+
 export const batteryService = {
   // CarDetail.jsx(/controller/cars/:id)의 "배터리 여권" 카드 전용.
-  // 차량 1대의 BATTERY_PASSPORT를 carId로 조회한다.
-  //
-  // TEMP: 항상 실제 API 호출. 백엔드 BatteryPassportDto 필드명(manufacturer/batteryType/
-  // ratedCapacity/sohScore/chargeCycles/currentTemp/lastInspectedAt/carId 등)이 mock과
-  // 완전히 같아서 매핑이 필요 없다. 다만 백엔드엔 "carId로 조회" 엔드포인트가 없어서
-  // 목록(/api/battery-passports)을 받아 carId가 일치하는 것을 찾는다 - 지금은 더미 데이터라
-  // carId가 매 요청 랜덤이라 거의 항상 못 찾고, 그 경우 첫 번째 항목을 임시로 보여준다.
-  // (chargingService.getStationByCarId와 동일한 패턴 - 실제 DB가 연결되면 자동으로 정확해진다)
-  getBatteryByCarId: async (carId) => {
-    const response = await api.get("/api/battery-passports");
-    const batteries = response.data;
-    return batteries.find((b) => b.carId === carId) ?? batteries[0] ?? null;
+  // 제조사·SOH·충전 사이클 등의 정적 여권 정보만 조회한다.
+  getBatteryByCarId: getPassportByCarId,
+
+  // 차량별 최신 Twin 측정값만 조회한다. 이 요청만 1초 polling에 사용한다.
+  // Twin이 없거나 지연돼도 다른 차량 또는 BATTERY_PASSPORT.currentTemp로 대체하지 않는다.
+  getLatestTwinMeasurementByCarId: async (carId) => {
+    try {
+      const response = await api.get(
+        `/api/twin-frames/cars/${carId}/latest-measurement`,
+        { params: { staleAfterSeconds: 10 } },
+      );
+      return response.data;
+    } catch {
+      return null;
+    }
   },
 
   // BatteryDiagnosis.jsx(/admin/battery "배터리 진단" 탭)에서 쓰는 형태 그대로 반환한다.
@@ -81,7 +89,7 @@ export const batteryService = {
   // BatteryDiagnosis.jsx 상단 "차량 선택" 드롭다운 전용 - carId로 고르면 그 차량의
   // batteryId를 찾아 getBatteryDiagnosis에 위임한다(진단 API는 batteryId 기준이라 필요).
   getDiagnosisByCarId: async (carId) => {
-    const passport = await batteryService.getBatteryByCarId(carId);
+    const passport = await getPassportByCarId(carId);
     if (!passport) return null;
     return batteryService.getBatteryDiagnosis(passport.batteryId);
   },
@@ -91,12 +99,10 @@ export const batteryService = {
   // /api/battery-proposals, /api/battery-diagnosis-metrics 둘 다 이미 있어서
   // carId -> batteryId로 찾아 매칭한다.
   //
-  // TEMP: getBatteryByCarId와 동일한 패턴 - "batteryId로 조회" 엔드포인트가
-  // 없어서 목록을 받아 batteryId가 일치하는 걸 찾는다. 지금은 carId가 배터리와
-  // 무작위로 매칭돼 있어 거의 항상 못 찾고, 그 경우 첫 번째 항목을 임시로 보여준다
-  // (실제 FK 연결이 되면 자동으로 정확해진다).
+  // 여권은 차량별 엔드포인트로 정확히 찾고, 제안/진단 목록 안에서 해당 batteryId를 찾는다.
+  // 제안·진단 전용 carId API가 생기면 아래 목록 조회도 차량별 조회로 교체할 수 있다.
   getProposalByCarId: async (carId) => {
-    const passport = await batteryService.getBatteryByCarId(carId);
+    const passport = await getPassportByCarId(carId);
     if (!passport) return null;
     const batteryId = passport.batteryId;
 

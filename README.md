@@ -42,6 +42,12 @@ npm install
 npm run dev          # http://localhost:5173, VITE_API_URL 기본값은 axios.js의 fallback(http://localhost:8080)
 ```
 
+차량 상세의 배터리 여권 카드는 Spring Boot의 차량별 여권 API를 5분간 캐시하고 최신 Twin 측정
+API만 1초마다 조회한다. 온도는 `maxCellTemperatureC`를 "현재 최고 셀 온도"로
+표시하며, Twin 데이터가 없을 때 `BATTERY_PASSPORT.currentTemp`나 다른 차량의 첫 번째
+배터리로 폴백하지 않는다. `isStale`이 참이면 오래된 온도를 현재값으로 표시하지 않고
+`데이터 지연`과 마지막 Twin 측정 시각을 표시한다.
+
 ## 배포
 
 GitHub Actions가 Docker 이미지를 빌드해 Docker Hub에 push하고
