@@ -56,7 +56,3 @@ ArgoCD가 자동 반영한다.
 
 - 외부(사용자) 경로: `https://www.mijungev.kro.kr/`
 - 내부(관리자/관제 전용, VPN 필요) 경로: `https://admin.mijungev.kro.kr/`
-
-## 브랜치 규칙
-
-작업은 `dev_nh`(개인 브랜치)에서 커밋 → 확인 후 `main`에 병합 → CI가 자동 배포.
