@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   FiMessageSquare,
   FiRefreshCw,
@@ -36,7 +37,19 @@ function errorMessage(error) {
   );
 }
 
+function vehicleIdFromPath(pathname) {
+  const match = pathname.match(/^\/controller\/cars\/([^/]+)(?:\/|$)/);
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return null;
+  }
+}
+
 export default function ChatbotWidget() {
+  const location = useLocation();
+  const vehicleId = vehicleIdFromPath(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -90,6 +103,7 @@ export default function ChatbotWidget() {
       const response = await chatService.sendMessage({
         message,
         conversationId,
+        vehicleId,
       });
       setMessages((current) => [
         ...current,
