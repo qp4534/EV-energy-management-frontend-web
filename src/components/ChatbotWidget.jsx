@@ -21,7 +21,6 @@ const CHATBOT_SIZE_LIMITS = {
   minWidth: 300,
   minHeight: 430,
   maxWidth: 720,
-  maxHeight: 780,
 };
 
 function clampChatbotSize(width, height) {
@@ -31,10 +30,9 @@ function clampChatbotSize(width, height) {
   );
   const availableHeight = Math.max(
     CHATBOT_SIZE_LIMITS.minHeight,
-    window.innerHeight - 125,
+    window.innerHeight - 112,
   );
   const maxWidth = Math.min(CHATBOT_SIZE_LIMITS.maxWidth, availableWidth);
-  const maxHeight = Math.min(CHATBOT_SIZE_LIMITS.maxHeight, availableHeight);
 
   return {
     width: Math.min(
@@ -42,7 +40,7 @@ function clampChatbotSize(width, height) {
       Math.max(CHATBOT_SIZE_LIMITS.minWidth, Math.round(width)),
     ),
     height: Math.min(
-      maxHeight,
+      availableHeight,
       Math.max(CHATBOT_SIZE_LIMITS.minHeight, Math.round(height)),
     ),
   };

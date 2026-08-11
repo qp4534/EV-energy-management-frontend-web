@@ -41,7 +41,7 @@
   min-width: 300px;
   min-height: 430px;
   max-width: min(720px, calc(100vw - 44px));
-  max-height: min(780px, calc(100vh - 125px));
+  max-height: calc(100vh - 112px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
