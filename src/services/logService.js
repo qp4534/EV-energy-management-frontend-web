@@ -32,6 +32,15 @@ const parseUserAgent = (ua) => {
   return `${os} · ${browser}`;
 };
 
+// 로그인 기록 "플랫폼" 컬럼용 - User-Agent로 추측하지 않고, 로그인한 계정의 role을 그대로
+// 매핑한다(이용자=모바일 앱 전용, 관제자/관리자=웹 전용이라 role만으로 정확히 구분됨).
+const ROLE_TO_PLATFORM = {
+  이용자: "앱",
+  관제자: "관제",
+  관리자: "관리",
+};
+const parsePlatform = (role) => ROLE_TO_PLATFORM[role] || "-";
+
 // detail은 JSON 문자열이라 안전하게 파싱, 실패하면 빈 객체
 const parseDetail = (detail) => {
   try {
@@ -59,6 +68,7 @@ export const logService = {
       device: parseUserAgent(log.userAgent),
       status: log.status === "SUCCESS" ? "성공" : log.status === "FAILED" ? "실패" : log.status,
       location: log.location,
+      platform: parsePlatform(log.userRole),
     }));
   },
 

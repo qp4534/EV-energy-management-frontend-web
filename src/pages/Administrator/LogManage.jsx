@@ -34,6 +34,7 @@ const TAB_CONFIG = {
     showStatusFilter: true,
     columns: [
       { key: "user", header: "이용자" },
+      { key: "platform", header: "플랫폼" },
       { key: "datetime", header: "일시" },
       { key: "ip", header: "IP주소" },
       { key: "device", header: "기기/브라우저" },
