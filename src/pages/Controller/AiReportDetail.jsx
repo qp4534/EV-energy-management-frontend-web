@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   HiArrowLeft,
@@ -7,7 +7,9 @@ import {
   HiOutlineTruck,
 } from "react-icons/hi2";
 import {
+  useDispatchEmergency,
   useMarkReportAsRead,
+  useNotifyCustomer,
   useReportDetail,
 } from "@/hooks/queries/useReport";
 import ReportSectionRenderer from "@/components/controller/reportDetail/ReportSectionRenderer";
@@ -37,7 +39,10 @@ export default function AiReportDetail() {
   const navigate = useNavigate();
   const { data: report, isLoading, isError } = useReportDetail(reportId);
   const markAsRead = useMarkReportAsRead();
+  const notifyCustomer = useNotifyCustomer();
+  const dispatchEmergency = useDispatchEmergency();
   const hasMarkedRef = useRef(false);
+  const [actionFeedback, setActionFeedback] = useState(null);
 
   useEffect(() => {
     if (report && !report.isRead && !hasMarkedRef.current) {
@@ -45,6 +50,33 @@ export default function AiReportDetail() {
       markAsRead.mutate(reportId);
     }
   }, [report, reportId, markAsRead]);
+
+  const ACTION_MUTATION = {
+    notifyCustomer,
+    dispatchEmergency,
+  };
+
+  const ACTION_SUCCESS_MESSAGE = {
+    notifyCustomer: "고객에게 알림을 발송했습니다.",
+    dispatchEmergency: "긴급출동을 접수하고 차주에게 알림을 보냈습니다.",
+  };
+
+  const handleAction = (actionKey) => {
+    const mutation = ACTION_MUTATION[actionKey];
+    if (!mutation) {
+      console.warn(`${actionKey} action is not implemented`);
+      return;
+    }
+    setActionFeedback(null);
+    mutation.mutate(reportId, {
+      onSuccess: () => {
+        setActionFeedback({ type: "success", text: ACTION_SUCCESS_MESSAGE[actionKey] });
+      },
+      onError: () => {
+        setActionFeedback({ type: "error", text: "처리에 실패했습니다. 잠시 후 다시 시도해주세요." });
+      },
+    });
+  };
 
   if (isLoading) {
     return (
@@ -172,21 +204,37 @@ export default function AiReportDetail() {
             )}
 
             {actions.length > 0 && (
-              <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-6">
-                {actions.map((action) => {
-                  const Icon = ACTION_ICON[action.key];
-                  return (
-                    <button
-                      key={action.key}
-                      type="button"
-                      onClick={() => console.warn(`${action.key} action is not implemented`)}
-                      className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-primary-btn)] px-4 py-2 text-sm font-semibold text-[var(--color-header-text)] shadow-sm transition hover:brightness-95"
-                    >
-                      {Icon && <Icon className="h-4 w-4" />}
-                      {action.label}
-                    </button>
-                  );
-                })}
+              <div className="border-t border-[var(--color-border)] pt-6">
+                <div className="flex flex-wrap items-center gap-3">
+                  {actions.map((action) => {
+                    const Icon = ACTION_ICON[action.key];
+                    const mutation = ACTION_MUTATION[action.key];
+                    const isPending = mutation?.isPending ?? false;
+                    return (
+                      <button
+                        key={action.key}
+                        type="button"
+                        onClick={() => handleAction(action.key)}
+                        disabled={isPending}
+                        className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-primary-btn)] px-4 py-2 text-sm font-semibold text-[var(--color-header-text)] shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {Icon && <Icon className="h-4 w-4" />}
+                        {isPending ? "처리 중..." : action.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {actionFeedback && (
+                  <p
+                    className={`mt-3 text-sm ${
+                      actionFeedback.type === "success"
+                        ? "text-[var(--color-header-text)]"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {actionFeedback.text}
+                  </p>
+                )}
               </div>
             )}
           </div>
