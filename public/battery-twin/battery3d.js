@@ -17,6 +17,14 @@ const PACK_CHASSIS_OFFSET_Y = 0.26;
 const PACK_VEHICLE_SCALE_X = 0.74;
 const PACK_VEHICLE_SCALE_Y = 0.72;
 const PACK_VEHICLE_SCALE_Z = 0.82;
+// Show the left-rear charging connector in the default vehicle view instead
+// of placing it behind the body shell. This preset is shared by the initial
+// camera and the "iso" reset so both digital-twin cards behave consistently.
+const DEFAULT_ISOMETRIC_VIEW = Object.freeze({
+  yaw: -2.35,
+  pitch: 0.58,
+  distance: 13.8,
+});
 
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 
@@ -76,9 +84,9 @@ export class BatteryPackViewer {
     this.vehicleVisible = false;
     this.vehicleWheelParts = [];
     this.visible = false;
-    this.yaw = -0.70;
-    this.pitch = 0.58;
-    this.distance = 13.8;
+    this.yaw = DEFAULT_ISOMETRIC_VIEW.yaw;
+    this.pitch = DEFAULT_ISOMETRIC_VIEW.pitch;
+    this.distance = DEFAULT_ISOMETRIC_VIEW.distance;
     this.pointerStart = null;
     this.pointerLast = null;
     this.dragDistance = 0;
@@ -1007,9 +1015,9 @@ export class BatteryPackViewer {
       this.pitch = 0.30;
       this.distance = 14.2 + vehicleDistance;
     } else {
-      this.yaw = -0.70;
-      this.pitch = 0.58;
-      this.distance = 13.8 + vehicleDistance;
+      this.yaw = DEFAULT_ISOMETRIC_VIEW.yaw;
+      this.pitch = DEFAULT_ISOMETRIC_VIEW.pitch;
+      this.distance = DEFAULT_ISOMETRIC_VIEW.distance + vehicleDistance;
     }
     this._updateCamera();
   }
