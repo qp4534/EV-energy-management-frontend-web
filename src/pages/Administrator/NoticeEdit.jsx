@@ -17,7 +17,7 @@ function NoticeEdit() {
     // formData만 보내면 PUT이 전체를 덮어쓰면서 이 필드들이 null이 되어 제약 위반(500)이 남.
     // 그래서 initialData(원본 전체)를 베이스로 깔고, 폼에서 실제로 바뀌는 값만 덮어씀.
     const { target, fileName, ...rest } = formData;
-    const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER" };
+    const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER", 이용자: "USER" };
 
     try {
       await updateNoticeMutation.mutateAsync({
@@ -39,7 +39,7 @@ function NoticeEdit() {
   if (isLoading || !initialData) return <div className="notice-detail-loading">불러오는 중...</div>;
 
   // 백엔드 targetRole('ADMIN'/'CONTROLLER'/null) -> 화면 드롭다운 값(한글)으로 역변환
-  const ROLE_TO_TARGET_MAP = { ADMIN: "관리자", CONTROLLER: "관제자" };
+  const ROLE_TO_TARGET_MAP = { ADMIN: "관리자", CONTROLLER: "관제자", USER: "이용자" };
   const initialFormData = {
     ...initialData,
     target: ROLE_TO_TARGET_MAP[initialData.targetRole] ?? "전체",

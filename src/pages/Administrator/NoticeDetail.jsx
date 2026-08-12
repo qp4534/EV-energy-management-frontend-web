@@ -4,7 +4,7 @@ import { useNotices, useNoticeDetail, useDeleteNotice, useMarkNoticeAsRead, useN
 import { useUserById } from "../../hooks/queries/useUser";
 import "../../styles/administrator/NoticeDetail.css";
 
-const TARGET_ROLE_LABEL = { ADMIN: "관리자", CONTROLLER: "관제자" };
+const TARGET_ROLE_LABEL = { ADMIN: "관리자", CONTROLLER: "관제자", USER: "이용자(차주)" };
 
 function NoticeDetail() {
   const { id } = useParams();

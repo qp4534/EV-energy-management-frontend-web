@@ -12,13 +12,16 @@ function NoticeWrite() {
   const createNoticeMutation = useCreateNotice();
 
   const handleSubmit = async (formData) => {
-    // NoticeForm은 "target"으로 넘기지만 백엔드 NoticeDto는 "targetRole"이라 이름을 맞춰줌
+    // NoticeForm은 "target"으로 넘기지만 백엔드 NoticeDto는 "targetRole"이라 이름을 맞춰줌.
+    // ERD상 target_role은 'ADMIN'/'CONTROLLER'/'USER'만 허용하고, "전체"는 null(제한 없음)로
+    // 표현한다 (NoticeEdit.jsx와 동일한 매핑 - 여기 없어서 한글 값이 그대로 저장되던 버그였음).
     const { target, ...rest } = formData;
+    const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER", 이용자: "USER" };
 
     try {
       await createNoticeMutation.mutateAsync({
         ...rest,
-        targetRole: target,
+        targetRole: TARGET_ROLE_MAP[target] ?? null,
         userId: profile?.userId,
       });
       alert("공지사항이 등록되었습니다.");
