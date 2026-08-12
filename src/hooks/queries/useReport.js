@@ -32,3 +32,17 @@ export const useMarkReportAsRead = () => {
     },
   });
 };
+
+// AI 보고서 상세의 "고객 알림 발송" 액션 - 해당 차주에게 앱 알림을 (다시) 보낸다.
+export const useNotifyCustomer = () => {
+  return useMutation({
+    mutationFn: (reportId) => reportService.notifyCustomer(reportId),
+  });
+};
+
+// "긴급출동 배차" 액션 - 해당 차주에게만 긴급 알림을 보내고 ACTION_LOGS에 기록한다.
+export const useDispatchEmergency = () => {
+  return useMutation({
+    mutationFn: (reportId) => reportService.dispatchEmergency(reportId),
+  });
+};

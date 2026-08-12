@@ -140,4 +140,12 @@ export const reportService = {
     const response = await api.patch(`/api/ai-reports/${reportId}/read`);
     return response.data;
   },
+
+  notifyCustomer: async (reportId) => {
+    await api.post(`/api/ai-reports/${reportId}/actions/notify-customer`);
+  },
+
+  dispatchEmergency: async (reportId) => {
+    await api.post(`/api/ai-reports/${reportId}/actions/dispatch-emergency`);
+  },
 };
