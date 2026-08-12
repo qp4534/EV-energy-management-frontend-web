@@ -1,8 +1,8 @@
-// userService 결과를 컴포넌트에 전달 (UserManage.jsx 전용)
+// userService 결과를 컴포넌트에 전달
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { userService } from "../../services/userService";
 
-// 내 프로필 조회/수정 (MyPage.jsx 전용)
+
 export const useProfile = () => {
   return useQuery({
     queryKey: ["me"],
@@ -17,6 +17,8 @@ export const useUpdateProfile = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["me"] }),
   });
 };
+
+// 관리자 - 이용자 관리(UserManage.jsx)
 
 // 회원 목록 조회
 export const useUsers = () => {
@@ -48,8 +50,16 @@ export const useDeleteUser = () => {
   });
 };
 
-// 비밀번호 재설정 링크 전송
-// TODO: 백엔드에 POST /api/users/{userId}/password-reset 아직 없음 (userService.js 참고)
+// 특정 회원 1명 조회 (NoticeDetail.jsx 작성자 이름 표시용 등)
+export const useUserById = (userId) => {
+  return useQuery({
+    queryKey: ["users", userId],
+    queryFn: () => userService.getUser(userId),
+    enabled: !!userId,
+  });
+};
+
+// 비밀번호 재설정 링크 전송 (관리자가 다른 유저 대상으로 보내는 것)
 export const useRequestPasswordReset = () => {
   return useMutation({
     mutationFn: (userId) => userService.adminRequestPasswordReset(userId),

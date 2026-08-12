@@ -13,6 +13,7 @@ import StatusDot from "../common/StatusDot";
  * @param {string} gradeLabel - 등급 텍스트 (예: "재사용(EV 재제조)급")
  * @param {string} description - 설명 문단
  * @param {string} [tag] - 하단 태그 텍스트 (예: "현대글로비스 수거→현대모비스 재제조 순환경제 시스템")
+ * @param {string} [sourceUrl] - 위 tag(확인된 사업 영역)의 근거 링크 - 있으면 "참고자료" 하이퍼링크로 노출
  */
 export default function BuyerCard({
   rank,
@@ -23,6 +24,7 @@ export default function BuyerCard({
   gradeLabel,
   description,
   tag,
+  sourceUrl,
 }) {
   return (
     <div className="mb-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-login-frame)] px-6 py-5">
@@ -60,6 +62,17 @@ export default function BuyerCard({
         <span className="inline-block rounded-lg border border-[var(--color-footer-border)] bg-[var(--color-footer-bg)] px-3.5 py-1.5 text-[0.8125rem] font-medium text-[var(--color-footer-desc)]">
           {tag}
         </span>
+      )}
+
+      {sourceUrl && (
+        <a
+          href={sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2.5 block text-[0.8125rem] font-medium text-[var(--color-primary-btn)] underline underline-offset-2"
+        >
+          참고자료 ↗
+        </a>
       )}
     </div>
   );

@@ -171,8 +171,8 @@ export const TERMS_CONTENT = {
             t: "table",
             headers: ["구분", "내용"],
             rows: [
-              ["개인정보보호책임자", "MijungE 개인정보보호팀"],
-              ["연락처", "privacy@MijungE.com"],
+              ["개인정보보호책임자", "김미정"],
+              ["연락처", "tkyaho@mijungev.kro.kr"],
             ],
           },
           {
@@ -427,8 +427,8 @@ export const TERMS_CONTENT = {
             t: "table",
             headers: ["구분", "내용"],
             rows: [
-              ["성명", "고길동"],
-              ["연락처", "privacy@MijungE.com"],
+              ["성명", "김미정"],
+              ["연락처", "tkyaho@mijungev.kro.kr"],
             ],
           },
         ],

@@ -6,8 +6,6 @@ function NoticeForm({ initialData, onSubmit, onCancel, submitLabel = "등록" })
   const [isImportant, setIsImportant] = useState(initialData?.isImportant ?? true);
   const [target, setTarget] = useState(initialData?.target || "전체");
   const [isPinned, setIsPinned] = useState(initialData?.isPinned ?? false);
-  const [startDate, setStartDate] = useState(initialData?.startDate || "");
-  const [endDate, setEndDate] = useState(initialData?.endDate || "");
   const [content, setContent] = useState(initialData?.content || "");
   const [file, setFile] = useState(null);
 
@@ -36,8 +34,6 @@ function NoticeForm({ initialData, onSubmit, onCancel, submitLabel = "등록" })
       isImportant,
       target,
       isPinned,
-      startDate,
-      endDate,
       fileName: file?.name || initialData?.fileName || null,
     });
   };
@@ -94,23 +90,6 @@ function NoticeForm({ initialData, onSubmit, onCancel, submitLabel = "등록" })
             />
             <span>목록 상단에 고정</span>
           </label>
-        </div>
-      </div>
-
-      <div className="form-field">
-        <label>게시 기간</label>
-        <div className="date-range">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <span>~</span>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
         </div>
       </div>
 

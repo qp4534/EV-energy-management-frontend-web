@@ -4,6 +4,17 @@
   color: var(--color-header-text);
 }
 
+.notice-form {
+  padding: 32px;
+}
+
+.notice-form h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-header-text);
+  margin-bottom: 20px;
+}
+
 .notice-form-box {
   background-color: #ffffff;
   border: 1px solid var(--color-sub-text);
@@ -96,12 +107,6 @@
 
 .checkbox-label span {
   margin-left: 10px;
-}
-
-.date-range {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .file-drop-zone {

@@ -37,6 +37,12 @@ function replayPhases(replay) {
   });
 }
 
+function maxDecicTemperatureC(values) {
+  if (!Array.isArray(values) || !values.length) return null;
+  const temperatures = values.map(Number).filter(Number.isFinite);
+  return temperatures.length ? Math.max(...temperatures) / 10 : null;
+}
+
 function toRenderFrame(frame) {
   const riskLevel = Number(frame.final_risk_level) || 0;
   const temperatures = frame.temperature_decic ?? [];
@@ -90,13 +96,21 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
   const [status, setStatus] = useState("loading");
   const [dataSource, setDataSource] = useState("로컬 시뮬레이션");
   const [errorMessage, setErrorMessage] = useState("");
+  const [remoteHistoryFailed, setRemoteHistoryFailed] = useState(false);
   const [selectedCell, setSelectedCell] = useState(null);
   const [toggles, setToggles] = useState({ vehicle: true, cover: true, exploded: false });
 
   const localFrames = useMemo(() => replayFrames(replay), [replay]);
   const phases = useMemo(() => replayPhases(replay), [replay]);
-  const frames = remoteFrames.length ? remoteFrames : localFrames;
+  const frames = remoteFrames.length
+    ? remoteFrames
+    : isHistory && !remoteHistoryFailed
+      ? []
+      : localFrames;
   const currentFrame = frames[frameIndex] ?? null;
+  const maxConnectorTemperatureC = maxDecicTemperatureC(
+    currentFrame?.connector_twin_state?.temperature_decic,
+  );
   const activePhase = !remoteFrames.length
     ? phases.find((phase) => frameIndex >= phase.startIndex && frameIndex <= phase.endIndex)
     : null;
@@ -153,6 +167,8 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
     let socket;
 
     if (isHistory) {
+      setRemoteHistoryFailed(false);
+      setDataSource("사고 이력 불러오는 중...");
       fetch(`${TWIN_API_URL}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/incidents/latest/history?resolution_seconds=30`)
         .then((response) => {
           if (!response.ok) throw new Error(String(response.status));
@@ -164,7 +180,10 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
           setFrameIndex(0);
           setDataSource("사고 이력 API · 30초 간격");
         })
-        .catch(() => setDataSource("사고 이력 없음 · 로컬 시뮬레이션"));
+        .catch(() => {
+          setRemoteHistoryFailed(true);
+          setDataSource("사고 이력 없음 · 로컬 시뮬레이션");
+        });
     } else {
       const wsBase = TWIN_API_URL.replace(/^http/, "ws");
       socket = new WebSocket(`${wsBase}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/live`);
@@ -216,8 +235,8 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
     <div className={`card digital-twin-card digital-twin-card--${mode} flex h-full flex-col gap-3`}>
       <div className="digital-twin-heading">
         <div>
-          <h2>{isHistory ? "사고 전후 3시간 디지털 트윈" : "실시간 디지털 트윈"}</h2>
-          <p>{isHistory ? "사고 1시간 전부터 사고 2시간 후까지" : `${vehicleId} · 차량·배터리 상태 1Hz 모니터링`}</p>
+          <h2>{isHistory ? "사고 전 3시간 디지털 트윈" : "실시간 디지털 트윈"}</h2>
+          <p>{isHistory ? "사고 1시간 전부터 사고 2시간 후까지" : "차량·배터리 상태 1Hz 모니터링"}</p>
         </div>
         <span className={`digital-twin-live ${isHistory ? "digital-twin-live--history" : ""}`}>
           {isHistory ? "INCIDENT" : "LIVE"}
@@ -234,11 +253,33 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
 
         {status === "ready" && (
           <>
-            <div className="digital-twin-status">
-              <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : currentFrame?.scenario_name ?? "실시간 상태"}</span>
-              <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
-              <small>최대 셀 {Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</small>
-            </div>
+            {isHistory && !remoteFrames.length && !remoteHistoryFailed ? (
+              <div className="digital-twin-status">
+                <div className="digital-twin-status-section">
+                  <span>상태</span>
+                  <strong>사고 이력 불러오는 중...</strong>
+                </div>
+              </div>
+            ) : (
+              <div className="digital-twin-status" aria-label="디지털 트윈 현재 상태">
+                <div className="digital-twin-status-section digital-twin-status-section--risk">
+                  <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : "현재 상태"}</span>
+                  <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
+                </div>
+                <div className="digital-twin-status-section">
+                  <span>배터리 셀</span>
+                  <strong>{Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</strong>
+                </div>
+                <div className="digital-twin-status-section">
+                  <span>커넥터</span>
+                  <strong>
+                    {maxConnectorTemperatureC === null
+                    ? "측정 데이터 없음"
+                    : `${maxConnectorTemperatureC.toFixed(1)}°C`}
+                  </strong>
+                </div>
+              </div>
+            )}
             {selectedCell && (
               <div className="digital-twin-selection">
                 <span>선택 셀</span><strong>{selectedCell.cellId}</strong>
@@ -265,7 +306,7 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
 
         {isHistory ? (
           <div className="digital-twin-history-control">
-            {!remoteFrames.length && phases.length > 0 && (
+            {!remoteFrames.length && remoteHistoryFailed && phases.length > 0 && (
               <div className="digital-twin-phase-list" aria-label="위험 유형별 시연 구간">
                 {phases.map((phase) => (
                   <button
@@ -299,7 +340,7 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
               <input type="range" min="0" max={progressMax} value={Math.min(frameIndex, progressMax)} onChange={(event) => { setPlaying(false); setFrameIndex(Number(event.target.value)); }} disabled={status !== "ready"} aria-label="사고 전후 3시간 재생 위치" />
               <span>{formatIncidentTime(frameIndex, frames.length)}</span>
             </div>
-            <div className="digital-twin-time-axis"><span>-1시간</span><strong>사고 발생</strong><span>+2시간</span></div>
+                <div className="digital-twin-time-axis"><span>-3시간</span><span>-2시간</span><span>-1시간</span><strong>사고 발생</strong></div>
           </div>
         ) : (
           <div className="digital-twin-live-summary"><span className="digital-twin-pulse" />1초마다 최신 프레임 반영 <strong>{currentFrame?.timestamp ? new Date(currentFrame.timestamp).toLocaleTimeString("ko-KR") : "--:--:--"}</strong></div>

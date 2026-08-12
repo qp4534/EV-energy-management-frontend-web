@@ -20,6 +20,15 @@ const PACK_VEHICLE_SCALE_Z = 0.82;
 
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 
+// Frontend-only color thresholds (stored risk levels stay unchanged):
+// red >= 70°C, orange >= 60°C, yellow >= 50°C, teal >= 40°C, blue below.
+function displayTemperatureLevel(temperatureC) {
+  if (temperatureC >= 70) return 3;
+  if (temperatureC >= 60) return 2;
+  if (temperatureC >= 50) return 1;
+  return 0;
+}
+
 function cellColor(level, temperature, minimum, maximum) {
   const base = new THREE.Color(RISK_COLORS[level] || RISK_COLORS[0]);
   if (level !== 0 || maximum <= minimum) return base;
@@ -787,7 +796,9 @@ export class BatteryPackViewer {
   _updateHotspotMarker() {
     if (this.mode !== "webgl" || !this.state || !this.frame) return;
     const index = Number(this.state.hotspot_cell_index);
-    const level = Number(this.state.state_level[index]);
+    const level = displayTemperatureLevel(
+      Number(this.state.temperature_decic[index]) / 10,
+    );
     const active = this.frame.scenario_id === "battery_internal" && this.frame.event_active;
     this.hotspotMarker.visible = active;
     if (active) {
@@ -818,8 +829,8 @@ export class BatteryPackViewer {
     for (let index = 0; index < componentOrder.length; index += 1) {
       const material = this.connectorMaterials.get(componentOrder[index]);
       if (!material) continue;
-      const level = clamp(Number(state.state_level[index]) || 0, 0, 3);
       const temperature = Number(state.temperature_decic[index]) / 10;
+      const level = displayTemperatureLevel(temperature);
       maximumLevel = Math.max(maximumLevel, level);
       maximumTemperature = Math.max(maximumTemperature, temperature);
       const color = new THREE.Color(RISK_COLORS[level]);
@@ -876,10 +887,10 @@ export class BatteryPackViewer {
   _updateFallback() {
     if (!this.state || !this.fallbackCells) return;
     this.fallbackCells.forEach((cell, index) => {
-      const level = Number(this.state.state_level[index]);
+      const temperature = Number(this.state.temperature_decic[index]) / 10;
+      const level = displayTemperatureLevel(temperature);
       cell.dataset.level = String(level);
       cell.classList.toggle("selected", index === this.selectedIndex);
-      const temperature = Number(this.state.temperature_decic[index]) / 10;
       cell.title = `${this.definition.cell_order[index]} · ${temperature.toFixed(1)}°C · ${RISK_LABELS[level]}`;
     });
   }
@@ -888,12 +899,22 @@ export class BatteryPackViewer {
     if (!state || !Array.isArray(state.temperature_decic)) return;
     this.state = state;
     this.frame = frame;
+    const temperatures = state.temperature_decic.map((value) => Number(value) / 10);
+    const minimum = Math.min(...temperatures);
+    const maximum = Math.max(...temperatures);
+    // A real battery hotspot exists only when cells differ meaningfully;
+    // otherwise the "hottest cell" is just noise and must not be auto-selected.
+    const hasBatteryHotspot = maximum - minimum >= 2.0;
     const changedScenario = this.lastScenario !== frame.scenario_id;
-    const riskRaised = frame.risk_level > this.lastRiskLevel && frame.primary_risk_source === "battery";
+    const riskRaised = frame.risk_level > this.lastRiskLevel && hasBatteryHotspot;
     this.lastScenario = frame.scenario_id;
     this.lastRiskLevel = frame.risk_level;
     this._updateConnectorTwin(frame.connector_twin_state);
-    if (changedScenario || this.selectedIndex === null || (riskRaised && frame.risk_level >= 2)) {
+    if (changedScenario || this.selectedIndex === null) {
+      this.selectedIndex = hasBatteryHotspot
+        ? Number(state.hotspot_cell_index)
+        : null;
+    } else if (riskRaised && frame.risk_level >= 2) {
       this.selectedIndex = Number(state.hotspot_cell_index);
     }
 
@@ -903,11 +924,8 @@ export class BatteryPackViewer {
       return;
     }
 
-    const temperatures = state.temperature_decic.map((value) => Number(value) / 10);
-    const minimum = Math.min(...temperatures);
-    const maximum = Math.max(...temperatures);
     for (let index = 0; index < temperatures.length; index += 1) {
-      const level = Number(state.state_level[index]);
+      const level = displayTemperatureLevel(temperatures[index]);
       this.cells.setColorAt(index, cellColor(level, temperatures[index], minimum, maximum));
     }
     this.cells.instanceColor.needsUpdate = true;
@@ -917,7 +935,15 @@ export class BatteryPackViewer {
   }
 
   _updateSelection(notify) {
-    if (!this.state || this.selectedIndex === null) return;
+    if (!this.state) return;
+    if (this.selectedIndex === null) {
+      if (this.mode === "webgl" && this.selectionBox) {
+        this.selectionBox.visible = false;
+      }
+      if (this.mode === "fallback") this._updateFallback();
+      this.render?.();
+      return;
+    }
     const index = clamp(this.selectedIndex, 0, Number(this.definition.visualized_cell_count) - 1);
     this.selectedIndex = index;
     if (this.mode === "webgl" && this.selectionBox) {
@@ -926,7 +952,9 @@ export class BatteryPackViewer {
     }
     if (this.mode === "fallback") this._updateFallback();
     if (notify) {
-      const level = Number(this.state.state_level[index]);
+      const level = displayTemperatureLevel(
+        Number(this.state.temperature_decic[index]) / 10,
+      );
       const detail = {
         index,
         cellId: this.definition.cell_order[index],

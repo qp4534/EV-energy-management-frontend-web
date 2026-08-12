@@ -1,4 +1,4 @@
-// logService.js에 추가할 부분 (예시)
+// logService.js
 import api from "../api/axios";
 
 const STATUS_MAP = {
@@ -24,12 +24,12 @@ const fetchActionLogs = async () => {
 };
 
 export const logService = {
-  // LoginManage.jsx "로그인 기록" 탭 (이미 확인함)
+  // LoginManage.jsx "로그인 기록" 탭
   getLoginLogs: async () => {
     const res = await api.get("/api/login-logs");
     return res.data.map((log) => ({
       id: log.logId,
-      user: log.userId, // TEMP: User 조인 안 됨
+      user: log.userName || log.userId, // 백엔드에서 User 조인 완료. 탈퇴 등으로 못 찾으면 UUID로 폴백
       datetime: log.createdAt ? new Date(log.createdAt).toLocaleString("ko-KR") : "-",
       ip: log.ipAddress,
       device: log.userAgent,
@@ -39,8 +39,6 @@ export const logService = {
   },
 
   // LogManage.jsx "차량 등록/변경" 탭
-  // TEMP: targetType === "CAR" 기준으로 필터링. 실제 값 확인 후 조정 필요.
-  // detail JSON 안에 carNumber/owner/changeType/status가 있다고 가정 - DB 연결 후 실제 키 확인 필요.
   getCarChangeLogs: async () => {
     const logs = await fetchActionLogs();
     return logs
@@ -59,9 +57,6 @@ export const logService = {
   },
 
   // LogManage.jsx "이용자 활동" 탭
-  // TEMP: targetType === "USER"이면서 관리자 작업이 아닌 것으로 추정.
-  // "이용자 활동"과 "관리자 작업"을 가르는 명확한 기준(role, actionType 목록 등)은
-  // 실제 설계하면서 확정 필요.
   getUserActivityLogs: async () => {
     const logs = await fetchActionLogs();
     return logs
@@ -70,7 +65,7 @@ export const logService = {
         const detail = parseDetail(log.detail);
         return {
           id: log.actionId,
-          user: log.userId, // TEMP: User 조인 안 됨
+          user: log.userName || log.userId, // 백엔드에서 User 조인 완료. 탈퇴 등으로 못 찾으면 UUID로 폴백
           action: log.actionType,
           target: detail.target ?? log.targetType,
           datetime: log.createdAt ? new Date(log.createdAt).toLocaleString("ko-KR") : "-",
@@ -79,9 +74,17 @@ export const logService = {
   },
 
   // LogManage.jsx "관리자 작업" 탭
-  // TEMP: actionType이 관리 작업류(공지/유저/시스템 등)인 것으로 추정해서 필터링.
-  // 정확한 구분 기준은 백엔드 설계 시 확정 필요.
-  ADMIN_ACTION_TYPES: ["NOTICE_CREATE", "NOTICE_UPDATE", "NOTICE_DELETE", "USER_UPDATE", "SYSTEM_UPDATE"],
+  // 실제 관리자 전용 작업들 (본인 계정 셀프서비스가 아니라, 남/시스템에 영향을 주는 작업)
+  ADMIN_ACTION_TYPES: [
+    "USER_ROLE_UPDATE",
+    "USER_DELETE",
+    "NOTICE_CREATE",
+    "NOTICE_UPDATE",
+    "NOTICE_DELETE",
+    "NOTIFICATION_CHANNEL_UPDATE",
+    "NOTIFICATION_MATRIX_UPDATE",
+    "INTEGRATION_KEY_REISSUE",
+  ],
   getAdminActionLogs: async () => {
     const logs = await fetchActionLogs();
     const adminTypes = logService.ADMIN_ACTION_TYPES;
@@ -91,7 +94,7 @@ export const logService = {
         const detail = parseDetail(log.detail);
         return {
           id: log.actionId,
-          admin: log.userId, // TEMP: User 조인 안 됨
+          admin: log.userName || log.userId, // 백엔드에서 User 조인 완료. 탈퇴 등으로 못 찾으면 UUID로 폴백
           action: log.actionType,
           target: detail.title ?? detail.target ?? log.targetType,
           datetime: log.createdAt ? new Date(log.createdAt).toLocaleString("ko-KR") : "-",

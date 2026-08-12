@@ -1,42 +1,58 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getNoticeDetail, updateNotice } from "../../services/noticeService";
+import { useNoticeDetail, useUpdateNotice } from "../../hooks/queries/useNotice";
 import NoticeForm from "../../components/administrator/notice/NoticeForm";
 import "../../styles/administrator/NoticeForm.css";
 
 function NoticeEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [initialData, setInitialData] = useState(null);
+  const { data: initialData, isLoading } = useNoticeDetail(id);
+  const updateNoticeMutation = useUpdateNotice();
 
-  useEffect(() => {
-    const fetchDetail = async () => {
-      try {
-        const data = await getNoticeDetail(id);
-        setInitialData(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchDetail();
-  }, [id]);
+  const handleSubmit = async (formData) => {
+    // NoticeForm은 "target"으로 넘기지만 백엔드 NoticeDto는 "targetRole"이라 이름을 맞춰줌.
+    // ERD상 target_role은 'ADMIN'/'CONTROLLER'만 허용하고, "전체"는 null(제한 없음)로 표현.
+    //
+    // viewCount/isRead가 ERD상 NOT NULL인데 NoticeForm은 이 값들을 안 다루기 때문에,
+    // formData만 보내면 PUT이 전체를 덮어쓰면서 이 필드들이 null이 되어 제약 위반(500)이 남.
+    // 그래서 initialData(원본 전체)를 베이스로 깔고, 폼에서 실제로 바뀌는 값만 덮어씀.
+    const { target, fileName, ...rest } = formData;
+    const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER" };
 
-  const handleSubmit = async (data) => {
-    await updateNotice(id, data);
-    alert("공지사항이 수정되었습니다!");
-    navigate(`/admin/notices/${id}`);
+    try {
+      await updateNoticeMutation.mutateAsync({
+        id,
+        noticeData: {
+          ...initialData,
+          ...rest,
+          targetRole: TARGET_ROLE_MAP[target] ?? null,
+        },
+      });
+      alert("공지사항이 수정되었습니다!");
+      navigate(`/admin/notices/${id}`);
+    } catch (err) {
+      console.error("공지사항 수정 실패:", err);
+      alert("공지사항 수정에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
 
-  if (!initialData) return <div className="notice-detail-loading">불러오는 중...</div>;
+  if (isLoading || !initialData) return <div className="notice-detail-loading">불러오는 중...</div>;
+
+  // 백엔드 targetRole('ADMIN'/'CONTROLLER'/null) -> 화면 드롭다운 값(한글)으로 역변환
+  const ROLE_TO_TARGET_MAP = { ADMIN: "관리자", CONTROLLER: "관제자" };
+  const initialFormData = {
+    ...initialData,
+    target: ROLE_TO_TARGET_MAP[initialData.targetRole] ?? "전체",
+  };
 
   return (
     <div className="notice-form">
       <h2>공지사항 수정</h2>
       <NoticeForm
-        initialData={initialData}
+        initialData={initialFormData}
         onSubmit={handleSubmit}
         onCancel={() => navigate(`/admin/notices/${id}`)}
-        submitLabel="수정"
+        submitLabel={updateNoticeMutation.isPending ? "수정 중..." : "수정"}
       />
     </div>
   );

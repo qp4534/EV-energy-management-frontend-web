@@ -110,8 +110,10 @@
 .digital-twin-status {
   top: 10px;
   left: 10px;
-  max-width: 230px;
-  padding: 8px 10px;
+  width: 128px;
+  max-width: calc(100% - 20px);
+  padding: 0;
+  overflow: hidden;
   border-left: 3px solid #28c9ad;
 }
 
@@ -119,26 +121,40 @@
 .digital-twin-stage[data-level="2"] .digital-twin-status { border-left-color: #ff944d; }
 .digital-twin-stage[data-level="3"] .digital-twin-status { border-left-color: #ff5263; }
 
-.digital-twin-status span,
+.digital-twin-status-section {
+  padding: 6px 9px;
+}
+
+.digital-twin-status-section + .digital-twin-status-section {
+  border-top: 1px solid rgba(148, 211, 218, 0.16);
+}
+
+.digital-twin-status-section span,
 .digital-twin-selection span {
   display: block;
   color: #7fa0a7;
-  font-size: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-.digital-twin-status strong,
+.digital-twin-status-section strong,
 .digital-twin-selection strong {
   display: block;
-  margin-top: 2px;
-  font-size: 13px;
+  margin-top: 1px;
+  font-size: 19px;
+  line-height: 1.15;
 }
 
-.digital-twin-status small,
 .digital-twin-selection small {
   display: block;
   margin-top: 2px;
   color: #9db7bc;
   font-size: 10px;
+}
+
+.digital-twin-status-section--risk strong {
+  font-size: 20px;
 }
 
 .digital-twin-selection {
@@ -278,21 +294,36 @@
 }
 
 .digital-twin-time-axis {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  padding-left: 132px;
+  position: relative;
+  height: 14px;
+  margin-left: 132px;
+  margin-right: 74px;
   color: var(--color-sub-text);
   font-size: 9px;
 }
 
-.digital-twin-time-axis strong {
-  color: #c55225;
-  font-weight: 800;
-  text-align: left;
+.digital-twin-time-axis span:first-child {
+  position: absolute;
+  left: 0;
 }
 
-.digital-twin-time-axis span:last-child {
-  justify-self: end;
+.digital-twin-time-axis span:nth-child(2) {
+  position: absolute;
+  left: 33.333%;
+  transform: translateX(-50%);
+}
+
+.digital-twin-time-axis span:nth-child(3) {
+  position: absolute;
+  left: 66.667%;
+  transform: translateX(-50%);
+}
+
+.digital-twin-time-axis strong {
+  position: absolute;
+  right: 0;
+  color: #c55225;
+  font-weight: 800;
 }
 
 .digital-twin-live-summary {

@@ -7,6 +7,16 @@ export const useBatteryByCarId = (carId) => {
     queryKey: ["battery", carId],
     queryFn: () => batteryService.getBatteryByCarId(carId),
     enabled: !!carId,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useLatestTwinMeasurementByCarId = (carId) => {
+  return useQuery({
+    queryKey: ["latestTwinMeasurement", carId],
+    queryFn: () => batteryService.getLatestTwinMeasurementByCarId(carId),
+    enabled: !!carId,
+    refetchInterval: 1000,
   });
 };
 
@@ -27,16 +37,6 @@ export const useProposalByCarId = (carId) => {
   return useQuery({
     queryKey: ["batteryProposal", carId],
     queryFn: () => batteryService.getProposalByCarId(carId),
-    enabled: !!carId,
-  });
-};
-
-// BatteryDiagnosis.jsx "배터리 잔존가치/판매처" 탭 전용. 마찬가지로 진단 탭과
-// 같은 carId(diagnosedCarId)를 공유한다.
-export const useOffersByCarId = (carId) => {
-  return useQuery({
-    queryKey: ["batteryOffers", carId],
-    queryFn: () => batteryService.getOffersByCarId(carId),
     enabled: !!carId,
   });
 };
