@@ -4,20 +4,15 @@ import api from "../api/axios";
 import {
   MOCK_INTEGRATIONS,
   MOCK_BATCH_JOBS,
-  MOCK_RESOURCE_USAGE,
-  MOCK_DEPLOY_HISTORY,
   MOCK_BACKUPS,
 } from "../mocks/systemMock";
 
-// 알림 채널/매트릭스는 실제 API 연결 완료 -> USE_MOCK과 무관하게 항상 실제 호출
-// 나머지(연동, 배치, 상태, 백업)는 아직 백엔드 미구현 -> mock 유지
+// 알림 채널/매트릭스/시스템 상태(리소스 사용량, 배포 이력)는 실제 API 연결 완료 -> USE_MOCK과 무관하게 항상 실제 호출
+// 나머지(연동, 배치, 백업)는 아직 백엔드 미구현 -> mock 유지
 const USE_MOCK = true;
 
 const randomHex = (length) =>
   Array.from({ length }, () => Math.floor(Math.random() * 16).toString(16)).join("");
-
-const randomPercent = (base, spread) =>
-  Math.min(99, Math.max(1, base + Math.round((Math.random() - 0.5) * spread)));
 
 export const systemService = {
   // SystemAlertChannel.jsx "채널 활성화" 카드
@@ -137,25 +132,28 @@ reissueIntegrationKey: async (id) => {
     return response.data;
   },
 
-  // SystemStatus.jsx - 백엔드 미구현, mock 유지
+  // SystemStatus.jsx - 리소스 사용량/배포 이력 둘 다 실제 API 연결 완료
+  // 백엔드: GET /api/system/monitor/resource-usage -> [{ key, label, percent }]
+  //        GET /api/system/monitor/deploy-history  -> [{ version, repo, desc, deployedAt, status }]
+  // 프론트가 원하는 형태({ version, date, desc })에 맞춰 deployedAt만 로컬 포맷으로 변환
   getSystemStatus: async () => {
-    if (USE_MOCK) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return { resourceUsage: MOCK_RESOURCE_USAGE, deployHistory: MOCK_DEPLOY_HISTORY };
-    }
-    const response = await api.get("/api/v1/system/status");
-    return response.data;
+    const [resourceUsageRes, deployHistoryRes] = await Promise.all([
+      api.get("/api/system/monitor/resource-usage"),
+      api.get("/api/system/monitor/deploy-history"),
+    ]);
+    return {
+      resourceUsage: resourceUsageRes.data,
+      deployHistory: deployHistoryRes.data.map((entry) => ({
+        version: entry.version,
+        date: entry.deployedAt ? new Date(entry.deployedAt).toLocaleString("ko-KR") : "-",
+        desc: entry.desc,
+        status: entry.status,
+      })),
+    };
   },
 
   refreshResourceUsage: async () => {
-    if (USE_MOCK) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      MOCK_RESOURCE_USAGE.forEach((item) => {
-        item.percent = randomPercent(item.percent, 20);
-      });
-      return MOCK_RESOURCE_USAGE;
-    }
-    const response = await api.get("/api/v1/system/status/resource-usage");
+    const response = await api.get("/api/system/monitor/resource-usage");
     return response.data;
   },
 

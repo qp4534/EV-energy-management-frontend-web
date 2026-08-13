@@ -8,6 +8,39 @@ const STATUS_MAP = {
   rejected: "반려",
 };
 
+// 로그인 기록 "기기/브라우저" 컬럼용 - 원본 User-Agent 문자열을 그대로 보여주면 너무 길고
+// 읽기 힘들어서, OS/브라우저만 뽑아 "Windows · Chrome" 형태로 요약한다. 정교한 UA 파서
+// 라이브러리를 새로 추가하는 대신 이 화면에 필요한 만큼만 간단히 매칭한다.
+const parseUserAgent = (ua) => {
+  if (!ua) return "-";
+
+  let os = "알 수 없음";
+  if (/Windows/i.test(ua)) os = "Windows";
+  else if (/Mac OS X/i.test(ua)) os = "macOS";
+  else if (/Android/i.test(ua)) os = "Android";
+  else if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS";
+  else if (/Linux/i.test(ua)) os = "Linux";
+
+  // 순서 중요: Edge/Chrome 둘 다 UA에 "Chrome/"이 들어있어서 Edge를 먼저 걸러내야 함
+  let browser = "알 수 없음";
+  if (/Edg\//i.test(ua)) browser = "Edge";
+  else if (/OPR\//i.test(ua)) browser = "Opera";
+  else if (/Chrome\//i.test(ua)) browser = "Chrome";
+  else if (/Firefox\//i.test(ua)) browser = "Firefox";
+  else if (/Safari\//i.test(ua)) browser = "Safari";
+
+  return `${os} · ${browser}`;
+};
+
+// 로그인 기록 "플랫폼" 컬럼용 - User-Agent로 추측하지 않고, 로그인한 계정의 role을 그대로
+// 매핑한다(이용자=모바일 앱 전용, 관제자/관리자=웹 전용이라 role만으로 정확히 구분됨).
+const ROLE_TO_PLATFORM = {
+  이용자: "앱",
+  관제자: "관제",
+  관리자: "관리",
+};
+const parsePlatform = (role) => ROLE_TO_PLATFORM[role] || "-";
+
 // detail은 JSON 문자열이라 안전하게 파싱, 실패하면 빈 객체
 const parseDetail = (detail) => {
   try {
@@ -32,9 +65,10 @@ export const logService = {
       user: log.userName || log.userId, // 백엔드에서 User 조인 완료. 탈퇴 등으로 못 찾으면 UUID로 폴백
       datetime: log.createdAt ? new Date(log.createdAt).toLocaleString("ko-KR") : "-",
       ip: log.ipAddress,
-      device: log.userAgent,
+      device: parseUserAgent(log.userAgent),
       status: log.status === "SUCCESS" ? "성공" : log.status === "FAILED" ? "실패" : log.status,
       location: log.location,
+      platform: parsePlatform(log.userRole),
     }));
   },
 
