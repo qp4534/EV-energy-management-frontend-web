@@ -27,7 +27,7 @@ export default function NoticePreviewList({ notices = [], limit = 3, onSelect })
       onSelect(notice);
       return;
     }
-    navigate(`/notices/${notice.noticeId}`);
+    navigate(`/admin/notices/${notice.noticeId}`);
   };
 
   return (

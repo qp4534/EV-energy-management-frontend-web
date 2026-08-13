@@ -1,12 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useNoticeDetail, useUpdateNotice } from "../../hooks/queries/useNotice";
+import { useNoticeDetail, useUpdateNotice, useNoticeAttachments } from "../../hooks/queries/useNotice";
 import NoticeForm from "../../components/administrator/notice/NoticeForm";
+import { noticeAttachmentService } from "../../services/noticeAttachmentService";
 import "../../styles/administrator/NoticeForm.css";
 
 function NoticeEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: initialData, isLoading } = useNoticeDetail(id);
+  const { data: existingAttachments } = useNoticeAttachments(id);
   const updateNoticeMutation = useUpdateNotice();
 
   const handleSubmit = async (formData) => {
@@ -16,7 +18,7 @@ function NoticeEdit() {
     // viewCount/isRead가 ERD상 NOT NULL인데 NoticeForm은 이 값들을 안 다루기 때문에,
     // formData만 보내면 PUT이 전체를 덮어쓰면서 이 필드들이 null이 되어 제약 위반(500)이 남.
     // 그래서 initialData(원본 전체)를 베이스로 깔고, 폼에서 실제로 바뀌는 값만 덮어씀.
-    const { target, fileName, ...rest } = formData;
+    const { target, file, ...rest } = formData;
     const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER" };
 
     try {
@@ -28,6 +30,24 @@ function NoticeEdit() {
           targetRole: TARGET_ROLE_MAP[target] ?? null,
         },
       });
+
+      // 새 파일을 골랐으면, 기존 첨부파일은 지우고(S3+DB) 새 파일로 교체
+      if (file) {
+        try {
+          await Promise.all(
+            (existingAttachments ?? []).map((a) =>
+              noticeAttachmentService.deleteAttachment(a.attachmentId)
+            )
+          );
+          await noticeAttachmentService.uploadFile(file, id);
+        } catch (uploadErr) {
+          console.error("첨부파일 교체 실패:", uploadErr);
+          alert("공지사항은 수정됐지만, 첨부파일 교체에는 실패했습니다.");
+          navigate(`/admin/notices/${id}`);
+          return;
+        }
+      }
+
       alert("공지사항이 수정되었습니다!");
       navigate(`/admin/notices/${id}`);
     } catch (err) {

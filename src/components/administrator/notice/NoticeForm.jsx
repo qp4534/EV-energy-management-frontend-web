@@ -34,7 +34,7 @@ function NoticeForm({ initialData, onSubmit, onCancel, submitLabel = "등록" })
       isImportant,
       target,
       isPinned,
-      fileName: file?.name || initialData?.fileName || null,
+      file, // 실제 업로드는 부모(NoticeWrite/NoticeEdit)에서 공지 저장 후 처리
     });
   };
 
@@ -118,8 +118,6 @@ function NoticeForm({ initialData, onSubmit, onCancel, submitLabel = "등록" })
           />
           {file ? (
             <span>{file.name}</span>
-          ) : initialData?.fileName ? (
-            <span>{initialData.fileName} (기존 첨부)</span>
           ) : (
             <>
               <div className="upload-icon">⬆</div>
