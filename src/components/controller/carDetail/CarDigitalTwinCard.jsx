@@ -263,19 +263,9 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
             ) : (
               <div className="digital-twin-status" aria-label="디지털 트윈 현재 상태">
                 <div className="digital-twin-status-section digital-twin-status-section--risk">
-                  <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : "최종 안전 상태"}</span>
+                  <span>{isHistory ? formatIncidentTime(frameIndex, frames.length) : "현재 상태"}</span>
                   <strong>{currentFrame?.risk_label ?? RISK_LABELS[riskLevel]}</strong>
                 </div>
-                {!isHistory && remoteFrames.length > 0 && (
-                  <div className="digital-twin-status-section">
-                    <span>Hybrid HGB</span>
-                    <strong>
-                      {currentFrame?.ml_risk_level == null
-                        ? "워밍업"
-                        : RISK_LABELS[Number(currentFrame.ml_risk_level)]}
-                    </strong>
-                  </div>
-                )}
                 <div className="digital-twin-status-section">
                   <span>배터리 셀</span>
                   <strong>{Number(currentFrame?.max_cell_temperature_c ?? 0).toFixed(1)}°C</strong>
