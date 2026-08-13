@@ -9,6 +9,10 @@ import {
 } from "../../../hooks/queries/useSystem";
 import "../../../styles/administrator/SystemPage.css";
 
+// 백엔드가 "긴급" 등급은 항상 켜짐으로 강제 저장하도록 막아둬서, 여기서도 동일하게
+// 이 등급 행은 클릭 자체를 막고 항상 체크된 상태로 보여줌.
+const EMERGENCY_LEVEL = "긴급";
+
 export default function SystemAlertChannel() {
   const { data: channels } = useNotificationChannels();
   const updateChannel = useUpdateNotificationChannel();
@@ -52,37 +56,49 @@ export default function SystemAlertChannel() {
             </tr>
           </thead>
           <tbody>
-            {(matrix?.rows ?? []).map((row) => (
-              <tr key={row.level}>
-                <td>{row.level}</td>
-                {(matrix?.channels ?? []).map((channel) => (
-                  <td key={channel.key} className="system-table__td--center">
-                    <button
-                      type="button"
-                      className="matrix-check-btn"
-                      aria-pressed={row[channel.key]}
-                      onClick={() =>
-                        updateCell.mutate({
-                          level: row.level,
-                          channelKey: channel.key,
-                          checked: !row[channel.key],
-                        })
-                      }
-                    >
-                      <span
-                        className={`matrix-checkbox ${
-                          row[channel.key] ? "matrix-checkbox--checked" : ""
-                        }`}
-                      >
-                        {row[channel.key] && (
-                          <Check size={12} className="matrix-checkbox-icon" />
-                        )}
-                      </span>
-                    </button>
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {(matrix?.rows ?? []).map((row) => {
+              const isEmergencyRow = row.level === EMERGENCY_LEVEL;
+              return (
+                <tr key={row.level}>
+                  <td>{row.level}</td>
+                  {(matrix?.channels ?? []).map((channel) => {
+                    const cell = row[channel.key];
+                    // 긴급 행은 실제 값과 무관하게 항상 켜짐으로 보여주고, 클릭도 막음
+                    const checked = isEmergencyRow ? true : Boolean(cell?.enabled);
+                    return (
+                      <td key={channel.key} className="system-table__td--center">
+                        <button
+                          type="button"
+                          className="matrix-check-btn"
+                          aria-pressed={checked}
+                          disabled={isEmergencyRow}
+                          title={isEmergencyRow ? "긴급 등급은 항상 알림이 발송됩니다" : undefined}
+                          onClick={() => {
+                            if (isEmergencyRow || !cell) return;
+                            updateCell.mutate({
+                              matrixId: cell.matrixId,
+                              level: row.level,
+                              channelKey: channel.key,
+                              checked: !cell.enabled,
+                            });
+                          }}
+                        >
+                          <span
+                            className={`matrix-checkbox ${
+                              checked ? "matrix-checkbox--checked" : ""
+                            } ${isEmergencyRow ? "matrix-checkbox--locked" : ""}`}
+                          >
+                            {checked && (
+                              <Check size={12} className="matrix-checkbox-icon" />
+                            )}
+                          </span>
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

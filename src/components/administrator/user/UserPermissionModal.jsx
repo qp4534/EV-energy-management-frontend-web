@@ -191,14 +191,14 @@ export default function UserPermissionModal({ user, onClose, onSave, onResetPass
             <div className="account-row">
               <div>
                 <p className="account-title">비밀번호 변경</p>
-                <p className="sub">가입 이메일로 비밀번호 재설정 링크를 전송합니다.</p>
+                <p className="sub">가입 이메일로 비밀번호 재설정 인증 코드를 전송합니다.</p>
               </div>
               <button
                 className="account-btn primary"
                 onClick={handleResetPassword}
                 disabled={isResetting}
               >
-                {isResetting ? '전송 중...' : '재설정 링크 전송'}
+                {isResetting ? '전송 중...' : '재설정 코드 전송'}
               </button>
             </div>
 
