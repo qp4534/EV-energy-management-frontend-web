@@ -6,6 +6,8 @@ const RISK_LABEL = {
   UNKNOWN: "미확인",
 };
 
+// 초 단위, "KST" 표기는 카드에 담기엔 불필요한 정보라 분/날짜까지만 보여준다
+// (AiReportDetail.jsx 상단의 날짜 표시와 같은 형식으로 맞춤).
 function formatKst(value) {
   if (typeof value !== "string" || !value.includes("T")) return value;
   const date = new Date(value);
@@ -17,11 +19,10 @@ function formatKst(value) {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
     hour12: false,
   }).formatToParts(date);
   const part = (type) => parts.find((item) => item.type === type)?.value;
-  return `${part("year")}-${part("month")}-${part("day")} ${part("hour")}:${part("minute")}:${part("second")} KST`;
+  return `${part("year")}-${part("month")}-${part("day")} ${part("hour")}:${part("minute")}`;
 }
 
 function displayValue(item) {
