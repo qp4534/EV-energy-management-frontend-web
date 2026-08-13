@@ -49,16 +49,23 @@ function DashboardLayout() {
 
   // 경로(/administrator, /controller)가 특정 role 전용 구역을 가리키는지 우선 판단하고,
   // 판단이 안 되는 경로(/, /mypage 등)에서는 null로 둔다.
-  const pathImpliesRole = location.pathname.startsWith("/administrator") || location.pathname.startsWith("/admin")
-    ? "administrator"
-    : location.pathname.startsWith("/controller")
-      ? "controller"
-      : null;
+  const pathImpliesRole =
+    location.pathname.startsWith("/administrator") ||
+    location.pathname.startsWith("/admin")
+      ? "administrator"
+      : location.pathname.startsWith("/controller")
+        ? "controller"
+        : null;
 
   // 로그인은 했지만 자기 role이 아닌 대시보드 경로로 직접 들어온 경우, 주소를 바꿔도
   // 그 화면이 보이지 않도록 자기 role의 홈으로 되돌린다.
   if (isLoggedIn && pathImpliesRole && pathImpliesRole !== authRole) {
-    return <Navigate to={authRole === "administrator" ? "/administrator" : "/controller"} replace />;
+    return (
+      <Navigate
+        to={authRole === "administrator" ? "/administrator" : "/controller"}
+        replace
+      />
+    );
   }
 
   const activeRole = pathImpliesRole ?? (isLoggedIn ? authRole : userRole);
@@ -73,7 +80,11 @@ function DashboardLayout() {
         <Route path="/signup" element={<SignupConsent />} />
         <Route path="/signup/info" element={<SignupInfo />} />
         <Route path="/terms/:type" element={<Terms />} />
-        <Route path="/terms" element={<Navigate to="/terms/privacy" replace />} />
+        <Route
+          path="/terms"
+          element={<Navigate to="/terms/privacy" replace />}
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
   }
@@ -115,7 +126,10 @@ function DashboardLayout() {
                 <Route path="/admin/notices" element={<NoticeManage />} />
                 <Route path="/admin/notices/new" element={<NoticeWrite />} />
                 <Route path="/admin/notices/:id" element={<NoticeDetail />} />
-                <Route path="/admin/notices/:id/edit" element={<NoticeEdit />} />
+                <Route
+                  path="/admin/notices/:id/edit"
+                  element={<NoticeEdit />}
+                />
                 <Route path="/admin/logs" element={<LogManage />} />
                 <Route path="/admin/users" element={<UserManage />} />
                 <Route path="/admin/battery" element={<BatteryDiagnosis />} />
@@ -123,6 +137,20 @@ function DashboardLayout() {
                 <Route path="/admin/reports" element={<StatsReport />} />
               </>
             )}
+            {/* 정의 안 된 주소는 404를 띄우는 대신 본인 role의 대시보드로 되돌린다. */}
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to={
+                    activeRole === "administrator"
+                      ? "/administrator"
+                      : "/controller"
+                  }
+                  replace
+                />
+              }
+            />
           </Routes>
         </main>
       </div>
