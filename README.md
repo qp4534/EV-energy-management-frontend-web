@@ -48,6 +48,8 @@ API만 1초마다 조회한다. 온도는 `maxCellTemperatureC`를 "현재 최�
 배터리로 폴백하지 않는다. `isStale`이 참이면 오래된 온도를 현재값으로 표시하지 않고
 `데이터 지연`과 마지막 Twin 측정 시각을 표시한다.
 
+로그 관리(`Administrator/LogManage.jsx`)의 로그인 기록 탭은 `GET /api/login-logs`의 `location`(IP 기반 국가/지역), `userRole`(플랫폼 표시용) 필드까지 반영한다. 시스템 상태(`Administrator/system/SystemStatus.jsx`)의 리소스 사용량/최근 배포 이력 카드도 각각 `GET /api/system/monitor/resource-usage`, `GET /api/system/monitor/deploy-history`(GitHub Actions 실행 이력) 실호출로 붙어 있다.
+
 ## 배포
 
 GitHub Actions가 Docker 이미지를 빌드해 Docker Hub에 push하고
