@@ -9,15 +9,6 @@ export const MOCK_CAR_STATS = {
   normal: 1095,
 };
 
-// 일별 위험 차량 수 (ChartCard용)
-export const MOCK_ANOMALY_DAILY_COUNTS = [
-  { date: "7/12", count: 2 },
-  { date: "7/13", count: 4 },
-  { date: "7/14", count: 1 },
-  { date: "7/15", count: 3 },
-  { date: "7/16", count: 2 },
-];
-
 // 지도 표시용 차량 목록
 // (실제 API에서는 CAR + CHARGING_SESSION + ANOMALY_LOGS를 조인한 응답으로 예상)
 export const MOCK_CARS = [

@@ -30,6 +30,11 @@ export const useMarkReportAsRead = () => {
       queryClient.invalidateQueries({ queryKey: ["reportList"] });
       queryClient.invalidateQueries({ queryKey: ["reportDetail", reportId] });
     },
+    // 실패해도 화면엔 아무 표시가 없어서(호출부인 AiReportDetail.jsx도 에러를 안 잡음) NEW
+    // 뱃지가 왜 안 없어지는지 콘솔로도 전혀 확인할 수 없었다 - 최소한 콘솔에는 남긴다.
+    onError: (error, reportId) => {
+      console.error(`AI 보고서(${reportId}) 읽음 처리 실패:`, error);
+    },
   });
 };
 
