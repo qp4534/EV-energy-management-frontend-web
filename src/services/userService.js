@@ -173,14 +173,9 @@ export const userService = {
     await api.delete(`/api/users/${userId}`);
   },
 
-  // TODO: 백엔드에 아직 이 엔드포인트가 없음. UserController에
-  // POST /api/users/{userId}/password-reset 추가 요청 필요.
-  // 그 전까지는 호출하면 404가 날 수 있음(정상 — 백엔드 작업 후 해결됨).
-  // 이름 앞에 admin이 붙은 이유: 위 requestPasswordReset(email)은 본인이 비밀번호를
-  // 잊었을 때 이메일로 인증코드를 받는 함수라 시그니처(이메일 vs userId)와 용도가 달라서
-  // 이름이 같으면 헷갈리기 때문.
+  // 메일 발송(SMTP 핸드셰이크 포함)이라 기본 5초 타임아웃보다 오래 걸릴 수 있어서 넉넉하게 줌.
   async adminRequestPasswordReset(userId) {
-    const { data } = await api.post(`/api/users/${userId}/password-reset`);
+    const { data } = await api.post(`/api/users/${userId}/password-reset`, null, { timeout: 15000 });
     return data;
   },
 };

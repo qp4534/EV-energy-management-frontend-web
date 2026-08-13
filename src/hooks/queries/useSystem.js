@@ -32,8 +32,8 @@ export const useRiskChannelMatrix = () => {
 export const useUpdateRiskChannelCell = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ level, channelKey, checked }) =>
-      systemService.updateRiskChannelCell(level, channelKey, checked),
+    mutationFn: ({ matrixId, level, channelKey, checked }) =>
+      systemService.updateRiskChannelCell(matrixId, level, channelKey, checked),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["riskChannelMatrix"] });
     },
@@ -77,6 +77,15 @@ export const useRunBatchJob = () => {
 };
 
 // SystemStatus.jsx
+// 배포 이력은 저장해두는 곳(테이블)이 없어서 제외. 리소스 사용률만 실시간 조회.
+export const useResourceUsage = () => {
+  return useQuery({
+    queryKey: ["resourceUsage"],
+    queryFn: systemService.getResourceUsage,
+  });
+};
+
+// 리소스 사용량 + 배포 이력을 한 번에 가져옴 (systemService.getSystemStatus)
 export const useSystemStatus = () => {
   return useQuery({
     queryKey: ["systemStatus"],
@@ -89,7 +98,7 @@ export const useRefreshResourceUsage = () => {
   return useMutation({
     mutationFn: systemService.refreshResourceUsage,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["systemStatus"] });
+      queryClient.invalidateQueries({ queryKey: ["resourceUsage"] });
     },
   });
 };

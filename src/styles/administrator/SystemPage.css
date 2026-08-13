@@ -196,6 +196,10 @@
   display: inline-flex;
 }
 
+.matrix-check-btn:disabled {
+  cursor: not-allowed;
+}
+
 .matrix-checkbox {
   display: inline-flex;
   align-items: center;
@@ -210,6 +214,12 @@
 .matrix-checkbox--checked {
   background-color: var(--color-sub-text);
   border-color: var(--color-sub-text);
+}
+
+.matrix-checkbox--locked {
+  background-color: #e0725c;
+  border-color: #e0725c;
+  opacity: 0.85;
 }
 
 .matrix-checkbox-icon {

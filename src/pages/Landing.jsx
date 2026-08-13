@@ -8,9 +8,9 @@ import NoticePreviewList from "../components/landing/NoticePreviewList";
 import LandingFooter from "../components/landing/LandingFooter";
 import "../styles/Landing.css";
 
-import { MOCK_LANDING_NOTICES } from "../mocks/landingNoticeMock";
+import { useNotices } from "../hooks/queries/useNotice";
 
-// 특징 소개 카드 3종 (재사용 가능한 FeatureCard에 넘겨줄 데이터)
+// 특징 소개 카드 3종
 const FEATURES = [
   {
     icon: <Flame size={26} />,
@@ -30,6 +30,8 @@ const FEATURES = [
 ];
 
 export default function Landing() {
+  const { data: notices } = useNotices();
+
   return (
     <div className="landing-page">
       <HeroSection />
@@ -48,7 +50,7 @@ export default function Landing() {
 
         <section className="landing-notice-section">
           <SectionHeader title="공지사항" linkTo="/admin/notices" />
-          <NoticePreviewList notices={MOCK_LANDING_NOTICES} limit={3} />
+          <NoticePreviewList notices={notices ?? []} limit={3} />
         </section>
       </div>
 

@@ -111,7 +111,6 @@ export default function UserManage() {
   };
 
   // 비밀번호 재설정 링크 전송
-  // TODO: 백엔드에 POST /api/users/{userId}/password-reset 없음 — 추가되기 전까지 404
   const handleResetPassword = async (targetUser) => {
     try {
       await resetPasswordMutation.mutateAsync(targetUser.userId);
