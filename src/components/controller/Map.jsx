@@ -93,7 +93,7 @@ export default function Map({
 
   const handleVehicleClick = useCallback(
     (vehicleId) => {
-      if (vehicleId) navigate(`/controller/stat/${vehicleId}`);
+      if (vehicleId) navigate(`/controller/cars/${vehicleId}`);
     },
     [navigate],
   );
@@ -114,6 +114,7 @@ export default function Map({
             map={map}
             lat={s.latitude}
             lng={s.longitude}
+            name={s.name}
           />
         ))}
 
