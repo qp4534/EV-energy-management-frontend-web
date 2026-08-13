@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./CarDigitalTwinCard.css";
-import { issueTwinAccessToken } from "../../../services/twinService";
 
 const TWIN_BASE_URL = `${import.meta.env.BASE_URL}battery-twin/`;
 const TWIN_API_URL = (import.meta.env.VITE_TWIN_API_URL ?? "").replace(/\/$/, "");
@@ -166,64 +165,40 @@ export default function CarDigitalTwinCard({ mode = "live", vehicleId = "car-uui
     if (!TWIN_API_URL || status !== "ready") return undefined;
     let cancelled = false;
     let socket;
-    let reconnectTimer;
 
-    async function connectRemoteTwin() {
-      try {
-        const { accessToken } = await issueTwinAccessToken(vehicleId);
-        if (cancelled) return;
-        if (isHistory) {
-          setRemoteHistoryFailed(false);
-          setDataSource("사고 이력 불러오는 중...");
-          const response = await fetch(
-            `${TWIN_API_URL}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/incidents/latest/history?resolution_seconds=30`,
-            { headers: { Authorization: `Bearer ${accessToken}` } },
-          );
+    if (isHistory) {
+      setRemoteHistoryFailed(false);
+      setDataSource("사고 이력 불러오는 중...");
+      fetch(`${TWIN_API_URL}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/incidents/latest/history?resolution_seconds=30`)
+        .then((response) => {
           if (!response.ok) throw new Error(String(response.status));
-          const payload = await response.json();
+          return response.json();
+        })
+        .then((payload) => {
           if (cancelled || !payload.frames?.length) return;
           setRemoteFrames(payload.frames.map(toRenderFrame));
           setFrameIndex(0);
           setDataSource("사고 이력 API · 30초 간격");
-          return;
-        }
-
-        const wsBase = TWIN_API_URL.replace(/^http/, "ws");
-        socket = new WebSocket(
-          `${wsBase}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/live`,
-          ["twin-v1", `auth.${accessToken}`],
-        );
-        socket.onmessage = (event) => {
-          if (cancelled) return;
-          const frame = toRenderFrame(JSON.parse(event.data));
-          setRemoteFrames([frame]);
-          setFrameIndex(0);
-          setDataSource("WebSocket 실시간 · 1Hz");
-        };
-        socket.onerror = () => setDataSource("연결 대기 · 로컬 시뮬레이션");
-        socket.onclose = () => {
-          if (!cancelled) {
-            setDataSource("연결 재인증 중 · 로컬 시뮬레이션");
-            reconnectTimer = window.setTimeout(connectRemoteTwin, 2_000);
-          }
-        };
-      } catch {
-        if (cancelled) return;
-        if (isHistory) {
+        })
+        .catch(() => {
           setRemoteHistoryFailed(true);
           setDataSource("사고 이력 없음 · 로컬 시뮬레이션");
-        } else {
-          setDataSource("권한 확인 실패 · 로컬 시뮬레이션");
-          reconnectTimer = window.setTimeout(connectRemoteTwin, 5_000);
-        }
-      }
+        });
+    } else {
+      const wsBase = TWIN_API_URL.replace(/^http/, "ws");
+      socket = new WebSocket(`${wsBase}/api/v1/twins/vehicles/${encodeURIComponent(vehicleId)}/live`);
+      socket.onmessage = (event) => {
+        if (cancelled) return;
+        const frame = toRenderFrame(JSON.parse(event.data));
+        setRemoteFrames([frame]);
+        setFrameIndex(0);
+        setDataSource("WebSocket 실시간 · 1Hz");
+      };
+      socket.onerror = () => setDataSource("연결 대기 · 로컬 시뮬레이션");
     }
-
-    connectRemoteTwin();
 
     return () => {
       cancelled = true;
-      window.clearTimeout(reconnectTimer);
       socket?.close();
     };
   }, [isHistory, status, vehicleId]);
