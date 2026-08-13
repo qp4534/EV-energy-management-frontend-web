@@ -1,5 +1,4 @@
 import api from "../api/axios";
-import { MOCK_ANOMALY_DAILY_COUNTS } from "../mocks/carMock";
 import { MOCK_THERMAL_STREAMS } from "../mocks/anomalyMock";
 
 const RISK_LEVEL_TO_PIN_STATUS = {
@@ -77,7 +76,11 @@ export const carService = {
   },
 
   getDailyDangerCarCount: async () => {
-    return MOCK_ANOMALY_DAILY_COUNTS;
+    const overview = await fetchVehicleRiskOverview();
+    return overview.dailyRiskCounts.map(({ date, count }) => {
+      const [, month, day] = date.split("-");
+      return { date: `${Number(month)}/${Number(day)}`, count };
+    });
   },
 
   getCarSummaryList: async () => {
