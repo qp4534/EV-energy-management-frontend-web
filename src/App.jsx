@@ -84,7 +84,13 @@ function DashboardLayout() {
       <Header role={activeRole} />
       <div className="main-layout">
         <Sidebar role={activeRole} />
-        <main className="content-area">
+        <main
+          className={`content-area${
+            location.pathname.startsWith("/controller")
+              ? " content-area--controller"
+              : ""
+          }`}
+        >
           <Routes>
             <Route path="/mypage" element={<MyPage />} />
             {activeRole === "controller" ? (

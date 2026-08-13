@@ -23,3 +23,8 @@
   padding: 20px;
   overflow-y: auto;
 }
+
+/* 관제 화면의 마지막 내용이 우측 하단 챗봇 버튼과 겹치지 않도록 여백 확보 */
+.content-area--controller {
+  padding-bottom: 110px;
+}
