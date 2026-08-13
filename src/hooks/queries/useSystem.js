@@ -85,6 +85,14 @@ export const useResourceUsage = () => {
   });
 };
 
+// 리소스 사용량 + 배포 이력을 한 번에 가져옴 (systemService.getSystemStatus)
+export const useSystemStatus = () => {
+  return useQuery({
+    queryKey: ["systemStatus"],
+    queryFn: systemService.getSystemStatus,
+  });
+};
+
 export const useRefreshResourceUsage = () => {
   const queryClient = useQueryClient();
   return useMutation({

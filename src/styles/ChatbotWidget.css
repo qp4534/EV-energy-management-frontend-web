@@ -38,7 +38,10 @@
   bottom: 78px;
   width: min(348px, calc(100vw - 28px));
   height: min(590px, calc(100vh - 125px));
+  min-width: 300px;
   min-height: 430px;
+  max-width: min(720px, calc(100vw - 44px));
+  max-height: calc(100vh - 112px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -47,6 +50,53 @@
   background: #faf9f4;
   box-shadow: 2px 4px 9px rgba(0, 0, 0, 0.28);
   animation: chatbot-panel-open 0.18s ease-out;
+}
+
+.chatbot-panel--resizing {
+  user-select: none;
+}
+
+.chatbot-resize-handle {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 3;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.chatbot-resize-handle::before,
+.chatbot-resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+}
+
+.chatbot-resize-handle::before {
+  width: 10px;
+  height: 10px;
+}
+
+.chatbot-resize-handle::after {
+  width: 5px;
+  height: 5px;
+}
+
+.chatbot-resize-handle:hover,
+.chatbot-resize-handle:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.13);
+  color: #ffffff;
 }
 
 @keyframes chatbot-panel-open {
@@ -66,7 +116,7 @@
   grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 8px;
-  padding: 0 12px 0 18px;
+  padding: 0 12px 0 35px;
   border-radius: 13px 13px 9px 9px;
   background: #0d4938;
   color: #ffffff;
@@ -312,9 +362,20 @@
 
   .chatbot-panel {
     bottom: 70px;
-    width: calc(100vw - 28px);
-    height: min(560px, calc(100vh - 100px));
+    width: calc(100vw - 28px) !important;
+    height: min(560px, calc(100vh - 100px)) !important;
+    min-width: 0;
     min-height: 390px;
+    max-width: calc(100vw - 28px);
+    max-height: calc(100vh - 100px);
+  }
+
+  .chatbot-resize-handle {
+    display: none;
+  }
+
+  .chatbot-header {
+    padding-left: 18px;
   }
 }
 

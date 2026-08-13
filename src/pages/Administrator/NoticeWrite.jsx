@@ -5,8 +5,6 @@ import { useProfile } from "../../hooks/queries/useUser";
 import { noticeAttachmentService } from "../../services/noticeAttachmentService";
 import "../../styles/administrator/NoticeForm.css";
 
-const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER" };
-
 function NoticeWrite() {
   const navigate = useNavigate();
   const { data: profile } = useProfile();
@@ -14,7 +12,9 @@ function NoticeWrite() {
 
   const handleSubmit = async (formData) => {
     // NoticeForm은 "target"으로 넘기지만 백엔드 NoticeDto는 "targetRole"이라 이름을 맞춰줌.
-    // ERD상 target_role은 'ADMIN'/'CONTROLLER'만 허용하고, "전체"는 null(제한 없음)로 표현.
+    // ERD상 target_role은 'ADMIN'/'CONTROLLER'/'USER'만 허용하고, "전체"는 null(제한 없음)로
+    // 표현한다 (NoticeEdit.jsx와 동일한 매핑 - 여기 없어서 한글 값이 그대로 저장되던 버그였음).
+    const TARGET_ROLE_MAP = { 전체: null, 관리자: "ADMIN", 관제자: "CONTROLLER", 이용자: "USER" };
     const { target, file, ...rest } = formData;
 
     try {

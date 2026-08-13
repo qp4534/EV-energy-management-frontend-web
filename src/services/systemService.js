@@ -3,13 +3,12 @@
 import api from "../api/axios";
 import { MOCK_BACKUPS } from "../mocks/systemMock";
 
-// 알림 채널/매트릭스/연동/배치실행/리소스는 실제 API 연결 완료.
+// 알림 채널/매트릭스/연동/배치실행/리소스/배포이력은 실제 API 연결 완료.
 // 백업만 별도로 기록해두는 곳(테이블)이 없어서 mock 유지.
 const USE_MOCK = true;
 
 export const systemService = {
   // SystemAlertChannel.jsx "채널 활성화" 카드
-  // TEMP: USE_MOCK과 무관하게 항상 실제 API 호출.
   // 백엔드: [{ channelId, channelName, isActive, updatedAt }]
   // 프론트가 원하는 형태: [{ key, label, enabled, desc }]로 변환해서 반환
   getNotificationChannels: async () => {
@@ -31,9 +30,9 @@ export const systemService = {
   },
 
   // SystemAlertChannel.jsx "위험도별 발송 매트릭스" 카드
-  // TEMP: USE_MOCK과 무관하게 항상 실제 API 호출.
   // 백엔드: [{ matrixId, riskLevel, isEnabled, channelId }] (평평한 리스트)
-  // 프론트가 원하는 형태: { channels, rows } 표 형태로 변환
+  // 프론트가 원하는 형태: { channels, rows } 표 형태로 변환.
+  // 셀 하나를 수정하려면 matrixId가 있어야 해서, 각 셀에 matrixId도 같이 담아둠.
   getRiskChannelMatrix: async () => {
     const res = await api.get("/api/notification-matrix");
     const channelKeys = [...new Set(res.data.map((m) => m.channelId))];
@@ -123,6 +122,26 @@ export const systemService = {
   getResourceUsage: async () => {
     const response = await api.get("/api/system/monitor/resource-usage");
     return response.data;
+  },
+
+  // SystemStatus.jsx - 리소스 사용량/배포 이력 둘 다 실제 API 연결 완료
+  // 백엔드: GET /api/system/monitor/resource-usage -> [{ key, label, percent }]
+  //        GET /api/system/monitor/deploy-history  -> [{ version, repo, desc, deployedAt, status }]
+  // 프론트가 원하는 형태({ version, date, desc })에 맞춰 deployedAt만 로컬 포맷으로 변환
+  getSystemStatus: async () => {
+    const [resourceUsageRes, deployHistoryRes] = await Promise.all([
+      api.get("/api/system/monitor/resource-usage"),
+      api.get("/api/system/monitor/deploy-history"),
+    ]);
+    return {
+      resourceUsage: resourceUsageRes.data,
+      deployHistory: deployHistoryRes.data.map((entry) => ({
+        version: entry.version,
+        date: entry.deployedAt ? new Date(entry.deployedAt).toLocaleString("ko-KR") : "-",
+        desc: entry.desc,
+        status: entry.status,
+      })),
+    };
   },
 
   refreshResourceUsage: async () => {

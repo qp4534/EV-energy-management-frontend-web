@@ -77,6 +77,7 @@ function NoticeForm({ initialData, onSubmit, onCancel, submitLabel = "등록" })
             <option value="전체">전체</option>
             <option value="관리자">관리자</option>
             <option value="관제자">관제자</option>
+            <option value="이용자">이용자(차주)</option>
           </select>
         </div>
 
