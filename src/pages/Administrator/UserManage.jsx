@@ -4,6 +4,7 @@ import SearchFilterSection from '../../components/administrator/user/SearchFilte
 import UserTable from '../../components/administrator/user/UserTable';
 import UserPermissionModal from '../../components/administrator/user/UserPermissionModal';
 import Pagination from '../../components/common/Pagination';
+import LoadingIndicator from '../../components/common/LoadingIndicator';
 import {
   useUsers,
   useUpdateUser,
@@ -142,7 +143,9 @@ export default function UserManage() {
       />
 
       {isLoading ? (
-        <div className="user-management-status">불러오는 중...</div>
+        <div className="user-management-status">
+          <LoadingIndicator />
+        </div>
       ) : error ? (
         <div className="user-management-status user-management-status--error">
           회원 목록을 불러오지 못했습니다.

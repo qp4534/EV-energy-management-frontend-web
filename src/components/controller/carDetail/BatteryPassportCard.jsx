@@ -2,6 +2,7 @@ import {
   useBatteryByCarId,
   useLatestTwinMeasurementByCarId,
 } from "@/hooks/queries/useBattery";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 const formatMeasurementAge = (ageSeconds) => {
   if (ageSeconds === null || ageSeconds === undefined || ageSeconds === "") {
@@ -31,7 +32,7 @@ export default function BatteryPassportCard({ carId }) {
     return (
       <div className="card flex h-full flex-col gap-3">
         <h2>배터리 여권</h2>
-        <p className="text-sm text-[var(--color-btn-desc)]">불러오는 중...</p>
+        <LoadingIndicator />
       </div>
     );
   }

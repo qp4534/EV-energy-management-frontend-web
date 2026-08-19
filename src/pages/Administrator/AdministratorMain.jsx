@@ -1,16 +1,44 @@
 import UserCard from "../../components/administrator/main/UserCard";
 import NoticeCard from "../../components/administrator/main/NoticeCard";
 import FlowChartCard from "../../components/administrator/main/FlowChartCard";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 import { useNotices } from "../../hooks/queries/useNotice";
-import { useMemberFlow, useAccountStatusTrend } from "../../hooks/queries/useDashboard";
+import {
+  useMemberFlow,
+  useAccountStatusTrend,
+  useCarModelDistribution,
+  useUserRoleDistribution,
+} from "../../hooks/queries/useDashboard";
 
 import "../../styles/administrator/Administrator.css";
 
 export default function AdministratorMain() {
-  const { data: notices } = useNotices();
-  const { data: memberFlow } = useMemberFlow();
-  const { data: accountFlow } = useAccountStatusTrend();
+  const { data: notices, isLoading: isNoticesLoading } = useNotices();
+  const { data: memberFlow, isLoading: isMemberFlowLoading } = useMemberFlow();
+  const { data: accountFlow, isLoading: isAccountFlowLoading } = useAccountStatusTrend();
+  const { isLoading: isCarModelLoading } = useCarModelDistribution();
+  const { isLoading: isUserRoleLoading } = useUserRoleDistribution();
+
+  // ControllerMain과 동일하게, 카드별 개별 스피너 대신 초기 로딩(isLoading)만
+  // 한 번에 묶어서 페이지 단위로 보여준다.
+  const isDashboardLoading =
+    isNoticesLoading ||
+    isMemberFlowLoading ||
+    isAccountFlowLoading ||
+    isCarModelLoading ||
+    isUserRoleLoading;
+
+  if (isDashboardLoading) {
+    return (
+      <div className="dashboard-page">
+        <h2>관리자 메인 페이지</h2>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <LoadingIndicator size="lg" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-page">

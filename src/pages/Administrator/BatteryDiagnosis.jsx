@@ -13,6 +13,7 @@ import ReuseJudgementCard from "../../components/administrator/battery/ReuseJudg
 import BatteryStatCard from "../../components/administrator/battery/BatteryStatCard";
 import BuyerCard from "../../components/administrator/battery/BuyerCard";
 import BuyerTable from "../../components/administrator/battery/BuyerTable";
+import LoadingIndicator from "../../components/common/LoadingIndicator";
 import ProposalContent from "../../components/administrator/battery/ProposalContent";
 import { useCarOptions } from "../../hooks/queries/useCar";
 import {
@@ -189,7 +190,9 @@ export default function BatteryDiagnosis() {
           )}
 
           {diagnosedCarId && isDiagnosing && (
-            <div className="placeholder-card">불러오는 중...</div>
+            <div className="placeholder-card">
+              <LoadingIndicator />
+            </div>
           )}
 
           {diagnosedCarId && !isDiagnosing && (isDiagnosisError || !diagnosisData) && (
@@ -292,7 +295,9 @@ export default function BatteryDiagnosis() {
           )}
 
           {diagnosedCarId && (isDiagnosing || isProposalFetching) && (
-            <div className="placeholder-card">제안서를 불러오는 중...</div>
+            <div className="placeholder-card">
+              <LoadingIndicator text="제안서를 불러오는 중..." />
+            </div>
           )}
 
           {diagnosedCarId &&

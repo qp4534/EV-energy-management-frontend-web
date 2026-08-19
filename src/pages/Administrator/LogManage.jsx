@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import TabBar from "../../components/administrator/common/TabBar";
 import DataTable from "../../components/administrator/common/DataTable";
 import Pagination from "../../components/common/Pagination";
+import LoadingIndicator from "../../components/common/LoadingIndicator";
 import { logService } from "../../services/logService";
 import "../../styles/administrator/LogManage.css";
 
@@ -183,7 +184,9 @@ export default function LogManage() {
       </div>
 
       {isLoading ? (
-        <div className="log-manage-status">불러오는 중...</div>
+        <div className="log-manage-status">
+          <LoadingIndicator />
+        </div>
       ) : error ? (
         <div className="log-manage-status log-manage-status--error">{error}</div>
       ) : (

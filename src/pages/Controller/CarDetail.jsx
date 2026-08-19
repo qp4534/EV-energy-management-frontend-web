@@ -11,6 +11,7 @@ import StatusCard from "@/components/controller/carDetail/StatusCard";
 import LocationCard from "@/components/controller/carDetail/LocationCard";
 import ReportList from "@/components/controller/report/ReportList";
 import ExpandButton from "@/components/ExpandButton";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 export default function CarDetail() {
   // 라우트가 "/controller/cars/:id"이므로 파라미터 이름이 id다 (carId 아님, AiReportDetail과 동일한 이슈)
@@ -29,9 +30,7 @@ export default function CarDetail() {
   });
 
   if (isLoading) {
-    return (
-      <p className="p-6 text-sm text-[var(--color-btn-desc)]">불러오는 중...</p>
-    );
+    return <LoadingIndicator />;
   }
 
   if (isError || !car) {

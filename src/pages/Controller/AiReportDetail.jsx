@@ -13,6 +13,7 @@ import {
   useReportDetail,
 } from "@/hooks/queries/useReport";
 import ReportSectionRenderer from "@/components/controller/reportDetail/ReportSectionRenderer";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 import {
   REPORT_RISK_BADGE_LABEL,
   REPORT_RISK_COLOR,
@@ -79,9 +80,7 @@ export default function AiReportDetail() {
   };
 
   if (isLoading) {
-    return (
-      <p className="p-6 text-sm text-[var(--color-btn-desc)]">불러오는 중...</p>
-    );
+    return <LoadingIndicator />;
   }
 
   if (isError || !report) {

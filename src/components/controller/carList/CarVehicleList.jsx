@@ -1,4 +1,5 @@
 import CarVehicleRow from "./CarVehicleRow";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 const COLUMNS = [
   "위험도",
@@ -25,11 +26,8 @@ export default function CarVehicleList({ cars, isLoading, onStopCharging }) {
       <tbody>
         {isLoading ? (
           <tr>
-            <td
-              colSpan={COLUMNS.length}
-              className="py-10 text-center text-sm text-[var(--color-btn-desc)]"
-            >
-              불러오는 중...
+            <td colSpan={COLUMNS.length}>
+              <LoadingIndicator size="sm" />
             </td>
           </tr>
         ) : cars.length === 0 ? (

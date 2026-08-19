@@ -7,6 +7,7 @@ import { clearAuth } from "../hooks/common/useAuth";
 import PasswordInput from "../components/auth/PasswordInput";
 import AuthButton from "../components/auth/AuthButton";
 import { formatPhoneNumber } from "../utils/phone";
+import LoadingIndicator from "../components/common/LoadingIndicator";
 import "../styles/MyPage.css";
 
 export default function MyPage() {
@@ -112,7 +113,11 @@ export default function MyPage() {
   };
 
   if (isLoading) {
-    return <div className="mypage">불러오는 중...</div>;
+    return (
+      <div className="mypage">
+        <LoadingIndicator />
+      </div>
+    );
   }
 
   const avatarSrc = avatarPreview || form.profileImageUrl || null;

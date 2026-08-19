@@ -1,5 +1,6 @@
 import Map from "@/components/controller/Map";
 import { useStationByCarId } from "@/hooks/queries/useCharging";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 const RISK_TO_MAP_STATUS = {
   긴급: "danger",
@@ -15,7 +16,7 @@ export default function LocationCard({ carId, riskLevel }) {
     return (
       <div className="card flex h-full flex-col gap-3">
         <h2>상세 위치</h2>
-        <p className="text-sm text-[var(--color-btn-desc)]">불러오는 중...</p>
+        <LoadingIndicator />
       </div>
     );
   }

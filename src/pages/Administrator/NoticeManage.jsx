@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/common/Pagination";
 import { useNotices } from "../../hooks/queries/useNotice";
+import LoadingIndicator from "../../components/common/LoadingIndicator";
 import "../../styles/administrator/NoticeManage.css";
 
 const PAGE_SIZE = 10;
@@ -78,7 +79,9 @@ function NoticeManage() {
       </div>
 
       {isLoading ? (
-        <div className="notice-empty">불러오는 중...</div>
+        <div className="notice-empty">
+          <LoadingIndicator />
+        </div>
       ) : error ? (
         <div className="notice-empty">공지사항을 불러오지 못했습니다.</div>
       ) : (

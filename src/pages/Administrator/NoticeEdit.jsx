@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useNoticeDetail, useUpdateNotice, useNoticeAttachments } from "../../hooks/queries/useNotice";
 import NoticeForm from "../../components/administrator/notice/NoticeForm";
 import { noticeAttachmentService } from "../../services/noticeAttachmentService";
+import LoadingIndicator from "../../components/common/LoadingIndicator";
 import "../../styles/administrator/NoticeForm.css";
 
 function NoticeEdit() {
@@ -56,7 +57,12 @@ function NoticeEdit() {
     }
   };
 
-  if (isLoading || !initialData) return <div className="notice-detail-loading">불러오는 중...</div>;
+  if (isLoading || !initialData)
+    return (
+      <div className="notice-detail-loading">
+        <LoadingIndicator />
+      </div>
+    );
 
   // 백엔드 targetRole('ADMIN'/'CONTROLLER'/null) -> 화면 드롭다운 값(한글)으로 역변환
   const ROLE_TO_TARGET_MAP = { ADMIN: "관리자", CONTROLLER: "관제자", USER: "이용자" };
