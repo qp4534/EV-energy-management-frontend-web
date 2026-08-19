@@ -3,6 +3,7 @@ import Map from "@/components/controller/Map";
 import MapLegend from "@/components/controller/MapLegend";
 import { useStations } from "@/hooks/queries/useCharging";
 import { useCarList } from "@/hooks/queries/useCar";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 export default function ControllerMap() {
   const { data: stations = [], isLoading: isStationsLoading } = useStations();
@@ -22,7 +23,7 @@ export default function ControllerMap() {
   if (isStationsLoading || isVehiclesLoading) {
     return (
       <div className="card">
-        <p>지도 데이터를 불러오는 중입니다...</p>
+        <LoadingIndicator text="지도 데이터를 불러오는 중입니다..." />
       </div>
     );
   }

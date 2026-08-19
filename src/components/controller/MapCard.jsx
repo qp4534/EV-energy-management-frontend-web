@@ -3,6 +3,7 @@ import Map from "./Map";
 import { useStations } from "@/hooks/queries/useCharging";
 import { useCarList } from "@/hooks/queries/useCar";
 import ExpandButton from "../ExpandButton";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 import { FaGasPump } from "react-icons/fa";
 import { FaCar } from "react-icons/fa6";
@@ -43,7 +44,7 @@ export default function MapCard() {
   if (isStationsLoading || isVehiclesLoading) {
     return (
       <div className="card">
-        <p>지도 데이터를 불러오는 중입니다...</p>
+        <LoadingIndicator text="지도 데이터를 불러오는 중입니다..." />
       </div>
     );
   }

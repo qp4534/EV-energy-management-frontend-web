@@ -1,4 +1,5 @@
 import ReportRow from "./ReportRow";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 export default function ReportList({
   reports,
@@ -6,11 +7,7 @@ export default function ReportList({
   showCarNumber = true,
 }) {
   if (isLoading) {
-    return (
-      <p className="py-10 text-center text-sm text-[var(--color-btn-desc)]">
-        불러오는 중...
-      </p>
-    );
+    return <LoadingIndicator />;
   }
 
   if (reports.length === 0) {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useNotices, useNoticeDetail, useDeleteNotice, useMarkNoticeAsRead, useNoticeAttachments } from "../../hooks/queries/useNotice";
 import { useUserById } from "../../hooks/queries/useUser";
+import LoadingIndicator from "../../components/common/LoadingIndicator";
 import "../../styles/administrator/NoticeDetail.css";
 
 const TARGET_ROLE_LABEL = { ADMIN: "관리자", CONTROLLER: "관제자", USER: "이용자(차주)" };
@@ -56,7 +57,12 @@ function NoticeDetail() {
     }
   };
 
-  if (isLoading || !notice) return <div className="notice-detail-loading">불러오는 중...</div>;
+  if (isLoading || !notice)
+    return (
+      <div className="notice-detail-loading">
+        <LoadingIndicator />
+      </div>
+    );
 
   // "2026-08-01T03:58:56Z" -> "2026-08-01 12:58"
   const formattedDate = (() => {

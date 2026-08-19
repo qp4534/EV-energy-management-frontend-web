@@ -2,6 +2,7 @@ import React from "react";
 import ExpandButton from "../ExpandButton";
 import { useCarSummaryList } from "@/hooks/queries/useCar";
 import CarTableRow from "./CarTableRow";
+import LoadingIndicator from "@/components/common/LoadingIndicator";
 
 export default function CarTableCard() {
   const { data: carList, isLoading, isError } = useCarSummaryList();
@@ -9,7 +10,7 @@ export default function CarTableCard() {
   if (isLoading) {
     return (
       <div className="card h-full flex items-center justify-center">
-        <p className="text-gray-500">데이터를 불러오는 중입니다...</p>
+        <LoadingIndicator />
       </div>
     );
   }
