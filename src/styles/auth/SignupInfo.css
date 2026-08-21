@@ -118,6 +118,12 @@
   margin: 0;
 }
 
+.signup-info-email-hint {
+  color: var(--color-sub-text);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
 .signup-info-submit {
   margin-top: 16px;
   width: 100%;
