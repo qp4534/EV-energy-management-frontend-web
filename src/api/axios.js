@@ -32,7 +32,7 @@ const PUBLIC_AUTH_PATHS = [
 ];
 
 // 그 외 요청이 401을 받으면 토큰이 없거나 만료/위조된 것이므로, 로컬 인증 상태를 지우고
-// 로그인 화면으로 돌려보낸다. axios.js는 React 트리 밖이라 react-router navigate를 못 쓰므로
+// 루트(랜딩) 화면으로 돌려보낸다. axios.js는 React 트리 밖이라 react-router navigate를 못 쓰므로
 // 풀 리로드로 처리한다.
 api.interceptors.response.use(
   (response) => response,
@@ -45,8 +45,8 @@ api.interceptors.response.use(
 
     if (status === 401 && !isPublicAuthRequest) {
       clearAuth();
-      if (!window.location.pathname.startsWith("/login")) {
-        window.location.href = "/login";
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
       }
     }
 
