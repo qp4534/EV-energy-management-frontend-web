@@ -40,7 +40,7 @@ export default function ResetPasswordRequest() {
       await userService.requestPasswordReset(email);
       setCodeSent(true);
       setMessage("인증번호를 보냈어요. 이메일을 확인해주세요.");
-      setCooldown(60);
+      setCooldown(120);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -111,6 +111,12 @@ export default function ResetPasswordRequest() {
 
         {message && <p className={verified ? "reset-success" : "reset-error"}>{message}</p>}
         {error && <p className="reset-error">{error}</p>}
+
+        {codeSent && !verified && (
+          <p className="reset-email-hint">
+            구글 메일 인증 특성상 인증번호 도착까지 최대 1~2분 정도 걸릴 수 있어요. 조금만 기다려주세요.
+          </p>
+        )}
 
         {verified && (
           <div className="reset-sent-notice">

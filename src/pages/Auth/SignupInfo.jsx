@@ -66,7 +66,7 @@ export default function SignupInfo() {
       await userService.sendVerificationCode(form.email);
       setEmailCodeSent(true);
       setEmailMessage("인증번호를 보냈어요. 이메일을 확인해주세요.");
-      setCooldown(60);
+      setCooldown(120);
     } catch (err) {
       setEmailMessage(err.response?.data?.message || err.message);
     } finally {
@@ -220,6 +220,12 @@ export default function SignupInfo() {
           {emailMessage && (
             <p className={emailVerified ? "signup-info-email-success" : "signup-info-error"}>
               {emailMessage}
+            </p>
+          )}
+
+          {emailCodeSent && !emailVerified && (
+            <p className="signup-info-email-hint">
+              구글 메일 인증 특성상 인증번호 도착까지 최대 1~2분 정도 걸릴 수 있어요. 조금만 기다려주세요.
             </p>
           )}
 
